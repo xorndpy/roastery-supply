@@ -1,59 +1,110 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Roastery Supply — E-Commerce Mesin Kopi
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+> Tugas Akhir [kelompok 5] — []  
+> Program Studi [sistem informasi] — [TI]  
+> [Nama Universitas] — [2024]
 
-## About Laravel
+Platform e-commerce untuk penjualan mesin kopi profesional (espresso machine, grinder, milk frother) dengan fitur **viewer 3D interaktif** untuk melihat detail produk.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 📖 Deskripsi
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Roastery Supply adalah aplikasi web e-commerce yang dirancang untuk memenuhi kebutuhan kedai kopi dalam membeli mesin kopi profesional. Aplikasi ini menyediakan pengalaman belanja yang modern dengan dukungan tampilan 3D untuk produk mesin kopi.
 
-## Learning Laravel
+### Fitur Utama
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+**Customer:**
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- Katalog produk dengan filter kategori, merek, harga
+- Detail produk dengan **viewer 3D** (model-viewer)
+- Keranjang belanja
+- Checkout dengan alamat pengiriman
+- Upload bukti pembayaran
+- Riwayat pesanan + tracking resi
+- Profil pengguna
 
-## Laravel Sponsors
+**Admin:**
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- Dashboard dengan statistik & chart penjualan
+- Manajemen produk (CRUD, upload gambar + model 3D)
+- Manajemen kategori & merek
+- Manajemen pesanan (konfirmasi pembayaran → proses → kirim → selesai)
+- Manajemen stok + peringatan stok menipis
+- Manajemen pelanggan
+- Laporan penjualan (export Excel/PDF)
+- Manajemen user & role (RBAC)
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## 🛠️ Tech Stack
 
-## Contributing
+| Layer          | Teknologi                        |
+| -------------- | -------------------------------- |
+| Backend        | Laravel 12 (PHP 8.4+)            |
+| Template       | Blade                            |
+| Styling        | Tailwind CSS                     |
+| Interaktivitas | Alpine.js + Livewire 3           |
+| Database       | MySQL 8                          |
+| Auth           | Laravel Breeze + Sanctum         |
+| Permission     | spatie/laravel-permission        |
+| Activity Log   | spatie/laravel-activitylog       |
+| 3D Viewer      | `<model-viewer>` (web component) |
+| PDF            | barryvdh/laravel-dompdf          |
+| Excel          | maatwebsite/excel                |
+| Chart          | Chart.js                         |
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## 📸 Screenshot
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Halaman Customer
 
-## Security Vulnerabilities
+**Home Page:**
+![Home](docs/screenshots/home.png)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+**Katalog Produk:**
+![Katalog](docs/screenshots/katalog.png)
 
-## License
+**Detail Produk dengan 3D Viewer:**
+![Detail Produk](docs/screenshots/detail-produk.png)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+**Keranjang Belanja:**
+![Cart](docs/screenshots/cart.png)
+
+**Checkout:**
+![Checkout](docs/screenshots/checkout.png)
+
+### Halaman Admin
+
+**Dashboard Admin:**
+![Dashboard Admin](docs/screenshots/admin-dashboard.png)
+
+**Manajemen Produk:**
+![Produk](docs/screenshots/admin-produk.png)
+
+**Manajemen Pesanan:**
+![Pesanan](docs/screenshots/admin-pesanan.png)
+
+> _Catatan: Buat folder `docs/screenshots/` di root project, taruh screenshot di sana._
+
+---
+
+## 🚀 Cara Install
+
+### Prasyarat
+
+- PHP 8.4+
+- Composer
+- Node.js 18+ & npm
+- MySQL 8+
+- Laragon / XAMPP / Docker
+
+### Langkah Instalasi
+
+**1. Clone repository**
+
+```bash
+git clone https://github.com/[username]/roastery-supply.git
+cd roastery-supply
+```
