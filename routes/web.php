@@ -184,10 +184,11 @@ Route::prefix('admin')
         // Penjualan - Payments
         // ---------------------------------------------------------------
         Route::prefix('payments')->as('payments.')->group(function () {
-            Route::get('/', [PaymentController::class, 'index'])->name('index');
-            Route::post('/{id}/verify', [PaymentController::class, 'verify'])->name('verify');
-            Route::post('/{id}/reject', [PaymentController::class, 'reject'])->name('reject');
-        });
+        Route::get('/', [PaymentController::class, 'index'])->name('index');
+        Route::get('/{payment}', [PaymentController::class, 'show'])->name('show');
+        Route::post('/{payment}/verify', [PaymentController::class, 'verify'])->name('verify');
+        Route::post('/{payment}/reject', [PaymentController::class, 'reject'])->name('reject');
+    });
 
         // Penjualan - Shipments
         Route::get('/shipments', [ShipmentController::class, 'index'])->name('shipments.index');

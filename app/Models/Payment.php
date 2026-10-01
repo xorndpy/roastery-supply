@@ -2,15 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Payment extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $fillable = [
         'order_id',
@@ -23,18 +21,13 @@ class Payment extends Model
         'note',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'order_id' => 'integer',
-            'amount' => 'decimal:2',
-            'verified_by' => 'integer',
-            'verified_at' => 'datetime',
-        ];
-    }
+    protected $casts = [
+        'amount' => 'decimal:2',
+        'verified_at' => 'datetime',
+    ];
 
     /**
-     * Order associated with this payment.
+     * Relasi ke Order
      */
     public function order(): BelongsTo
     {
@@ -42,49 +35,34 @@ class Payment extends Model
     }
 
     /**
-     * User (staff/admin) who verified the payment.
+     * Relasi ke User yang verify (admin/staff)
      */
-    public function verifiedBy(): BelongsTo
+    public function verifier(): BelongsTo
     {
         return $this->belongsTo(User::class, 'verified_by');
     }
 
     /**
-     * Scope pending payments.
+     * Scope: pembayaran pending
      */
-    public function scopePending(Builder $query): Builder
+    public function scopePending($query)
     {
         return $query->where('status', 'pending');
     }
 
     /**
-     * Verify payment and update order status.
+     * Scope: pembayaran verified
      */
-    public function verify(?int $userId = null): bool
+    public function scopeVerified($query)
     {
-        $updated = $this->update([
-            'status' => 'verified',
-            'verified_by' => $userId ?? auth()->id(),
-            'verified_at' => now(),
-        ]);
-
-        if ($updated && $this->order) {
-            $this->order->confirmPayment();
-        }
-
-        return $updated;
+        return $query->where('status', 'verified');
     }
 
     /**
-     * Reject payment with reason.
+     * Scope: pembayaran rejected
      */
-    public function reject(?string $note = null, ?int $userId = null): bool
+    public function scopeRejected($query)
     {
-        return $this->update([
-            'status' => 'rejected',
-            'verified_by' => $userId ?? auth()->id(),
-            'verified_at' => now(),
-            'note' => $note ?? $this->note,
-        ]);
+        return $query->where('status', 'rejected');
     }
 }
