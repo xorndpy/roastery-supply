@@ -152,7 +152,10 @@ Route::prefix('admin')
         Route::patch('products/{product}/toggle-featured', [ProductController::class, 'toggleFeatured'])->name('products.toggle-featured');
 
         Route::resource('categories', CategoryController::class);
+        Route::patch('categories/{category}/toggle-active', [CategoryController::class, 'toggleActive'])->name('categories.toggle-active');
+
         Route::resource('brands', BrandController::class);
+        Route::patch('brands/{brand}/toggle-active', [BrandController::class, 'toggleActive'])->name('brands.toggle-active');
 
         // ---------------------------------------------------------------
         // Stok
