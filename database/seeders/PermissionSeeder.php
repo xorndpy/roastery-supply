@@ -41,6 +41,8 @@ class PermissionSeeder extends Seeder
                 'verify_payments',
                 'reject_payments',
                 'manage_shipments',
+                'view_shipping_rates',
+                'manage_shipping_rates',
                 'view_returns',
                 'approve_returns',
                 'reject_returns',

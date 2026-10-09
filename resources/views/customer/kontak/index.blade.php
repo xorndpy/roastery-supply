@@ -9,6 +9,15 @@
         <h1 class="text-4xl font-bold mb-2">Hubungi Kami</h1>
         <p class="text-stone-600 mb-8">Ada pertanyaan? Tim kami siap membantu.</p>
 
+        @if($site['contact_email'] || $site['contact_phone'] || $site['contact_whatsapp'] || $site['contact_address'])
+            <div class="mb-8 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                @if($site['contact_email'])<div><div class="text-stone-500">Email</div><a href="mailto:{{ $site['contact_email'] }}" class="font-medium hover:underline">{{ $site['contact_email'] }}</a></div>@endif
+                @if($site['contact_phone'])<div><div class="text-stone-500">Telepon</div><a href="tel:{{ preg_replace('/[^0-9+]/', '', $site['contact_phone']) }}" class="font-medium hover:underline">{{ $site['contact_phone'] }}</a></div>@endif
+                @if($site['contact_whatsapp'])<div><div class="text-stone-500">WhatsApp</div><a href="https://wa.me/{{ preg_replace('/\D/', '', $site['contact_whatsapp']) }}" target="_blank" rel="noopener noreferrer" class="font-medium hover:underline">Chat via WhatsApp</a></div>@endif
+                @if($site['contact_address'])<div><div class="text-stone-500">Alamat</div><div class="font-medium whitespace-pre-line">{{ $site['contact_address'] }}</div></div>@endif
+            </div>
+        @endif
+
         @if(session('success'))
             <div class="mb-6 p-4 bg-green-50 border border-green-200 text-green-800 rounded-lg">
                 {{ session('success') }}
@@ -17,6 +26,11 @@
 
         <form method="POST" action="{{ route('contact.send') }}" class="space-y-6 bg-white p-8 rounded-lg border border-stone-200">
             @csrf
+
+            {{-- Honeypot anti-spam: disembunyikan dari manusia --}}
+            <div style="position:absolute;left:-10000px" aria-hidden="true">
+                <label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+            </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>

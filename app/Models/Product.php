@@ -9,10 +9,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 
 class Product extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, LogsActivity;
 
     protected $fillable = [
         'category_id',
@@ -131,5 +133,18 @@ class Product extends Model
         }
 
         return $sku;
+    }
+
+    /**
+     * Audit log (PRD 6.7): siapa mengubah apa. Hanya field penting yang dicatat.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'sku', 'price', 'stock_threshold', 'is_active', 'is_featured', 'category_id', 'brand_id'])
+            ->logOnlyDirty()
+            ->dontLogEmptyChanges()
+            ->useLogName('produk')
+            ->setDescriptionForEvent(fn (string $event) => "Produk {$event}");
     }
 }

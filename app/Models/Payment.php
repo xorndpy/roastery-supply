@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 
 class Payment extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
 
     protected $fillable = [
         'order_id',
@@ -64,5 +66,18 @@ class Payment extends Model
     public function scopeRejected($query)
     {
         return $query->where('status', 'rejected');
+    }
+
+    /**
+     * Audit log (PRD 6.7): siapa mengubah apa. Hanya field penting yang dicatat.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['status', 'amount'])
+            ->logOnlyDirty()
+            ->dontLogEmptyChanges()
+            ->useLogName('pembayaran')
+            ->setDescriptionForEvent(fn (string $event) => "Pembayaran {$event}");
     }
 }

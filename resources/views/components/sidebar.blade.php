@@ -21,6 +21,7 @@
                 ['label' => 'Pesanan', 'route' => 'admin.orders.index', 'icon' => '🛒'],
                 ['label' => 'Pembayaran', 'route' => 'admin.payments.index', 'icon' => '💳'],
                 ['label' => 'Pengiriman', 'route' => 'admin.shipments.index', 'icon' => '🚚'],
+                ['label' => 'Tarif Kirim', 'route' => 'admin.shipping.index', 'icon' => '💲'],
                 ['label' => 'Retur', 'route' => 'admin.returns.index', 'icon' => '🔄'],
                 ['label' => 'Pelanggan', 'route' => 'admin.customers.index', 'icon' => '👥'],
             ],
@@ -58,6 +59,32 @@
             ],
         ],
     ];
+
+    // Hanya tampilkan menu yang boleh diakses user ini (permission sama dengan yang menjaga route-nya).
+    $menuPermissions = [
+        'admin.products.index' => 'view_products', 'admin.categories.index' => 'view_categories',
+        'admin.brands.index' => 'view_brands', 'admin.stock.index' => 'view_stock',
+        'admin.orders.index' => 'view_orders', 'admin.payments.index' => 'verify_payments',
+        'admin.shipments.index' => 'manage_shipments', 'admin.shipping.index' => 'view_shipping_rates', 'admin.returns.index' => 'view_returns',
+        'admin.customers.index' => 'view_customers', 'admin.vouchers.index' => 'view_vouchers',
+        'admin.banners.index' => 'view_banners', 'admin.testimonials.index' => 'view_testimonials',
+        'admin.faqs.index' => 'view_faqs', 'admin.partners.index' => 'view_partners',
+        'admin.branches.index' => 'view_branches', 'admin.messages.index' => 'view_contact_messages',
+        'admin.settings.index' => 'view_settings', 'admin.reports.index' => 'view_reports',
+        'admin.users.index' => 'view_users', 'admin.roles.index' => 'view_roles',
+        'admin.logs.index' => 'view_activity_logs',
+    ];
+    $unreadMessages = auth()->user()->can('view_contact_messages') ? \App\Models\ContactMessage::where('is_read', false)->count() : 0;
+
+    $menus = collect($menus)
+        ->map(function ($menu) use ($menuPermissions) {
+            $menu['items'] = collect($menu['items'])
+                ->filter(fn ($i) => !isset($menuPermissions[$i['route']]) || auth()->user()->can($menuPermissions[$i['route']]))
+                ->values()->all();
+            return $menu;
+        })
+        ->filter(fn ($m) => count($m['items']) > 0)
+        ->values()->all();
 @endphp
 
 <div class="flex flex-col h-full">
@@ -89,6 +116,9 @@
                                       : 'text-stone-300 hover:bg-stone-800 hover:text-white' }}">
                             <span class="text-base">{{ $item['icon'] }}</span>
                             <span>{{ $item['label'] }}</span>
+                            @if($item['route'] === 'admin.messages.index' && $unreadMessages > 0)
+                                <span class="ml-auto bg-orange-500 text-white text-xs font-semibold rounded-full px-2 py-0.5">{{ $unreadMessages }}</span>
+                            @endif
                         </a>
                     @endforeach
                 </div>

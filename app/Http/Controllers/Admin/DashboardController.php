@@ -17,6 +17,10 @@ class DashboardController extends Controller
         $totalRevenue = Order::whereIn('status', ['dikonfirmasi', 'diproses', 'dikirim', 'selesai'])
             ->sum('total');
 
+        // Pendapatan bersih: refund retur yang disetujui mengurangi pendapatan (PRD 6.2 retur/refund)
+        $totalRefund = (float) \App\Models\ReturnOrder::where('status', 'approved')->sum('refund_amount');
+        $totalRevenue -= $totalRefund;
+
         $totalOrders = Order::count();
         $pendingOrders = Order::where('status', 'menunggu_bayar')->count();
         $totalProducts = Product::where('is_active', true)->count();
@@ -50,7 +54,18 @@ class DashboardController extends Controller
             ->orderBy('date')
             ->get();
 
+        // Pesan kontak masuk tampil di dashboard (PRD 6.5)
+        $unreadMessages = \App\Models\ContactMessage::where('is_read', false)->count();
+        $pendingTestimonials = \App\Models\Testimonial::where('is_approved', false)->count();
+        $pendingReturns = \App\Models\ReturnOrder::where('status', 'pending')->count();
+        $shippingConfigured = app(\App\Services\ShippingService::class)->configured();
+
         return view('admin.dashboard', compact(
+            'unreadMessages',
+            'pendingTestimonials',
+            'pendingReturns',
+            'shippingConfigured',
+            'totalRefund',
             'totalRevenue',
             'totalOrders',
             'pendingOrders',

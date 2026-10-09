@@ -5,11 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class StockMovement extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory; // ledger: tidak boleh dihapus (tabel memang tanpa deleted_at)
 
     protected $fillable = [
         'product_id',

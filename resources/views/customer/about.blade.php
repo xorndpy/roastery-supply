@@ -1,8 +1,14 @@
 @extends('layouts.app')
-@section('title', 'Tentang Kami')
+
+@section('title', $site['about_title'])
+
 @section('content')
-<div class="max-w-4xl mx-auto px-4 py-16">
-    <h1 class="text-4xl font-bold mb-6">Tentang Roastery Supply</h1>
-    <p class="text-stone-600">Kami menyediakan mesin kopi profesional untuk kedai kopi serius di Indonesia.</p>
+<div class="max-w-3xl mx-auto px-4 py-16">
+    <h1 class="text-4xl font-bold mb-6">{{ $site['about_title'] }}</h1>
+    <div class="space-y-4 text-stone-700 leading-relaxed">
+        @foreach(preg_split('/\R{2,}/', trim($site['about_body'] ?? '')) as $paragraph)
+            <p>{!! nl2br(e($paragraph)) !!}</p>
+        @endforeach
+    </div>
 </div>
 @endsection

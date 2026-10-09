@@ -3,63 +3,59 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ContactMessage;
 use Illuminate\Http\Request;
 
 class ContactMessageController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $query = ContactMessage::query()->latest('id');
+
+        if ($request->status === 'unread') {
+            $query->where('is_read', false);
+        }
+        if ($search = $request->search) {
+            $query->where(fn ($q) => $q->where('name', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%")
+                ->orWhere('subject', 'like', "%{$search}%"));
+        }
+
+        $messages = $query->paginate(20)->withQueryString();
+        $unread = ContactMessage::where('is_read', false)->count();
+
+        return view('admin.messages.index', compact('messages', 'unread'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    /** Membuka pesan otomatis menandainya sudah dibaca. */
+    public function show(ContactMessage $message)
     {
-        //
+        if (!$message->is_read) {
+            $message->update(['is_read' => true]);
+        }
+
+        return view('admin.messages.show', compact('message'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    /** Toggle dibaca / belum dibaca (PRD 6.7). */
+    public function markAsRead(ContactMessage $message)
     {
-        //
+        $message->update(['is_read' => !$message->is_read]);
+
+        return back()->with('success', $message->is_read ? 'Ditandai sudah dibaca.' : 'Ditandai belum dibaca.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function markReplied(ContactMessage $message)
     {
-        //
+        $message->update(['replied_at' => $message->replied_at ? null : now(), 'is_read' => true]);
+
+        return back()->with('success', $message->replied_at ? 'Ditandai sudah dibalas.' : 'Tanda dibalas dibatalkan.');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function destroy(ContactMessage $message)
     {
-        //
-    }
+        $message->delete();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return redirect()->route('admin.messages.index')->with('success', 'Pesan dihapus.');
     }
 }

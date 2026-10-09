@@ -20,8 +20,14 @@ class ContactController extends Controller
             'email' => 'required|email|max:255',
             'phone' => 'nullable|string|max:20',
             'subject' => 'required|string|max:255',
-            'message' => 'required|string',
+            'message' => 'required|string|max:5000',
         ]);
+
+        // Honeypot: kolom "website" disembunyikan dari manusia. Bot yang mengisinya
+        // dianggap sukses (agar tidak belajar) tetapi pesannya tidak disimpan.
+        if (filled($request->input('website'))) {
+            return back()->with('success', 'Pesan Anda berhasil dikirim. Kami akan segera menghubungi Anda.');
+        }
 
         ContactMessage::create($validated);
 

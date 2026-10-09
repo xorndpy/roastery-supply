@@ -123,11 +123,20 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium mb-1.5">Stok *</label>
-                        <input type="number" name="stock" value="{{ old('stock', $product->stock ?? 0) }}"
-                               required min="0"
-                               class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-orange-500 focus:border-orange-500">
-                        @error('stock') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                        <label class="block text-sm font-medium mb-1.5">{{ $product->exists ? 'Stok Saat Ini' : 'Stok Awal *' }}</label>
+                        @if($product->exists)
+                            <input type="number" value="{{ $product->stock }}" readonly disabled
+                                   class="w-full border border-stone-200 bg-stone-50 text-stone-500 rounded-lg px-3 py-2">
+                            <p class="text-xs text-stone-500 mt-1">
+                                Ubah stok lewat <a href="{{ route('admin.stock.index', ['search' => $product->sku]) }}" class="text-orange-600 underline">menu Stok</a>
+                                agar tercatat di riwayat.
+                            </p>
+                        @else
+                            <input type="number" name="stock" value="{{ old('stock', 0) }}"
+                                   required min="0"
+                                   class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-orange-500 focus:border-orange-500">
+                            @error('stock') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                        @endif
                     </div>
 
                     <div>

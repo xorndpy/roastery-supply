@@ -44,4 +44,6 @@
             </x-primary-button>
         </div>
     </form>
+
+    @include('auth.partials.google-button')
 </x-guest-layout>

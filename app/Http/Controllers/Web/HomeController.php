@@ -3,13 +3,17 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
-use App\Models\Category;
-use App\Models\Testimonial;
 use App\Models\Banner;
-use App\Models\Faq;
 use App\Models\Branch;
+use App\Models\Category;
+use App\Models\Faq;
+use App\Models\Partner;
+use App\Models\Product;
+use App\Models\Testimonial;
 
+/**
+ * Halaman publik. Semua konten berasal dari database/pengaturan (PRD 6.5: tanpa hardcode).
+ */
 class HomeController extends Controller
 {
     public function index()
@@ -23,24 +27,18 @@ class HomeController extends Controller
 
         $categories = Category::where('is_active', true)
             ->whereNull('parent_id')
+            ->orderBy('name')
             ->take(6)
             ->get();
 
-        $testimonials = Testimonial::where('is_approved', true)
-            ->latest()
-            ->take(6)
-            ->get();
+        $testimonials = Testimonial::approved()->latest()->take(6)->get();
 
-        $banners = Banner::where('is_active', true)
-            ->orderBy('sort_order')
-            ->get();
+        // scopeActive: aktif DAN dalam jadwal tayang (PRD 6.4 "Banner tampil sesuai jadwal")
+        $banners = Banner::active()->orderBy('sort_order')->orderBy('id')->get();
 
-        return view('customer.home', compact(
-            'featuredProducts',
-            'categories',
-            'testimonials',
-            'banners'
-        ));
+        $partners = Partner::active()->orderBy('sort_order')->orderBy('name')->get();
+
+        return view('customer.home', compact('featuredProducts', 'categories', 'testimonials', 'banners', 'partners'));
     }
 
     public function about()
@@ -50,16 +48,18 @@ class HomeController extends Controller
 
     public function faq()
     {
-        $faqs = Faq::where('is_active', true)
+        $faqs = Faq::active()
             ->orderBy('sort_order')
-            ->get();
+            ->orderBy('id')
+            ->get()
+            ->groupBy('category');
 
         return view('customer.faq', compact('faqs'));
     }
 
     public function branches()
     {
-        $branches = Branch::where('is_active', true)->get();
+        $branches = Branch::active()->orderBy('name')->get();
 
         return view('customer.branches', compact('branches'));
     }

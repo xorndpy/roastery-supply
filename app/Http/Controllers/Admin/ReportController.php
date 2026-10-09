@@ -155,6 +155,11 @@ class ReportController extends Controller
         $totalOrders = (clone $orders)->count();
         $avgOrderValue = $totalOrders > 0 ? $totalRevenue / $totalOrders : 0;
 
+        // Refund retur yang disetujui pada periode ini (diakui saat disetujui)
+        $totalRefund = (float) \App\Models\ReturnOrder::where('status', 'approved')
+            ->whereBetween('approved_at', [$startDate, $endDate])
+            ->sum('refund_amount');
+
         $newCustomers = Customer::whereBetween('created_at', [$startDate, $endDate])->count();
 
         // Total produk terjual
@@ -170,6 +175,8 @@ class ReportController extends Controller
 
         return [
             'total_revenue' => $totalRevenue,
+            'total_refund' => $totalRefund,
+            'net_revenue' => $totalRevenue - $totalRefund,
             'total_orders' => $totalOrders,
             'avg_order_value' => $avgOrderValue,
             'new_customers' => $newCustomers,

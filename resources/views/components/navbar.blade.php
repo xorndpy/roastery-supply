@@ -4,7 +4,11 @@
             
             {{-- Logo --}}
             <a href="{{ route('home') }}" class="text-xl font-bold tracking-tight text-stone-900">
-                ROASTERY<span class="text-orange-500">.</span>
+                @if(!empty($site['site_logo']))
+                    <img src="{{ asset('storage/' . $site['site_logo']) }}" alt="{{ $site['site_name'] }}" class="h-8 w-auto">
+                @else
+                    {{ $site['site_name'] }}
+                @endif
             </a>
 
             {{-- Menu Desktop --}}
@@ -37,6 +41,7 @@
                              class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-stone-200 py-1">
                             <a href="{{ route('customer.dashboard') }}" class="block px-4 py-2 text-sm hover:bg-stone-50">Dashboard</a>
                             <a href="{{ route('customer.orders.index') }}" class="block px-4 py-2 text-sm hover:bg-stone-50">Pesanan Saya</a>
+                            <a href="{{ route('customer.returns.index') }}" class="block px-4 py-2 text-sm hover:bg-stone-50">Retur Saya</a>
                             <a href="{{ route('customer.profile.edit') }}" class="block px-4 py-2 text-sm hover:bg-stone-50">Profil</a>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf

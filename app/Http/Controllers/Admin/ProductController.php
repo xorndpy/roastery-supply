@@ -6,10 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
+use App\Models\StockMovement;
 use App\Models\Category;
 use App\Models\Brand;
 use App\Services\ProductService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -119,7 +121,23 @@ class ProductController extends Controller
         }
 
         // Buat produk
-        $product = Product::create($data);
+        $product = DB::transaction(function () use ($data) {
+            $product = Product::create($data);
+
+            // Stok awal harus punya jejak di riwayat stok.
+            if ($product->stock > 0) {
+                StockMovement::create([
+                    'product_id' => $product->id,
+                    'type' => 'in',
+                    'quantity' => $product->stock,
+                    'reference_type' => 'initial',
+                    'note' => 'Stok awal',
+                    'user_id' => auth()->id(),
+                ]);
+            }
+
+            return $product;
+        });
 
         // Upload gambar
         if ($request->hasFile('images')) {
@@ -164,6 +182,9 @@ class ProductController extends Controller
     public function update(UpdateProductRequest $request, Product $product)
     {
         $data = $request->validated();
+
+        // Stok TIDAK boleh diubah dari form produk (tanpa jejak). Pakai menu Stok.
+        unset($data['stock']);
 
         // Handle nullable fields + checkbox booleans
         $data['weight'] = $data['weight'] ?? 0;

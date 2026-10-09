@@ -4,13 +4,16 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Payment;
-use App\Models\Order;
-use App\Models\StockMovement;
+use App\Services\OrderService;
+use DomainException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
+    public function __construct(private OrderService $orders)
+    {
+    }
+
     /**
      * List pembayaran dengan filter.
      */
@@ -65,90 +68,37 @@ class PaymentController extends Controller
     }
 
     /**
-     * Verify pembayaran → status jadi "dikonfirmasi" + stok berkurang.
+     * Verify pembayaran -> order "dikonfirmasi" + stok berkurang (lihat OrderService).
      */
     public function verify(Payment $payment)
     {
-        // Cek status payment
         if ($payment->status !== 'pending') {
             return back()->with('error', 'Pembayaran ini sudah diproses sebelumnya.');
         }
 
-        // Cek status order
-        $order = $payment->order;
-        if (!$order || $order->status !== 'menunggu_bayar') {
-            return back()->with('error', 'Order tidak dalam status menunggu bayar.');
-        }
-
-        DB::beginTransaction();
-
         try {
-            // Update payment
-            $payment->update([
-                'status' => 'verified',
-                'verified_by' => auth()->id(),
-                'verified_at' => now(),
-            ]);
-
-            // Update order status
-            $order->update(['status' => 'dikonfirmasi']);
-
-            // Kurangi stok + catat stock movement
-            foreach ($order->items as $item) {
-                $product = $item->product;
-
-                if (!$product) {
-                    continue;
-                }
-
-                if ($product->stock < $item->quantity) {
-                    DB::rollBack();
-                    return back()->with('error', "Stok produk {$product->name} tidak mencukupi.");
-                }
-
-                $product->decrement('stock', $item->quantity);
-
-                StockMovement::create([
-                    'product_id' => $product->id,
-                    'type' => 'out',
-                    'quantity' => $item->quantity,
-                    'reference_type' => 'order',
-                    'reference_id' => $order->id,
-                    'note' => 'Pesanan ' . $order->order_number,
-                    'user_id' => auth()->id(),
-                ]);
-            }
-
-            DB::commit();
-
-            return back()->with('success', "Pembayaran {$order->order_number} berhasil diverifikasi. Stok telah dikurangi.");
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->with('error', 'Gagal verifikasi: ' . $e->getMessage());
+            $this->orders->confirmPayment($payment->order, auth()->id(), $payment);
+        } catch (DomainException $e) {
+            return back()->with('error', $e->getMessage());
         }
+
+        return back()->with('success', "Pembayaran {$payment->order->order_number} berhasil diverifikasi. Stok telah dikurangi.");
     }
 
     /**
-     * Reject pembayaran → status jadi "rejected" + order tetap "menunggu_bayar".
+     * Reject pembayaran. Order tetap "menunggu_bayar" dan customer bisa upload ulang.
      */
     public function reject(Request $request, Payment $payment)
     {
-        // Cek status payment
-        if ($payment->status !== 'pending') {
-            return back()->with('error', 'Pembayaran ini sudah diproses sebelumnya.');
-        }
-
         $validated = $request->validate([
             'note' => 'nullable|string|max:500',
         ]);
 
-        $payment->update([
-            'status' => 'rejected',
-            'verified_by' => auth()->id(),
-            'verified_at' => now(),
-            'note' => $validated['note'] ?? 'Ditolak oleh admin.',
-        ]);
+        try {
+            $this->orders->rejectPayment($payment, $validated['note'] ?? null, auth()->id());
+        } catch (DomainException $e) {
+            return back()->with('error', $e->getMessage());
+        }
 
         return back()->with('success', 'Pembayaran ditolak. Customer akan diminta upload ulang.');
     }

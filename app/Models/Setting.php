@@ -16,14 +16,64 @@ class Setting extends Model
         'group',
     ];
 
-    /**
-     * Get a setting value by key.
-     */
+    /** @var array<string,?string>|null Cache per-request: 1 query untuk semua pengaturan. */
+    private static ?array $memo = null;
+
+    protected static function booted(): void
+    {
+        $reset = fn () => self::$memo = null;
+        static::saved($reset);
+        static::deleted($reset);
+    }
+
+    /** Semua nilai tersimpan (key => value). */
+    public static function stored(): array
+    {
+        return self::$memo ??= static::query()->pluck('value', 'key')->all();
+    }
+
+    public static function forgetMemo(): void
+    {
+        self::$memo = null;
+    }
+
+    /** Ambil satu nilai. Kosong/belum diisi -> $default, lalu default dari config/cms.php. */
     public static function get(string $key, mixed $default = null): mixed
     {
-        $setting = static::where('key', $key)->first();
+        $value = static::stored()[$key] ?? null;
 
-        return $setting ? $setting->value : $default;
+        if (filled($value)) {
+            return $value;
+        }
+
+        return $default ?? static::defaults()[$key] ?? null;
+    }
+
+    /** Semua key pengaturan dengan nilai (atau default) - dipakai view lewat variabel $site. */
+    public static function site(): array
+    {
+        $site = [];
+        foreach (static::definitions() as $key => $_) {
+            $site[$key] = static::get($key);
+        }
+
+        return $site;
+    }
+
+    /** @return array<string,array> key => definisi, tanpa pengelompokan */
+    public static function definitions(): array
+    {
+        $flat = [];
+        foreach (config('cms.settings') as $fields) {
+            $flat += $fields;
+        }
+
+        return $flat;
+    }
+
+    private static function defaults(): array
+    {
+        return collect(static::definitions())->map(fn ($d) => $d['default'] ?? null)->all();
     }
 
     /**

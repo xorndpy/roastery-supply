@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+use Spatie\Permission\Models\Role;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
@@ -42,10 +43,13 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        // findOrCreate: pendaftaran tidak boleh gagal hanya karena seeder role belum dijalankan.
+        $user->assignRole(Role::findOrCreate('customer', 'web'));
+
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect()->intended(route('dashboard', absolute: false));
     }
 }

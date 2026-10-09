@@ -1,230 +1,111 @@
 @extends('layouts.admin')
 
-@section('title', 'Pembayaran')
+@section('title', 'Pembayaran ' . $payment->order->order_number)
 
 @section('content')
 
-<div class="flex flex-wrap justify-between items-center gap-4 mb-6">
-    <div>
-        <h1 class="text-2xl font-bold text-stone-900">Verifikasi Pembayaran</h1>
-        <p class="text-sm text-stone-500 mt-1">Kelola bukti pembayaran dari customer.</p>
+@php
+    $order = $payment->order;
+    $badge = [
+        'pending'  => 'bg-yellow-100 text-yellow-800',
+        'verified' => 'bg-green-100 text-green-800',
+        'rejected' => 'bg-red-100 text-red-800',
+    ][$payment->status] ?? 'bg-stone-100 text-stone-700';
+    $label = ['pending' => 'Menunggu verifikasi', 'verified' => 'Terverifikasi', 'rejected' => 'Ditolak'][$payment->status] ?? $payment->status;
+    $methodLabel = ['transfer_bca' => 'Transfer BCA', 'transfer_mandiri' => 'Transfer Mandiri', 'transfer_bni' => 'Transfer BNI'][$payment->method] ?? $payment->method;
+@endphp
+
+<div class="mb-6">
+    <a href="{{ route('admin.payments.index') }}" class="text-sm text-stone-500 hover:text-stone-700">← Kembali ke Pembayaran</a>
+    <div class="flex flex-wrap items-center gap-3 mt-2">
+        <h1 class="text-2xl font-bold text-stone-900 font-mono">{{ $order->order_number }}</h1>
+        <span class="px-2.5 py-1 rounded text-xs font-medium {{ $badge }}">{{ $label }}</span>
     </div>
 </div>
 
-{{-- Stats --}}
-<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-    <a href="{{ route('admin.payments.index', ['status' => 'pending']) }}"
-       class="bg-white p-4 rounded-lg border-2 {{ request('status') === 'pending' ? 'border-orange-500' : 'border-stone-200' }} hover:border-orange-500 transition">
-        <div class="flex items-center justify-between mb-1">
-            <div class="text-xs text-stone-500">Menunggu Verifikasi</div>
-            <div class="text-lg">⏳</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    {{-- Kiri: bukti + aksi --}}
+    <div class="lg:col-span-2 space-y-6">
+        <div class="bg-white p-6 rounded-lg border border-stone-200">
+            <h2 class="font-bold mb-4">Bukti Pembayaran</h2>
+            @if($payment->proof_image)
+                <a href="{{ route('admin.payments.proof', $payment->id) }}" target="_blank">
+                    <img src="{{ route('admin.payments.proof', $payment->id) }}" alt="Bukti transfer"
+                         class="max-h-[32rem] rounded border border-stone-200">
+                </a>
+            @else
+                <p class="text-stone-500 text-sm">Tidak ada file bukti.</p>
+            @endif
         </div>
-        <div class="text-2xl font-bold text-orange-600">{{ $stats['pending'] }}</div>
-    </a>
-    <a href="{{ route('admin.payments.index', ['status' => 'verified']) }}"
-       class="bg-white p-4 rounded-lg border-2 {{ request('status') === 'verified' ? 'border-green-500' : 'border-stone-200' }} hover:border-green-500 transition">
-        <div class="flex items-center justify-between mb-1">
-            <div class="text-xs text-stone-500">Terverifikasi</div>
-            <div class="text-lg">✅</div>
-        </div>
-        <div class="text-2xl font-bold text-green-600">{{ $stats['verified'] }}</div>
-    </a>
-    <a href="{{ route('admin.payments.index', ['status' => 'rejected']) }}"
-       class="bg-white p-4 rounded-lg border-2 {{ request('status') === 'rejected' ? 'border-red-500' : 'border-stone-200' }} hover:border-red-500 transition">
-        <div class="flex items-center justify-between mb-1">
-            <div class="text-xs text-stone-500">Ditolak</div>
-            <div class="text-lg">❌</div>
-        </div>
-        <div class="text-2xl font-bold text-red-600">{{ $stats['rejected'] }}</div>
-    </a>
-    <div class="bg-white p-4 rounded-lg border border-stone-200">
-        <div class="flex items-center justify-between mb-1">
-            <div class="text-xs text-stone-500">Total Pending</div>
-            <div class="text-lg">💰</div>
-        </div>
-        <div class="text-lg font-bold text-stone-900">
-            Rp {{ number_format($stats['total_pending_amount'], 0, ',', '.') }}
-        </div>
-    </div>
-</div>
 
-{{-- Filter --}}
-<div class="bg-white p-4 rounded-lg border border-stone-200 mb-6">
-    <form method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-3">
-        <input type="text" name="search" value="{{ request('search') }}"
-               placeholder="Cari no. order / nama customer..."
-               class="md:col-span-2 border border-stone-300 rounded-lg px-3 py-2 text-sm">
-
-        <select name="status" class="border border-stone-300 rounded-lg px-3 py-2 text-sm">
-            <option value="">Semua Status</option>
-            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Menunggu</option>
-            <option value="verified" {{ request('status') == 'verified' ? 'selected' : '' }}>Terverifikasi</option>
-            <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Ditolak</option>
-        </select>
-
-        <input type="date" name="from" value="{{ request('from') }}"
-               class="border border-stone-300 rounded-lg px-3 py-2 text-sm">
-
-        <div class="flex gap-2">
-            <button type="submit" class="flex-1 bg-stone-800 hover:bg-stone-900 text-white px-4 py-2 rounded-lg text-sm font-medium">
-                Filter
-            </button>
-            <a href="{{ route('admin.payments.index') }}"
-               class="px-4 py-2 border border-stone-300 rounded-lg text-sm hover:bg-stone-50">
-                Reset
-            </a>
-        </div>
-    </form>
-</div>
-
-{{-- Table --}}
-<div class="bg-white rounded-lg border border-stone-200 overflow-hidden">
-    <div class="overflow-x-auto">
-        <table class="w-full text-sm">
-            <thead class="bg-stone-50 border-b border-stone-200">
-                <tr>
-                    <th class="px-4 py-3 text-left font-medium text-stone-600 w-20">Bukti</th>
-                    <th class="px-4 py-3 text-left font-medium text-stone-600">Order</th>
-                    <th class="px-4 py-3 text-left font-medium text-stone-600">Customer</th>
-                    <th class="px-4 py-3 text-left font-medium text-stone-600">Metode</th>
-                    <th class="px-4 py-3 text-right font-medium text-stone-600">Jumlah</th>
-                    <th class="px-4 py-3 text-center font-medium text-stone-600">Status</th>
-                    <th class="px-4 py-3 text-right font-medium text-stone-600">Aksi</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-stone-200">
-                @forelse($payments as $payment)
-                    <tr class="hover:bg-stone-50">
-                        <td class="px-4 py-3">
-                            <div class="w-12 h-12 rounded bg-stone-100 overflow-hidden border border-stone-200">
-                                @if($payment->proof_image)
-                                    <a href="{{ asset('storage/' . $payment->proof_image) }}" target="_blank">
-                                        <img src="{{ asset('storage/' . $payment->proof_image) }}"
-                                             alt="Bukti"
-                                             class="w-full h-full object-cover hover:scale-110 transition">
-                                    </a>
-                                @else
-                                    <div class="w-full h-full flex items-center justify-center text-stone-400 text-xs">N/A</div>
-                                @endif
-                            </div>
-                        </td>
-                        <td class="px-4 py-3">
-                            <a href="{{ route('admin.orders.show', $payment->order_id) }}"
-                               class="font-medium text-blue-600 hover:text-blue-800">
-                                {{ $payment->order->order_number ?? '-' }}
-                            </a>
-                            <div class="text-xs text-stone-500">{{ $payment->created_at->format('d M Y, H:i') }}</div>
-                        </td>
-                        <td class="px-4 py-3">
-                            <div class="font-medium">{{ $payment->order->customer->name ?? 'Guest' }}</div>
-                            <div class="text-xs text-stone-500">{{ $payment->order->customer->phone ?? '-' }}</div>
-                        </td>
-                        <td class="px-4 py-3 text-stone-600 text-xs">
-                            {{ str_replace('_', ' ', strtoupper($payment->method)) }}
-                        </td>
-                        <td class="px-4 py-3 text-right font-medium">
-                            Rp {{ number_format($payment->amount, 0, ',', '.') }}
-                        </td>
-                        <td class="px-4 py-3 text-center">
-                            @php
-                                $badges = [
-                                    'pending' => 'bg-yellow-100 text-yellow-800',
-                                    'verified' => 'bg-green-100 text-green-800',
-                                    'rejected' => 'bg-red-100 text-red-800',
-                                ];
-                                $labels = [
-                                    'pending' => 'Menunggu',
-                                    'verified' => 'Terverifikasi',
-                                    'rejected' => 'Ditolak',
-                                ];
-                            @endphp
-                            <span class="text-xs px-2 py-1 rounded-full {{ $badges[$payment->status] ?? 'bg-stone-100' }}">
-                                {{ $labels[$payment->status] ?? $payment->status }}
-                            </span>
-                        </td>
-                        <td class="px-4 py-3 text-right">
-                            <div class="flex items-center justify-end gap-1">
-                                @if($payment->status === 'pending')
-                                    <form method="POST" action="{{ route('admin.payments.verify', $payment->id) }}" class="inline">
-                                        @csrf
-                                        <button type="submit"
-                                                onclick="return confirm('Verify pembayaran ini?')"
-                                                class="text-xs bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded font-medium">
-                                            ✓ Verify
-                                        </button>
-                                    </form>
-                                    <button type="button"
-                                            onclick="openRejectModal({{ $payment->id }})"
-                                            class="text-xs bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded font-medium">
-                                        ✕ Reject
-                                    </button>
-                                @endif
-                                <a href="{{ route('admin.payments.show', $payment->id) }}"
-                                   class="text-xs text-blue-600 hover:text-blue-800 font-medium">
-                                    Detail
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="7" class="px-4 py-16 text-center text-stone-500">
-                            <div class="text-4xl mb-3">💳</div>
-                            <p>Belum ada pembayaran.</p>
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<div class="mt-4">
-    {{ $payments->links() }}
-</div>
-
-{{-- Reject Modal --}}
-<div id="rejectModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
-    <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-        <h3 class="font-bold text-lg mb-3">Tolak Pembayaran</h3>
-        <form method="POST" id="rejectForm">
-            @csrf
-            <div class="mb-4">
-                <label class="block text-sm font-medium mb-1.5">Alasan Penolakan</label>
-                <textarea name="note" rows="3" required
-                          class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm"
-                          placeholder="Contoh: Bukti transfer tidak jelas, nominal tidak sesuai, dll."></textarea>
+        @if($payment->status === 'pending')
+            @canany(['verify_payments', 'reject_payments'])
+            <div class="bg-white p-6 rounded-lg border border-stone-200">
+                <h2 class="font-bold mb-1">Verifikasi</h2>
+                <p class="text-sm text-stone-500 mb-4">
+                    Pastikan nominal <strong>Rp {{ number_format($payment->amount, 0, ',', '.') }}</strong> sudah masuk ke rekening.
+                    Verifikasi akan mengurangi stok.
+                </p>
+                <div class="flex flex-wrap gap-6 items-start">
+                    @can('verify_payments')
+                    <form method="POST" action="{{ route('admin.payments.verify', $payment->id) }}">
+                        @csrf
+                        <button class="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-lg font-medium">Verifikasi Pembayaran</button>
+                    </form>
+                    @endcan
+                    @can('reject_payments')
+                    <form method="POST" action="{{ route('admin.payments.reject', $payment->id) }}" class="flex-1 min-w-[260px] space-y-2">
+                        @csrf
+                        <textarea name="note" rows="2" maxlength="500" placeholder="Alasan penolakan (dilihat customer)"
+                                  class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm"></textarea>
+                        <button class="border border-red-300 text-red-700 hover:bg-red-50 px-5 py-2 rounded-lg text-sm">Tolak</button>
+                    </form>
+                    @endcan
+                </div>
             </div>
-            <div class="flex justify-end gap-2">
-                <button type="button" onclick="closeRejectModal()"
-                        class="px-4 py-2 border border-stone-300 rounded-lg text-sm hover:bg-stone-50">
-                    Batal
-                </button>
-                <button type="submit"
-                        class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium">
-                    Tolak Pembayaran
-                </button>
+            @endcanany
+        @endif
+    </div>
+
+    {{-- Kanan: ringkasan --}}
+    <div class="space-y-6">
+        <div class="bg-white p-6 rounded-lg border border-stone-200 text-sm space-y-2">
+            <h2 class="font-bold mb-2">Pembayaran</h2>
+            <div class="flex justify-between"><span class="text-stone-500">Metode</span><span>{{ $methodLabel }}</span></div>
+            <div class="flex justify-between"><span class="text-stone-500">Jumlah</span><span class="font-bold">Rp {{ number_format($payment->amount, 0, ',', '.') }}</span></div>
+            <div class="flex justify-between"><span class="text-stone-500">Diunggah</span><span>{{ $payment->created_at->format('d M Y H:i') }}</span></div>
+            @if($payment->verified_at)
+                <div class="flex justify-between"><span class="text-stone-500">Diproses</span><span>{{ $payment->verified_at->format('d M Y H:i') }}</span></div>
+                <div class="flex justify-between"><span class="text-stone-500">Oleh</span><span>{{ $payment->verifier->name ?? '-' }}</span></div>
+            @endif
+            @if($payment->note)
+                <div class="pt-2 border-t border-stone-100"><div class="text-stone-500">Catatan</div><div>{{ $payment->note }}</div></div>
+            @endif
+        </div>
+
+        <div class="bg-white p-6 rounded-lg border border-stone-200 text-sm space-y-2">
+            <h2 class="font-bold mb-2">Pesanan</h2>
+            <div class="flex justify-between"><span class="text-stone-500">Status</span><span class="capitalize">{{ $order->status }}</span></div>
+            <div class="flex justify-between"><span class="text-stone-500">Total</span><span class="font-bold">Rp {{ number_format($order->total, 0, ',', '.') }}</span></div>
+            @if((float) $payment->amount !== (float) $order->total)
+                <div class="p-2 bg-amber-50 border border-amber-200 text-amber-800 rounded text-xs">Nominal pembayaran berbeda dengan total pesanan.</div>
+            @endif
+            <div class="pt-2 border-t border-stone-100">
+                <div class="font-medium">{{ $order->shipping_name ?: ($order->customer->name ?? '-') }}</div>
+                <div class="text-stone-500">{{ $order->shipping_phone ?: ($order->customer->phone ?? '') }}</div>
+                <div class="text-stone-500">{{ $order->full_shipping_address ?: ($order->customer->address ?? '-') }}</div>
             </div>
-        </form>
+            <ul class="pt-2 border-t border-stone-100 space-y-1">
+                @foreach($order->items as $item)
+                    <li class="flex justify-between gap-3"><span>{{ $item->product_name }} × {{ $item->quantity }}</span><span>Rp {{ number_format($item->subtotal, 0, ',', '.') }}</span></li>
+                @endforeach
+            </ul>
+            @can('view_orders')
+                <a href="{{ route('admin.orders.show', $order->id) }}" class="inline-block pt-2 text-orange-600 hover:underline">Buka pesanan →</a>
+            @endcan
+        </div>
     </div>
 </div>
-
-@push('scripts')
-<script>
-    function openRejectModal(paymentId) {
-        const modal = document.getElementById('rejectModal');
-        const form = document.getElementById('rejectForm');
-        form.action = `/admin/payments/${paymentId}/reject`;
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-    }
-
-    function closeRejectModal() {
-        const modal = document.getElementById('rejectModal');
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-    }
-</script>
-@endpush
 
 @endsection

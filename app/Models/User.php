@@ -11,11 +11,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, HasRoles, SoftDeletes;
+    use HasFactory, Notifiable, HasRoles, SoftDeletes, LogsActivity;
 
     /**
      * The attributes that are mass assignable.
@@ -66,5 +68,18 @@ class User extends Authenticatable
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
+    }
+
+    /**
+     * Audit log (PRD 6.7): siapa mengubah apa. Hanya field penting yang dicatat.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'email', 'phone'])
+            ->logOnlyDirty()
+            ->dontLogEmptyChanges()
+            ->useLogName('user')
+            ->setDescriptionForEvent(fn (string $event) => "User {$event}");
     }
 }

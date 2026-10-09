@@ -19,6 +19,12 @@
         </div>
     @endif
 
+    @if(session('warning'))
+        <div class="mb-6 p-4 bg-amber-50 border border-amber-200 text-amber-800 rounded-lg">
+            {{ session('warning') }}
+        </div>
+    @endif
+
     @if(count($cart) > 0)
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             

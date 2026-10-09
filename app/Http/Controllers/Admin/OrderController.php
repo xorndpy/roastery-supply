@@ -4,14 +4,17 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
-use App\Models\Payment;
-use App\Models\Shipment;
-use App\Models\StockMovement;
+use App\Services\OrderService;
+use Barryvdh\DomPDF\Facade\Pdf;
+use DomainException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
+    public function __construct(private OrderService $orders)
+    {
+    }
+
     /**
      * List pesanan dengan filter.
      */
@@ -69,80 +72,19 @@ class OrderController extends Controller
     }
 
     /**
-     * Konfirmasi pembayaran → status jadi "dikonfirmasi".
-     * Di sini stok berkurang (sesuai PRD).
+     * Konfirmasi pembayaran -> "dikonfirmasi" + stok berkurang (lihat OrderService).
      */
     public function confirmPayment(Order $order)
     {
-        if ($order->status !== 'menunggu_bayar') {
-            return back()->with('error', 'Pesanan ini tidak dalam status menunggu bayar.');
-        }
-
-        if (!$order->payment || $order->payment->status !== 'pending') {
-            return back()->with('error', 'Belum ada bukti pembayaran yang diunggah.');
-        }
-
-        DB::beginTransaction();
-
-        try {
-            // Update payment
-            $order->payment->update([
-                'status' => 'verified',
-                'verified_by' => auth()->id(),
-                'verified_at' => now(),
-            ]);
-
-            // Update order status
-            $order->update(['status' => 'dikonfirmasi']);
-
-            // Kurangi stok produk + catat stock movement
-            foreach ($order->items as $item) {
-                $product = $item->product;
-
-                if (!$product) {
-                    continue;
-                }
-
-                if ($product->stock < $item->quantity) {
-                    DB::rollBack();
-                    return back()->with('error', "Stok produk {$product->name} tidak mencukupi.");
-                }
-
-                $product->decrement('stock', $item->quantity);
-
-                StockMovement::create([
-                    'product_id' => $product->id,
-                    'type' => 'out',
-                    'quantity' => $item->quantity,
-                    'reference_type' => 'order',
-                    'reference_id' => $order->id,
-                    'note' => 'Pesanan ' . $order->order_number,
-                    'user_id' => auth()->id(),
-                ]);
-            }
-
-            DB::commit();
-
-            return back()->with('success', 'Pembayaran dikonfirmasi. Stok telah dikurangi.');
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->with('error', 'Gagal konfirmasi: ' . $e->getMessage());
-        }
+        return $this->run(
+            fn () => $this->orders->confirmPayment($order, auth()->id()),
+            'Pembayaran dikonfirmasi. Stok telah dikurangi.'
+        );
     }
 
-    /**
-     * Update status pesanan (diproses).
-     */
     public function process(Order $order)
     {
-        if ($order->status !== 'dikonfirmasi') {
-            return back()->with('error', 'Pesanan harus dalam status dikonfirmasi.');
-        }
-
-        $order->update(['status' => 'diproses']);
-
-        return back()->with('success', 'Pesanan sedang diproses.');
+        return $this->run(fn () => $this->orders->process($order), 'Pesanan sedang diproses.');
     }
 
     /**
@@ -150,10 +92,6 @@ class OrderController extends Controller
      */
     public function ship(Request $request, Order $order)
     {
-        if (!in_array($order->status, ['dikonfirmasi', 'diproses'])) {
-            return back()->with('error', 'Pesanan belum siap dikirim.');
-        }
-
         $validated = $request->validate([
             'courier' => 'required|string|max:100',
             'service' => 'nullable|string|max:100',
@@ -161,94 +99,50 @@ class OrderController extends Controller
             'cost' => 'nullable|numeric|min:0',
         ]);
 
-        Shipment::updateOrCreate(
-            ['order_id' => $order->id],
-            [
-                'courier' => $validated['courier'],
-                'service' => $validated['service'] ?? null,
-                'tracking_number' => $validated['tracking_number'],
-                'cost' => $validated['cost'] ?? 0,
-                'status' => 'shipped',
-                'shipped_at' => now(),
-            ]
+        return $this->run(
+            fn () => $this->orders->ship($order, $validated),
+            'Resi berhasil diinput. Pesanan sedang dikirim.'
         );
-
-        $order->update(['status' => 'dikirim']);
-
-        return back()->with('success', 'Resi berhasil diinput. Pesanan sedang dikirim.');
     }
 
-    /**
-     * Selesaikan pesanan.
-     */
     public function complete(Order $order)
     {
-        if ($order->status !== 'dikirim') {
-            return back()->with('error', 'Pesanan harus dalam status dikirim.');
-        }
-
-        $order->update(['status' => 'selesai']);
-
-        if ($order->shipment) {
-            $order->shipment->update([
-                'status' => 'delivered',
-                'delivered_at' => now(),
-            ]);
-        }
-
-        return back()->with('success', 'Pesanan selesai.');
+        return $this->run(fn () => $this->orders->complete($order), 'Pesanan selesai.');
     }
 
     /**
-     * Batalkan pesanan + kembalikan stok (kalau sudah dikurangi).
+     * Batalkan pesanan (admin: sampai status diproses). Stok kembali jika sudah dipotong.
      */
-    public function cancel(Order $order)
+    public function cancel(Request $request, Order $order)
     {
-        if (in_array($order->status, ['dikirim', 'selesai'])) {
-            return back()->with('error', 'Pesanan yang sudah dikirim/selesai tidak bisa dibatalkan.');
-        }
+        $reason = $request->validate(['reason' => 'nullable|string|max:255'])['reason'] ?? null;
 
-        DB::beginTransaction();
-
-        try {
-            // Kembalikan stok kalau status sudah "dikonfirmasi" atau lebih
-            if (in_array($order->status, ['dikonfirmasi', 'diproses'])) {
-                foreach ($order->items as $item) {
-                    $product = $item->product;
-                    if (!$product) continue;
-
-                    $product->increment('stock', $item->quantity);
-
-                    StockMovement::create([
-                        'product_id' => $product->id,
-                        'type' => 'in',
-                        'quantity' => $item->quantity,
-                        'reference_type' => 'order_cancel',
-                        'reference_id' => $order->id,
-                        'note' => 'Pembatalan ' . $order->order_number,
-                        'user_id' => auth()->id(),
-                    ]);
-                }
-            }
-
-            $order->update(['status' => 'batal']);
-
-            DB::commit();
-
-            return back()->with('success', 'Pesanan dibatalkan.');
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->with('error', 'Gagal batalkan: ' . $e->getMessage());
-        }
+        return $this->run(
+            fn () => $this->orders->cancel($order, $reason, auth()->id()),
+            'Pesanan dibatalkan.'
+        );
     }
 
     /**
-     * Generate invoice PDF.
+     * Invoice PDF (PRD 6.2).
      */
     public function invoice(Order $order)
     {
-        $order->load(['customer', 'items']);
-        return view('admin.orders.invoice', compact('order'));
+        $order->load(['customer', 'items', 'payment']);
+
+        return Pdf::loadView('pdf.invoice', compact('order'))
+            ->setPaper('a4')
+            ->stream('invoice-' . $order->order_number . '.pdf');
+    }
+
+    private function run(\Closure $action, string $successMessage)
+    {
+        try {
+            $action();
+        } catch (DomainException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return back()->with('success', $successMessage);
     }
 }

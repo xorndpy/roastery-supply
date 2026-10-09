@@ -7,10 +7,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 
 class Shipment extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, LogsActivity;
 
     protected $fillable = [
         'order_id',
@@ -47,5 +49,18 @@ class Shipment extends Model
     public function scopePending(Builder $query): Builder
     {
         return $query->where('status', 'pending');
+    }
+
+    /**
+     * Audit log (PRD 6.7): siapa mengubah apa. Hanya field penting yang dicatat.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['courier', 'tracking_number', 'status'])
+            ->logOnlyDirty()
+            ->dontLogEmptyChanges()
+            ->useLogName('pengiriman')
+            ->setDescriptionForEvent(fn (string $event) => "Pengiriman {$event}");
     }
 }

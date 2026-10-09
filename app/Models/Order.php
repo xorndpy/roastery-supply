@@ -9,22 +9,36 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 
 class Order extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, LogsActivity;
 
     protected $fillable = [
         'order_number',
+        'idempotency_key',
         'customer_id',
         'user_id',
         'voucher_id',
+        'voucher_code',
+        'completed_at',
         'status',
         'subtotal',
         'discount',
         'shipping_cost',
         'total',
         'note',
+        'shipping_name',
+        'shipping_phone',
+        'shipping_address',
+        'shipping_method',
+        'shipping_province',
+        'shipping_city',
+        'shipping_postal_code',
+        'shipping_weight',
+        'shipping_etd',
     ];
 
     protected function casts(): array
@@ -33,6 +47,7 @@ class Order extends Model
             'customer_id' => 'integer',
             'user_id' => 'integer',
             'voucher_id' => 'integer',
+            'completed_at' => 'datetime',
             'subtotal' => 'decimal:2',
             'discount' => 'decimal:2',
             'shipping_cost' => 'decimal:2',
@@ -153,128 +168,81 @@ class Order extends Model
     }
 
     /**
-     * Generate unique order number: ORD-[YYYYMMDD]-[NUMBER]
+     * Alamat kirim lengkap untuk ditampilkan. Order baru menyimpan jalan, kota, provinsi, kode pos
+     * terpisah; order lama (sebelum alamat terstruktur) sudah berisi alamat lengkap di shipping_address.
+     */
+    public function getFullShippingAddressAttribute(): ?string
+    {
+        if (!$this->shipping_city) {
+            return $this->shipping_address;
+        }
+
+        return trim(implode(', ', array_filter([$this->shipping_address, $this->shipping_city, trim($this->shipping_province . ' ' . $this->shipping_postal_code)])));
+    }
+
+    /** Batas akhir pengajuan retur (PRD: 7 hari sejak selesai). */
+    public function getReturnDeadlineAttribute(): ?\Illuminate\Support\Carbon
+    {
+        return $this->completed_at?->copy()->addDays(\App\Services\ReturnService::WINDOW_DAYS);
+    }
+
+    public function testimonial(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Testimonial::class);
+    }
+
+    /**
+     * Generate nomor order: ORD-[YYYYMMDD]-[NUMBER] (PRD bagian 10).
+     * Memakai nomor tertinggi hari ini (bukan count) supaya tidak bentrok
+     * walau ada order yang dihapus. Kolom order_number tetap unique sebagai pengaman.
      */
     public static function generateOrderNumber(): string
     {
-        $datePrefix = 'ORD-' . date('Ymd');
-        $count = static::withTrashed()->where('order_number', 'like', "{$datePrefix}-%")->count() + 1;
-        $orderNumber = sprintf('%s-%04d', $datePrefix, $count);
+        $prefix = 'ORD-' . date('Ymd') . '-';
 
-        while (static::withTrashed()->where('order_number', $orderNumber)->exists()) {
-            $count++;
-            $orderNumber = sprintf('%s-%04d', $datePrefix, $count);
-        }
+        $last = static::withTrashed()
+            ->where('order_number', 'like', $prefix . '%')
+            ->orderByDesc('order_number')
+            ->value('order_number');
 
-        return $orderNumber;
+        $next = $last ? ((int) substr($last, -4)) + 1 : 1;
+
+        return $prefix . str_pad((string) $next, 4, '0', STR_PAD_LEFT);
     }
 
     /**
-     * Confirm payment and deduct product stock (PRD Section 5 & 6.2).
+     * Nomor invoice: INV/[YYYYMM]/[NUMBER], diturunkan dari nomor order
+     * (ORD-20260115-0042 -> INV/202601/0042).
      */
-    public function confirmPayment(): bool
+    public function getInvoiceNumberAttribute(): string
     {
-        if ($this->status !== 'menunggu_bayar') {
-            return false;
-        }
+        $parts = explode('-', $this->order_number);
+        $ym = substr($parts[1] ?? $this->created_at->format('Ymd'), 0, 6);
 
-        $this->update(['status' => 'dikonfirmasi']);
+        return 'INV/' . $ym . '/' . end($parts);
+    }
 
-        foreach ($this->items as $item) {
-            if ($item->product) {
-                $item->product->decrement('stock', $item->quantity);
-                $item->product->stockMovements()->create([
-                    'type' => 'out',
-                    'quantity' => $item->quantity,
-                    'reference_type' => 'order',
-                    'reference_id' => $this->id,
-                    'note' => 'Pengurangan stok order #' . $this->order_number,
-                    'user_id' => auth()->id() ?? $this->user_id,
-                ]);
-            }
-        }
-
-        return true;
+    /** Batas waktu pembayaran (PRD aturan #6). */
+    public function getPaymentDeadlineAttribute(): \Illuminate\Support\Carbon
+    {
+        return $this->created_at->copy()->addHours(\App\Services\OrderService::PAYMENT_WINDOW_HOURS);
     }
 
     /**
-     * Process order (status -> diproses).
+     * Perubahan status dan stok SENGAJA tidak ada di model.
+     * Gunakan App\Services\OrderService.
      */
-    public function process(): bool
-    {
-        if ($this->status !== 'dikonfirmasi') {
-            return false;
-        }
-
-        return $this->update(['status' => 'diproses']);
-    }
 
     /**
-     * Ship order (status -> dikirim).
+     * Audit log (PRD 6.7): siapa mengubah apa. Hanya field penting yang dicatat.
      */
-    public function ship(?string $trackingNumber = null, ?string $courier = null): bool
+    public function getActivitylogOptions(): LogOptions
     {
-        if (!in_array($this->status, ['dikonfirmasi', 'diproses'])) {
-            return false;
-        }
-
-        $updated = $this->update(['status' => 'dikirim']);
-
-        if ($trackingNumber) {
-            $this->shipments()->create([
-                'courier' => $courier,
-                'tracking_number' => $trackingNumber,
-                'status' => 'shipped',
-                'shipped_at' => now(),
-            ]);
-        }
-
-        return $updated;
-    }
-
-    /**
-     * Complete order (status -> selesai).
-     */
-    public function complete(): bool
-    {
-        if ($this->status !== 'dikirim') {
-            return false;
-        }
-
-        return $this->update(['status' => 'selesai']);
-    }
-
-    /**
-     * Cancel order and restore stock if it was previously confirmed (PRD Section 11 Edge Cases).
-     */
-    public function cancel(?string $note = null): bool
-    {
-        if (in_array($this->status, ['selesai', 'batal'])) {
-            return false;
-        }
-
-        $previousStatus = $this->status;
-        $this->update([
-            'status' => 'batal',
-            'note' => $note ? ($this->note . "\nBatal: " . $note) : $this->note,
-        ]);
-
-        if (in_array($previousStatus, ['dikonfirmasi', 'diproses', 'dikirim'])) {
-            foreach ($this->items as $item) {
-                if ($item->product) {
-                    $item->product->increment('stock', $item->quantity);
-                    $item->product->stockMovements()->create([
-                        'type' => 'in',
-                        'quantity' => $item->quantity,
-                        'reference_type' => 'order',
-                        'reference_id' => $this->id,
-                        'note' => 'Pengembalian stok pembatalan order #' . $this->order_number,
-                        'user_id' => auth()->id() ?? $this->user_id,
-                    ]);
-                }
-            }
-        }
-
-        return true;
+        return LogOptions::defaults()
+            ->logOnly(['status', 'total'])
+            ->logOnlyDirty()
+            ->dontLogEmptyChanges()
+            ->useLogName('pesanan')
+            ->setDescriptionForEvent(fn (string $event) => "Pesanan {$event}");
     }
 }

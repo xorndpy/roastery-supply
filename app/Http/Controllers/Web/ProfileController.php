@@ -23,10 +23,13 @@ class ProfileController extends Controller
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
-            'city' => 'nullable|string|max:100',
-            'province' => 'nullable|string|max:100',
-            'postal_code' => 'nullable|string|max:10',
-        ]);
+            'province_id' => 'nullable|integer|exists:provinces,id',
+            'city_id' => ['nullable', 'integer', \Illuminate\Validation\Rule::exists('cities', 'id')->where('province_id', $request->input('province_id'))],
+            'postal_code' => 'nullable|digits:5',
+        ], ['city_id.exists' => 'Kota tidak sesuai dengan provinsi yang dipilih.', 'postal_code.digits' => 'Kode pos harus 5 digit angka.']);
+
+        $province = isset($validated['province_id']) ? \App\Models\Province::find($validated['province_id']) : null;
+        $city = isset($validated['city_id']) ? \App\Models\City::find($validated['city_id']) : null;
 
         // Update user
         $user->update([
@@ -43,8 +46,10 @@ class ProfileController extends Controller
                 'email' => $validated['email'],
                 'phone' => $validated['phone'] ?? null,
                 'address' => $validated['address'] ?? null,
-                'city' => $validated['city'] ?? null,
-                'province' => $validated['province'] ?? null,
+                'province_id' => $province?->id,
+                'city_id' => $city?->id,
+                'city' => $city?->name,
+                'province' => $province?->name,
                 'postal_code' => $validated['postal_code'] ?? null,
             ]
         );

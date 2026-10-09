@@ -98,8 +98,8 @@
                         <td class="px-4 py-3">
                             <div class="w-12 h-12 rounded bg-stone-100 overflow-hidden border border-stone-200">
                                 @if($payment->proof_image)
-                                    <a href="{{ asset('storage/' . $payment->proof_image) }}" target="_blank">
-                                        <img src="{{ asset('storage/' . $payment->proof_image) }}"
+                                    <a href="{{ route('admin.payments.proof', $payment->id) }}" target="_blank">
+                                        <img src="{{ route('admin.payments.proof', $payment->id) }}"
                                              alt="Bukti"
                                              class="w-full h-full object-cover hover:scale-110 transition">
                                     </a>

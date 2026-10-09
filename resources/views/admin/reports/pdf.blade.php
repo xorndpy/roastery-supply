@@ -134,6 +134,7 @@
     <div class="stat">
         <div class="stat-label">Total Pendapatan</div>
         <div class="stat-value">Rp {{ number_format($stats['total_revenue'], 0, ',', '.') }}</div>
+        @if(($stats['total_refund'] ?? 0) > 0)<div style="font-size:10px;color:#78716c">refund - Rp {{ number_format($stats['total_refund'], 0, ',', '.') }} / bersih Rp {{ number_format($stats['net_revenue'], 0, ',', '.') }}</div>@endif
     </div>
     <div class="stat">
         <div class="stat-label">Total Pesanan</div>

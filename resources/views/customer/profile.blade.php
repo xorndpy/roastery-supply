@@ -65,22 +65,12 @@
                     <textarea name="address" rows="3"
                               class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-orange-500 focus:border-orange-500">{{ old('address', $customer->address ?? '') }}</textarea>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-1.5">Kota</label>
-                        <input type="text" name="city" value="{{ old('city', $customer->city ?? '') }}"
-                               class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-orange-500 focus:border-orange-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1.5">Provinsi</label>
-                        <input type="text" name="province" value="{{ old('province', $customer->province ?? '') }}"
-                               class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-orange-500 focus:border-orange-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1.5">Kode Pos</label>
-                        <input type="text" name="postal_code" value="{{ old('postal_code', $customer->postal_code ?? '') }}"
-                               class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-orange-500 focus:border-orange-500">
-                    </div>
+                <x-region-select :province-id="old('province_id', $customer->province_id ?? null)" :city-id="old('city_id', $customer->city_id ?? null)" :required="false" />
+                <div class="md:w-1/2">
+                    <label class="block text-sm font-medium mb-1.5">Kode Pos</label>
+                    <input type="text" name="postal_code" inputmode="numeric" maxlength="5" value="{{ old('postal_code', $customer->postal_code ?? '') }}"
+                           class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-orange-500 focus:border-orange-500">
+                    @error('postal_code') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
             </div>
         </div>

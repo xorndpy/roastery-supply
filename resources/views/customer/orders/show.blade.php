@@ -84,12 +84,12 @@
             </div>
             @if($order->discount > 0)
                 <div class="flex justify-between text-green-600">
-                    <span>Diskon</span>
+                    <span>Diskon{{ $order->voucher_code ? ' (' . $order->voucher_code . ')' : '' }}</span>
                     <span>- Rp {{ number_format($order->discount, 0, ',', '.') }}</span>
                 </div>
             @endif
             <div class="flex justify-between">
-                <span class="text-stone-600">Ongkir</span>
+                <span class="text-stone-600">Ongkir{{ $order->shipping_method ? ' (' . $order->shipping_method . ($order->shipping_etd ? ', ' . $order->shipping_etd : '') . ')' : '' }}</span>
                 <span>Rp {{ number_format($order->shipping_cost, 0, ',', '.') }}</span>
             </div>
             <div class="flex justify-between font-bold text-lg pt-2 border-t">
@@ -99,77 +99,102 @@
         </div>
     </div>
 
-    {{-- Upload Bukti Pembayaran --}}
+    {{-- Pembayaran --}}
     @if($order->status === 'menunggu_bayar')
+        @php
+            $payment = $order->payment;
+            $isPending = $payment && $payment->status === 'pending';
+            $isRejected = $payment && $payment->status === 'rejected';
+        @endphp
         <div class="bg-white rounded-lg border border-stone-200 p-6 mb-6">
-            <h2 class="font-bold mb-4">Upload Bukti Pembayaran</h2>
+            <h2 class="font-bold mb-1">Pembayaran</h2>
+            <p class="text-sm text-stone-500 mb-4">
+                Bayar sebelum <strong>{{ $order->payment_deadline->format('d M Y, H:i') }}</strong>.
+                Pesanan yang belum dibayar akan dibatalkan otomatis.
+            </p>
 
-            @if($order->payment)
+            @if($isPending)
                 <div class="bg-yellow-50 border border-yellow-200 p-4 rounded-lg mb-4">
                     <div class="font-medium text-yellow-800">Bukti pembayaran sudah diunggah</div>
-                    <div class="text-sm text-yellow-700 mt-1">Menunggu verifikasi admin.</div>
-                    @if($order->payment->proof_image)
-                        <img src="{{ asset('storage/' . $order->payment->proof_image) }}"
+                    <div class="text-sm text-yellow-700 mt-1">Menunggu verifikasi admin. Salah unggah? Kirim ulang di bawah untuk mengganti.</div>
+                    @if($payment->proof_image)
+                        <img src="{{ route('customer.orders.proof', $order->order_number) }}"
                              alt="Bukti" class="mt-3 max-w-xs rounded border">
                     @endif
                 </div>
-            @else
+            @endif
+
+            @if($isRejected)
+                <div class="bg-red-50 border border-red-200 p-4 rounded-lg mb-4">
+                    <div class="font-medium text-red-800">Bukti pembayaran ditolak</div>
+                    <div class="text-sm text-red-700 mt-1">{{ $payment->note ?: 'Silakan unggah ulang bukti transfer yang valid.' }}</div>
+                </div>
+            @endif
+
+            @unless($isPending)
                 <div class="bg-orange-50 border border-orange-200 p-4 rounded-lg mb-6">
                     <div class="font-medium text-orange-900">Instruksi Pembayaran</div>
                     <p class="text-sm text-orange-700 mt-1">
                         Transfer ke rekening berikut, lalu upload bukti transfer:
                     </p>
-                    <div class="mt-2 font-mono text-sm bg-white p-3 rounded border border-orange-200">
-                        <div>Bank BCA</div>
-                        <div>No. Rek: <strong>1234567890</strong></div>
-                        <div>a/n: Roastery Supply</div>
-                    </div>
+                    @if($site['bank_name'] && $site['bank_account_number'])
+                        <div class="mt-2 font-mono text-sm bg-white p-3 rounded border border-orange-200">
+                            <div>{{ $site['bank_name'] }}</div>
+                            <div>No. Rek: <strong>{{ $site['bank_account_number'] }}</strong></div>
+                            @if($site['bank_account_name'])<div>a/n: {{ $site['bank_account_name'] }}</div>@endif
+                        </div>
+                    @else
+                        <div class="mt-2 text-sm bg-white p-3 rounded border border-orange-200 text-stone-600">
+                            Nomor rekening belum diatur. Silakan <a href="{{ route('contact.index') }}" class="underline">hubungi kami</a> untuk detail pembayaran.
+                        </div>
+                    @endif
+                    @if($site['payment_note'])<p class="mt-2 text-sm text-orange-700 whitespace-pre-line">{{ $site['payment_note'] }}</p>@endif
                     <div class="mt-3 text-sm text-orange-700">
                         Jumlah: <strong>Rp {{ number_format($order->total, 0, ',', '.') }}</strong>
                     </div>
                 </div>
+            @endunless
 
-                <form method="POST" action="{{ route('customer.orders.pay', $order->order_number) }}"
-                      enctype="multipart/form-data" class="space-y-4">
-                    @csrf
+            <form method="POST" action="{{ route('customer.orders.pay', $order->order_number) }}"
+                  enctype="multipart/form-data" class="space-y-4">
+                @csrf
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium mb-2">Metode Pembayaran *</label>
-                            <select name="method" required
-                                    class="w-full border border-stone-300 rounded-lg px-3 py-2">
-                                <option value="transfer_bca">Transfer BCA</option>
-                                <option value="transfer_mandiri">Transfer Mandiri</option>
-                                <option value="transfer_bni">Transfer BNI</option>
-                            </select>
-                        </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Metode Pembayaran *</label>
+                    <select name="method" required
+                            class="w-full border border-stone-300 rounded-lg px-3 py-2">
+                        <option value="transfer_bca">Transfer BCA</option>
+                        <option value="transfer_mandiri">Transfer Mandiri</option>
+                        <option value="transfer_bni">Transfer BNI</option>
+                    </select>
+                </div>
 
-                        <div>
-                            <label class="block text-sm font-medium mb-2">Jumlah Transfer *</label>
-                            <input type="number" name="amount" value="{{ $order->total }}" required
-                                   class="w-full border border-stone-300 rounded-lg px-3 py-2">
-                        </div>
-                    </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Bukti Transfer * <span class="text-stone-400 font-normal">(JPG/PNG/WEBP, maks 2 MB)</span></label>
+                    <input type="file" name="proof_image" accept="image/jpeg,image/png,image/webp" required
+                           class="w-full border border-stone-300 rounded-lg px-3 py-2">
+                    @error('proof_image') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
 
-                    <div>
-                        <label class="block text-sm font-medium mb-2">Bukti Transfer *</label>
-                        <input type="file" name="proof_image" accept="image/*" required
-                               class="w-full border border-stone-300 rounded-lg px-3 py-2">
-                        @error('proof_image') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                    </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Catatan (opsional)</label>
+                    <textarea name="note" rows="2"
+                              class="w-full border border-stone-300 rounded-lg px-3 py-2"></textarea>
+                </div>
 
-                    <div>
-                        <label class="block text-sm font-medium mb-2">Catatan (opsional)</label>
-                        <textarea name="note" rows="2"
-                                  class="w-full border border-stone-300 rounded-lg px-3 py-2"></textarea>
-                    </div>
+                <button type="submit"
+                        class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-medium transition">
+                    {{ $isPending ? 'Ganti Bukti Pembayaran' : 'Upload Bukti Pembayaran' }}
+                </button>
+            </form>
 
-                    <button type="submit"
-                            class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-medium transition">
-                        Upload Bukti Pembayaran
-                    </button>
-                </form>
-            @endif
+            <form method="POST" action="{{ route('customer.orders.cancel', $order->order_number) }}" class="mt-4">
+                @csrf
+                <button type="submit" onclick="return confirm('Yakin batalkan pesanan ini?')"
+                        class="text-sm text-red-600 hover:underline">
+                    Batalkan pesanan
+                </button>
+            </form>
         </div>
     @endif
 
@@ -183,6 +208,64 @@
             </div>
         </div>
     @endif
+
+    @if($order->status === 'selesai')
+        @if($order->return)
+            @php $rs = $order->return->stage; @endphp
+            <div class="bg-white rounded-lg border border-stone-200 p-6 mb-6 flex flex-wrap justify-between items-center gap-3">
+                <div>
+                    <h2 class="font-bold">Retur</h2>
+                    <p class="text-sm text-stone-600">{{ ['pending' => 'Pengajuan retur sedang ditinjau.', 'approved' => 'Retur disetujui, menunggu refund.', 'refunded' => 'Retur selesai, refund sudah ditransfer.', 'rejected' => 'Pengajuan retur ditolak.'][$rs] }}</p>
+                </div>
+                <a href="{{ route('customer.returns.show', $order->return->id) }}" class="text-sm text-orange-600 hover:underline">Lihat detail →</a>
+            </div>
+        @elseif($returnEligible)
+            <div class="bg-white rounded-lg border border-stone-200 p-6 mb-6 flex flex-wrap justify-between items-center gap-3">
+                <div>
+                    <h2 class="font-bold">Ada masalah dengan pesanan?</h2>
+                    <p class="text-sm text-stone-600">Retur bisa diajukan sampai {{ $order->return_deadline->format('d M Y H:i') }}.</p>
+                </div>
+                <a href="{{ route('customer.returns.create', $order->order_number) }}" class="border border-stone-300 hover:bg-stone-50 px-5 py-2 rounded-lg text-sm font-medium">Ajukan Retur</a>
+            </div>
+        @endif
+    @endif
+
+    @if($order->status === 'selesai')
+        <div class="bg-white rounded-lg border border-stone-200 p-6 mb-6">
+            <h2 class="font-bold mb-1">Testimoni</h2>
+            @if($order->testimonial)
+                <p class="text-sm text-stone-600">Terima kasih sudah menulis testimoni.
+                    {{ $order->testimonial->is_approved ? 'Testimoni kamu tampil di website.' : 'Sedang ditinjau admin sebelum tampil.' }}</p>
+            @else
+                <p class="text-sm text-stone-500 mb-4">Bagaimana pengalamanmu dengan pesanan ini?</p>
+                <form method="POST" action="{{ route('customer.orders.testimonial', $order->order_number) }}" class="space-y-3">
+                    @csrf
+                    <select name="rating" class="border border-stone-300 rounded-lg px-3 py-2" required>
+                        @for($i = 5; $i >= 1; $i--)<option value="{{ $i }}">{{ $i }} bintang</option>@endfor
+                    </select>
+                    <textarea name="content" rows="3" required minlength="10" maxlength="1000" placeholder="Tulis pengalamanmu (min. 10 karakter)"
+                              class="w-full border border-stone-300 rounded-lg px-3 py-2">{{ old('content') }}</textarea>
+                    @error('content') <p class="text-red-500 text-xs">{{ $message }}</p> @enderror
+                    <button class="bg-stone-900 text-white px-5 py-2 rounded-lg text-sm">Kirim Testimoni</button>
+                </form>
+            @endif
+        </div>
+    @endif
+
+    @if($order->status === 'dikirim')
+        <form method="POST" action="{{ route('customer.orders.received', $order->order_number) }}" class="mb-6">
+            @csrf
+            <button type="submit" onclick="return confirm('Pesanan sudah kamu terima?')"
+                    class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-medium transition">
+                Pesanan Sudah Diterima
+            </button>
+        </form>
+    @endif
+
+    <div class="text-center mb-4">
+        <a href="{{ route('customer.orders.invoice', $order->order_number) }}" target="_blank"
+           class="text-sm text-orange-600 hover:underline">Unduh Invoice (PDF)</a>
+    </div>
 
     <div class="text-center">
         <a href="{{ route('customer.orders.index') }}" 

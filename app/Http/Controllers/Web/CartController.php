@@ -4,62 +4,65 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Services\CartService;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
+    public function __construct(private CartService $carts)
+    {
+    }
+
     /**
-     * Tampilkan halaman cart.
+     * Tampilkan halaman cart. Harga & stok disegarkan dari database.
      */
     public function index()
     {
-        $cart = session()->get('cart', []);
-        $total = 0;
+        ['cart' => $cart, 'total' => $total, 'notices' => $notices] = $this->carts->refresh();
 
-        foreach ($cart as $item) {
-            $total += $item['price'] * $item['quantity'];
+        if ($notices) {
+            session()->flash('warning', implode(' ', $notices));
         }
 
         return view('customer.cart.index', compact('cart', 'total'));
     }
 
     /**
-     * Tambah produk ke cart.
+     * Tambah produk ke cart (guest boleh; login diminta saat checkout).
      */
     public function store(Request $request)
     {
         $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1',
+            'product_id' => 'required|integer|exists:products,id',
+            'quantity' => 'required|integer|min:1|max:999',
         ]);
 
-        $product = Product::findOrFail($request->product_id);
+        $product = Product::with('images')
+            ->where('is_active', true)
+            ->find($request->product_id);
 
-        // Cek stok
-        if ($product->stock < $request->quantity) {
-            return back()->with('error', 'Stok tidak mencukupi.');
+        if (!$product) {
+            return back()->with('error', 'Produk tidak tersedia.');
         }
 
         $cart = session()->get('cart', []);
-        $id = $product->id;
+        $newQty = ($cart[$product->id]['quantity'] ?? 0) + (int) $request->quantity;
 
-        if (isset($cart[$id])) {
-            $cart[$id]['quantity'] += $request->quantity;
-
-            if ($cart[$id]['quantity'] > $product->stock) {
-                return back()->with('error', 'Stok tidak mencukupi.');
-            }
-        } else {
-            $cart[$id] = [
-                'id' => $product->id,
-                'name' => $product->name,
-                'slug' => $product->slug,
-                'price' => $product->price,
-                'quantity' => $request->quantity,
-                'image' => $product->images->first()->image ?? null,
-                'stock' => $product->stock,
-            ];
+        if ($newQty > $product->stock) {
+            return back()->with('error', "Stok tidak mencukupi (tersisa {$product->stock}).");
         }
+
+        $cart[$product->id] = [
+            'id' => $product->id,
+            'name' => $product->name,
+            'slug' => $product->slug,
+            'sku' => $product->sku,
+            'weight' => (int) $product->weight,
+            'price' => $product->price,
+            'quantity' => $newQty,
+            'image' => $product->images->first()->image ?? null,
+            'stock' => $product->stock,
+        ];
 
         session()->put('cart', $cart);
 
@@ -73,7 +76,7 @@ class CartController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'quantity' => 'required|integer|min:1',
+            'quantity' => 'required|integer|min:1|max:999',
         ]);
 
         $cart = session()->get('cart', []);
@@ -82,13 +85,20 @@ class CartController extends Controller
             return back()->with('error', 'Produk tidak ada di keranjang.');
         }
 
-        $product = Product::find($id);
+        $product = Product::where('is_active', true)->find($id);
 
-        if ($product && $request->quantity > $product->stock) {
-            return back()->with('error', 'Stok tidak mencukupi.');
+        if (!$product) {
+            unset($cart[$id]);
+            session()->put('cart', $cart);
+
+            return back()->with('error', 'Produk sudah tidak tersedia dan dihapus dari keranjang.');
         }
 
-        $cart[$id]['quantity'] = $request->quantity;
+        if ($request->quantity > $product->stock) {
+            return back()->with('error', "Stok tidak mencukupi (tersisa {$product->stock}).");
+        }
+
+        $cart[$id]['quantity'] = (int) $request->quantity;
         session()->put('cart', $cart);
 
         return back()->with('success', 'Keranjang diperbarui.');

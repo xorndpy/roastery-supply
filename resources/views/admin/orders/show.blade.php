@@ -48,15 +48,15 @@
             <div class="grid grid-cols-2 gap-4 pt-4 border-t border-stone-200">
                 <div>
                     <div class="text-xs text-stone-500">Nama</div>
-                    <div class="font-medium">{{ $order->customer->name ?? 'Guest' }}</div>
+                    <div class="font-medium">{{ $order->shipping_name ?: ($order->customer->name ?? 'Guest') }}</div>
                 </div>
                 <div>
                     <div class="text-xs text-stone-500">Telepon</div>
-                    <div class="font-medium">{{ $order->customer->phone ?? '-' }}</div>
+                    <div class="font-medium">{{ $order->shipping_phone ?: ($order->customer->phone ?? '-') }}</div>
                 </div>
                 <div class="col-span-2">
                     <div class="text-xs text-stone-500">Alamat</div>
-                    <div class="font-medium">{{ $order->customer->address ?? '-' }}</div>
+                    <div class="font-medium">{{ $order->full_shipping_address ?: ($order->customer->address ?? '-') }}</div>
                 </div>
             </div>
 
@@ -92,12 +92,12 @@
                 </div>
                 @if($order->discount > 0)
                     <div class="flex justify-between text-sm text-green-600">
-                        <span>Diskon</span>
+                        <span>Diskon{{ $order->voucher_code ? ' (' . $order->voucher_code . ')' : '' }}</span>
                         <span>- Rp {{ number_format($order->discount, 0, ',', '.') }}</span>
                     </div>
                 @endif
                 <div class="flex justify-between text-sm">
-                    <span class="text-stone-600">Ongkir</span>
+                    <span class="text-stone-600">Ongkir{{ $order->shipping_method ? ' (' . $order->shipping_method . ($order->shipping_etd ? ', ' . $order->shipping_etd : '') . ')' : '' }}</span>
                     <span>Rp {{ number_format($order->shipping_cost, 0, ',', '.') }}</span>
                 </div>
                 <div class="flex justify-between font-bold text-lg pt-2 border-t">
@@ -122,7 +122,7 @@
                     </div>
                     <div>
                         @if($order->payment->proof_image)
-                            <img src="{{ asset('storage/' . $order->payment->proof_image) }}"
+                            <img src="{{ route('admin.payments.proof', $order->payment->id) }}"
                                  alt="Bukti Pembayaran"
                                  class="w-full rounded border border-stone-200">
                         @endif
@@ -212,6 +212,7 @@
 
             {{-- Cancel --}}
             @if(in_array($order->status, ['menunggu_bayar', 'dikonfirmasi', 'diproses']))
+                @can('cancel_orders')
                 <form method="POST" action="{{ route('admin.orders.cancel', $order->id) }}">
                     @csrf
                     <button type="submit"
@@ -220,6 +221,7 @@
                         Batalkan Pesanan
                     </button>
                 </form>
+                @endcan
             @endif
 
             {{-- Invoice --}}

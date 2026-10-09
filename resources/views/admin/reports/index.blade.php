@@ -60,6 +60,7 @@
         </div>
         <div class="text-2xl font-bold text-stone-900">
             Rp {{ number_format($stats['total_revenue'], 0, ',', '.') }}
+            @if(($stats['total_refund'] ?? 0) > 0)<span class="block text-xs font-normal text-stone-500 mt-1">refund − Rp {{ number_format($stats['total_refund'], 0, ',', '.') }} · bersih Rp {{ number_format($stats['net_revenue'], 0, ',', '.') }}</span>@endif
         </div>
     </div>
 
