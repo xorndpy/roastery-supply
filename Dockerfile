@@ -3,10 +3,12 @@ FROM php:8.4-fpm-alpine
 # Install system dependencies
 RUN apk add --no-cache \
     git curl libpng-dev oniguruma-dev libxml2-dev \
-    zip unzip nodejs npm nginx supervisor libzip-dev
+    zip unzip nodejs npm nginx supervisor libzip-dev \
+    libjpeg-turbo-dev libwebp-dev freetype-dev
 
-# Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd xml zip
+# Configure & install PHP extensions (TAMBAHIN GD CONFIG DI SINI)
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd xml zip
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -17,7 +19,7 @@ COPY . .
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# INSTALL NODE DEPS & BUILD ASSETS (INI YANG PENTING)
+# INSTALL NODE DEPS & BUILD ASSETS
 RUN npm install && npm run build
 
 # Set permissions
