@@ -17,11 +17,13 @@ return [
             'contact_phone'   => ['label' => 'Telepon', 'type' => 'text', 'max' => 30],
             'contact_whatsapp' => ['label' => 'WhatsApp', 'type' => 'text', 'max' => 20, 'help' => 'Format 628xxxxxxxxxx (tanpa + dan spasi).'],
             'contact_address' => ['label' => 'Alamat', 'type' => 'textarea', 'max' => 500],
+            'contact_hours' => ['label' => 'Jam Operasional', 'type' => 'text', 'default' => 'Senin – Sabtu, 08.00 – 17.00 WIB', 'max' => 100],
         ],
         'Media Sosial' => [
             'social_instagram' => ['label' => 'Instagram', 'type' => 'url'],
             'social_facebook'  => ['label' => 'Facebook', 'type' => 'url'],
             'social_tiktok'    => ['label' => 'TikTok', 'type' => 'url'],
+            'social_linkedin' => ['label' => 'LinkedIn', 'type' => 'url'],
             'social_youtube'   => ['label' => 'YouTube', 'type' => 'url'],
         ],
         'Rekening Pembayaran' => [
@@ -38,6 +40,11 @@ return [
             'about_title' => ['label' => 'Judul', 'type' => 'text', 'default' => 'Tentang Kami', 'max' => 120],
             'about_body'  => ['label' => 'Isi', 'type' => 'textarea', 'max' => 5000, 'rows' => 8,
                 'default' => 'Kami menyediakan mesin kopi profesional untuk kedai kopi di Indonesia.', 'help' => 'Pisahkan paragraf dengan baris kosong.'],
+        ],
+        'Tampilan' => [
+            'hero_bg'         => ['label' => 'Background Beranda (Hero)', 'type' => 'image', 'help' => 'Disarankan 1920 x 1000 px (JPG/WEBP, ideal di bawah 400 KB, maks 2 MB). Tampil di belakang judul dan model 3D di beranda. Kosongkan untuk memakai gradasi coklat.'],
+            'header_bg'       => ['label' => 'Background Header Halaman', 'type' => 'image', 'help' => 'Disarankan 1920 x 500 px (JPG/WEBP, ideal di bawah 300 KB, maks 2 MB). Dipakai di Katalog, Kontak, FAQ, dan halaman lain. Kosongkan untuk memakai latar polos.'],
+            'about_header_bg' => ['label' => 'Background Halaman Tentang', 'type' => 'image', 'help' => 'Opsional, ukuran sama. Kosongkan untuk memakai background header umum.'],
         ],
         'SEO' => [
             'meta_title'       => ['label' => 'Meta Title', 'type' => 'text', 'max' => 70],

@@ -17,7 +17,6 @@
        class="bg-white p-4 rounded-lg border-2 {{ request('status') === 'pending' ? 'border-orange-500' : 'border-stone-200' }} hover:border-orange-500 transition">
         <div class="flex items-center justify-between mb-1">
             <div class="text-xs text-stone-500">Menunggu Verifikasi</div>
-            <div class="text-lg">⏳</div>
         </div>
         <div class="text-2xl font-bold text-orange-600">{{ $stats['pending'] }}</div>
     </a>
@@ -25,7 +24,6 @@
        class="bg-white p-4 rounded-lg border-2 {{ request('status') === 'verified' ? 'border-green-500' : 'border-stone-200' }} hover:border-green-500 transition">
         <div class="flex items-center justify-between mb-1">
             <div class="text-xs text-stone-500">Terverifikasi</div>
-            <div class="text-lg">✅</div>
         </div>
         <div class="text-2xl font-bold text-green-600">{{ $stats['verified'] }}</div>
     </a>
@@ -33,14 +31,12 @@
        class="bg-white p-4 rounded-lg border-2 {{ request('status') === 'rejected' ? 'border-red-500' : 'border-stone-200' }} hover:border-red-500 transition">
         <div class="flex items-center justify-between mb-1">
             <div class="text-xs text-stone-500">Ditolak</div>
-            <div class="text-lg">❌</div>
         </div>
         <div class="text-2xl font-bold text-red-600">{{ $stats['rejected'] }}</div>
     </a>
     <div class="bg-white p-4 rounded-lg border border-stone-200">
         <div class="flex items-center justify-between mb-1">
             <div class="text-xs text-stone-500">Total Pending</div>
-            <div class="text-lg">💰</div>
         </div>
         <div class="text-lg font-bold text-stone-900">
             Rp {{ number_format($stats['total_pending_amount'], 0, ',', '.') }}
@@ -150,13 +146,13 @@
                                         <button type="submit"
                                                 onclick="return confirm('Verify pembayaran ini?')"
                                                 class="text-xs bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded font-medium">
-                                            ✓ Verify
+                                            Verify
                                         </button>
                                     </form>
                                     <button type="button"
                                             onclick="openRejectModal({{ $payment->id }})"
                                             class="text-xs bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded font-medium">
-                                        ✕ Reject
+                                        Reject
                                     </button>
                                 @endif
                                 <a href="{{ route('admin.payments.show', $payment->id) }}"
@@ -169,7 +165,6 @@
                 @empty
                     <tr>
                         <td colspan="7" class="px-4 py-16 text-center text-stone-500">
-                            <div class="text-4xl mb-3">💳</div>
                             <p>Belum ada pembayaran.</p>
                         </td>
                     </tr>

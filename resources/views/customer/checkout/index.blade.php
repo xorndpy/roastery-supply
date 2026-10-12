@@ -3,9 +3,8 @@
 @section('title', 'Checkout')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    
-    <h1 class="text-4xl font-bold mb-8">Checkout</h1>
+<x-page-header title="Checkout" :crumbs="[['Beranda', route('home')], ['Checkout']]" />
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
     @if(session('error'))
         <div class="mb-6 p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg">{{ session('error') }}</div>

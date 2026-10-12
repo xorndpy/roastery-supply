@@ -3,8 +3,8 @@
 @section('title', 'Cabang Kami')
 
 @section('content')
-<div class="max-w-5xl mx-auto px-4 py-16">
-    <h1 class="text-4xl font-bold mb-8">Cabang Kami</h1>
+<x-page-header title="Cabang Kami" :crumbs="[['Beranda', route('home')], ['Cabang Kami']]" />
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
     <div class="space-y-6">
     @forelse($branches as $branch)

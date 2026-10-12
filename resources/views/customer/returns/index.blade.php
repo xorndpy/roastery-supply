@@ -21,7 +21,7 @@
         @php
             $stage = $r->stage;
             $label = ['pending' => 'Menunggu tinjauan', 'approved' => 'Disetujui, menunggu refund', 'refunded' => 'Refund selesai', 'rejected' => 'Ditolak'][$stage];
-            $color = ['pending' => 'bg-yellow-100 text-yellow-800', 'approved' => 'bg-blue-100 text-blue-800', 'refunded' => 'bg-green-100 text-green-800', 'rejected' => 'bg-red-100 text-red-800'][$stage];
+            $color = ['pending' => 'bg-yellow-100 text-yellow-800', 'approved' => 'bg-orange-100 text-orange-800', 'refunded' => 'bg-green-100 text-green-800', 'rejected' => 'bg-red-100 text-red-800'][$stage];
         @endphp
         <a href="{{ route('customer.returns.show', $r->id) }}" class="flex flex-wrap justify-between gap-3 p-5 hover:bg-stone-50">
             <div>

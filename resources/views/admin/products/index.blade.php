@@ -116,7 +116,7 @@
                             <div class="text-xs text-stone-500 mt-0.5">
                                 SKU: {{ $product->sku }}
                                 @if($product->is_featured)
-                                    <span class="ml-2 text-orange-500">★ Featured</span>
+                                    <span class="ml-2 text-orange-500">Unggulan</span>
                                 @endif
                             </div>
                         </td>
@@ -175,7 +175,6 @@
                 @empty
                     <tr>
                         <td colspan="7" class="px-4 py-16 text-center text-stone-500">
-                            <div class="text-4xl mb-3">📦</div>
                             <p class="mb-3">Belum ada produk.</p>
                             <a href="{{ route('admin.products.create') }}"
                                class="inline-block bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-lg text-sm font-medium">

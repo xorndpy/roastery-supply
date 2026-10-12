@@ -3,20 +3,20 @@
 @section('title', 'FAQ')
 
 @section('content')
-<div class="max-w-3xl mx-auto px-4 py-16">
-    <h1 class="text-4xl font-bold mb-8">Pertanyaan Umum</h1>
+<x-page-header title="Pertanyaan Umum" :crumbs="[['Beranda', route('home')], ['Pertanyaan Umum']]" />
 
+<div class="container-x py-10">
     @forelse($faqs as $category => $items)
-        <section class="mb-10">
-            <h2 class="text-sm uppercase tracking-wider text-stone-500 mb-3">{{ $category }}</h2>
-            <div class="bg-white border border-stone-200 rounded-lg divide-y divide-stone-100">
+        <section class="grid gap-4 border-t border-stone-200 py-8 first:border-t-0 first:pt-0 md:grid-cols-[240px_1fr] md:gap-10">
+            <h2 class="heading text-xl">{{ $category }}</h2>
+            <div class="divide-y divide-stone-200">
                 @foreach($items as $faq)
-                    <details class="group p-5">
-                        <summary class="cursor-pointer font-medium list-none flex justify-between gap-4">
+                    <details class="group py-4 first:pt-0">
+                        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-medium [&::-webkit-details-marker]:hidden">
                             {{ $faq->question }}
-                            <span class="text-stone-400 group-open:rotate-45 transition" aria-hidden="true">+</span>
+                            <span class="text-xl leading-none text-orange-500 transition group-open:rotate-45" aria-hidden="true">+</span>
                         </summary>
-                        <p class="text-stone-600 mt-3 leading-relaxed">{!! nl2br(e($faq->answer)) !!}</p>
+                        <p class="mt-3 max-w-2xl text-sm leading-relaxed text-stone-600">{!! nl2br(e($faq->answer)) !!}</p>
                     </details>
                 @endforeach
             </div>
@@ -25,6 +25,12 @@
         <p class="text-stone-500">Belum ada pertanyaan umum.</p>
     @endforelse
 
-    <p class="text-sm text-stone-500">Belum terjawab? <a href="{{ route('contact.index') }}" class="text-orange-600 hover:underline">Hubungi kami</a>.</p>
+    <div class="mt-6 flex flex-col items-start justify-between gap-5 rounded-2xl bg-brand p-8 text-white sm:flex-row sm:items-center">
+        <div>
+            <h2 class="heading text-2xl">Belum menemukan jawaban?</h2>
+            <p class="mt-1 text-sm text-white/75">Tim kami siap membantu lewat form kontak atau WhatsApp.</p>
+        </div>
+        <a href="{{ route('contact.index') }}" class="btn bg-white text-brand hover:bg-orange-100">Hubungi Kami</a>
+    </div>
 </div>
 @endsection

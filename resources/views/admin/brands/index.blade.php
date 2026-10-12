@@ -127,7 +127,6 @@
                 @empty
                     <tr>
                         <td colspan="6" class="px-4 py-16 text-center text-stone-500">
-                            <div class="text-4xl mb-3">🔖</div>
                             <p class="mb-3">Belum ada merek.</p>
                             <a href="{{ route('admin.brands.create') }}"
                                class="inline-block bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-lg text-sm font-medium">

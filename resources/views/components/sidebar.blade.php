@@ -87,47 +87,33 @@
         ->values()->all();
 @endphp
 
-<div class="flex flex-col h-full">
+<div class="flex h-full flex-col">
     {{-- Logo --}}
-    <div class="h-16 flex items-center px-6 border-b border-stone-800 flex-shrink-0">
-        <a href="{{ route('admin.dashboard') }}" class="text-xl font-bold tracking-tight">
-            ROASTERY<span class="text-orange-500">.</span>
-            <span class="text-xs text-stone-500 font-normal ml-1">admin</span>
+    <div class="flex h-16 shrink-0 items-center border-b border-white/10 px-6">
+        <a href="{{ route('admin.dashboard') }}" class="heading text-lg text-white">
+            {{ $site['site_name'] ?? 'Roastery' }}<span class="ml-2 font-sans text-[10px] font-medium uppercase tracking-[0.14em] text-stone-400">admin</span>
         </a>
     </div>
 
     {{-- Nav --}}
-    <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-6">
-
+    <nav class="flex-1 space-y-5 overflow-y-auto py-4" aria-label="Menu admin">
         @foreach($menus as $menu)
             <div>
-                <div class="px-3 mb-2 text-xs font-semibold text-stone-500 uppercase tracking-wider">
-                    {{ $menu['group'] }}
-                </div>
-                <div class="space-y-1">
-                    @foreach($menu['items'] as $item)
-                        @php
-                            $isActive = request()->routeIs($item['route']);
-                        @endphp
-                        <a href="{{ route($item['route']) }}"
-                           class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors
-                                  {{ $isActive
-                                      ? 'bg-orange-500 text-white font-medium'
-                                      : 'text-stone-300 hover:bg-stone-800 hover:text-white' }}">
-                            <span class="text-base">{{ $item['icon'] }}</span>
-                            <span>{{ $item['label'] }}</span>
-                            @if($item['route'] === 'admin.messages.index' && $unreadMessages > 0)
-                                <span class="ml-auto bg-orange-500 text-white text-xs font-semibold rounded-full px-2 py-0.5">{{ $unreadMessages }}</span>
-                            @endif
-                        </a>
-                    @endforeach
-                </div>
+                <div class="mb-1.5 px-6 text-[10px] font-semibold uppercase tracking-[0.14em] text-stone-500">{{ $menu['group'] }}</div>
+                @foreach($menu['items'] as $item)
+                    @php $isActive = request()->routeIs(str_replace('.index', '.*', $item['route'])) || request()->routeIs($item['route']); @endphp
+                    <a href="{{ route($item['route']) }}"
+                       class="flex items-center border-l-[3px] px-6 py-2 text-[13.5px] transition
+                              {{ $isActive ? 'border-orange-400 bg-white/10 font-medium text-white' : 'border-transparent text-stone-300 hover:bg-white/5 hover:text-white' }}">
+                        <span>{{ $item['label'] }}</span>
+                        @if($item['route'] === 'admin.messages.index' && $unreadMessages > 0)
+                            <span class="ml-auto rounded-full bg-orange-500 px-2 py-0.5 text-[11px] font-semibold text-white">{{ $unreadMessages }}</span>
+                        @endif
+                    </a>
+                @endforeach
             </div>
         @endforeach
     </nav>
 
-    {{-- Footer --}}
-    <div class="p-4 border-t border-stone-800 text-xs text-stone-500 flex-shrink-0">
-        v1.0 — {{ now()->format('Y') }}
-    </div>
+    <div class="shrink-0 border-t border-white/10 px-6 py-4 text-xs text-stone-500">v1.0 — {{ now()->format('Y') }}</div>
 </div>

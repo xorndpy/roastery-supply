@@ -162,7 +162,7 @@
                     @csrf
                     <button type="submit"
                             class="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-medium transition">
-                        ✓ Konfirmasi Pembayaran
+                        Konfirmasi Pembayaran
                     </button>
                 </form>
             @endif
@@ -205,7 +205,7 @@
                     @csrf
                     <button type="submit"
                             class="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-medium transition">
-                        ✓ Tandai Selesai
+                        Tandai Selesai
                     </button>
                 </form>
             @endif
@@ -228,7 +228,7 @@
             <a href="{{ route('admin.orders.invoice', $order->id) }}"
                target="_blank"
                class="block mt-3 text-center border border-stone-300 hover:bg-stone-50 py-2 rounded-lg text-sm">
-                🖨️ Cetak Invoice
+                Cetak Invoice
             </a>
         </div>
     </div>

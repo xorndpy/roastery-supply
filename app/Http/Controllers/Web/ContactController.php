@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Models\Branch;
 use App\Models\ContactMessage;
 use Illuminate\Http\Request;
 
@@ -10,7 +11,9 @@ class ContactController extends Controller
 {
     public function index()
     {
-        return view('customer.kontak.index');
+        $branches = Branch::active()->orderBy('name')->get();
+
+        return view('customer.kontak.index', compact('branches'));
     }
 
     public function store(Request $request)

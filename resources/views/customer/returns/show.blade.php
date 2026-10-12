@@ -10,7 +10,7 @@
     @php
         $stage = $return->stage;
         $label = ['pending' => 'Menunggu tinjauan', 'approved' => 'Disetujui, menunggu refund', 'refunded' => 'Refund selesai', 'rejected' => 'Ditolak'][$stage];
-        $color = ['pending' => 'bg-yellow-100 text-yellow-800', 'approved' => 'bg-blue-100 text-blue-800', 'refunded' => 'bg-green-100 text-green-800', 'rejected' => 'bg-red-100 text-red-800'][$stage];
+        $color = ['pending' => 'bg-yellow-100 text-yellow-800', 'approved' => 'bg-orange-100 text-orange-800', 'refunded' => 'bg-green-100 text-green-800', 'rejected' => 'bg-red-100 text-red-800'][$stage];
     @endphp
 
     <div class="flex flex-wrap items-center gap-3 mt-2 mb-6">
@@ -23,9 +23,9 @@
     @if($stage === 'rejected')
         <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800"><strong>Alasan penolakan:</strong> {{ $return->note }}</div>
     @elseif($stage === 'approved')
-        <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-900">
+        <div class="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-lg text-sm text-orange-900">
             Refund <strong>Rp {{ number_format($return->refund_amount, 0, ',', '.') }}</strong> akan ditransfer ke rekening di bawah.
-            @if($return->note)<div class="mt-1 text-blue-800">Catatan admin: {{ $return->note }}</div>@endif
+            @if($return->note)<div class="mt-1 text-orange-800">Catatan admin: {{ $return->note }}</div>@endif
         </div>
     @elseif($stage === 'refunded')
         <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-sm text-green-900">

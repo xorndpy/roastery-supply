@@ -1,60 +1,85 @@
-<footer class="bg-stone-900 text-stone-300 mt-16">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+@php
+    $wa = !empty($site['contact_whatsapp']) ? preg_replace('/\D/', '', $site['contact_whatsapp']) : null;
+    $socials = array_filter([
+        'whatsapp'  => $wa ? 'https://wa.me/' . $wa : null,
+        'instagram' => $site['social_instagram'] ?? null,
+        'tiktok'    => $site['social_tiktok'] ?? null,
+        'linkedin'  => $site['social_linkedin'] ?? null,
+        'facebook'  => $site['social_facebook'] ?? null,
+        'youtube'   => $site['social_youtube'] ?? null,
+    ]);
+    $nav = [['Beranda', 'home'], ['Katalog', 'products.index'], ['Tentang Kami', 'about'], ['Cabang', 'branches.index'], ['FAQ', 'faq'], ['Kontak', 'contact.index']];
+    $contacts = array_filter([
+        ['pin',   $site['contact_address'] ?? null, null],
+        ['mail',  $site['contact_email'] ?? null, !empty($site['contact_email']) ? 'mailto:' . $site['contact_email'] : null],
+        ['phone', $site['contact_phone'] ?? null, !empty($site['contact_phone']) ? 'tel:' . preg_replace('/[^0-9+]/', '', $site['contact_phone']) : null],
+        ['whatsapp', $wa ? 'Chat via WhatsApp' : null, $wa ? 'https://wa.me/' . $wa : null],
+        ['clock', $site['contact_hours'] ?? null, null],
+    ], fn ($c) => filled($c[1]));
+@endphp
 
-            {{-- Brand --}}
-            <div>
-                <h3 class="text-white text-xl font-bold mb-4">{{ $site['site_name'] }}</h3>
-                @if($site['tagline'])<p class="text-sm">{{ $site['tagline'] }}</p>@endif
-            </div>
+<footer class="mt-20 border-t border-stone-200 bg-white">
+    <div class="container-x grid gap-12 py-14 md:grid-cols-[1.5fr_1fr_1.4fr]">
 
-            {{-- Katalog --}}
-            <div>
-                <h4 class="text-white font-semibold mb-4">Katalog</h4>
-                <ul class="space-y-2 text-sm">
-                    <li><a href="{{ route('products.index') }}" class="hover:text-orange-500">Semua Produk</a></li>
-                    <li><a href="{{ route('branches.index') }}" class="hover:text-orange-500">Cabang</a></li>
-                </ul>
-            </div>
+        {{-- Brand + sosial --}}
+        <div>
+            @if(!empty($site['site_logo']))
+                <img src="{{ asset('storage/' . $site['site_logo']) }}" alt="{{ $site['site_name'] }}" class="h-10 w-auto">
+            @else
+                <div class="heading text-2xl text-brand">{{ $site['site_name'] }}</div>
+            @endif
+            @if(!empty($site['tagline']))
+                <p class="mt-3 max-w-sm text-sm leading-relaxed text-stone-600">{{ $site['tagline'] }}</p>
+            @endif
 
-            {{-- Info --}}
-            <div>
-                <h4 class="text-white font-semibold mb-4">Informasi</h4>
-                <ul class="space-y-2 text-sm">
-                    <li><a href="{{ route('about') }}" class="hover:text-orange-500">Tentang Kami</a></li>
-                    <li><a href="{{ route('contact.index') }}" class="hover:text-orange-500">Kontak</a></li>
-                    <li><a href="{{ route('faq') }}" class="hover:text-orange-500">FAQ</a></li>
-                </ul>
-            </div>
-
-            {{-- Kontak: hanya yang sudah diisi di Pengaturan --}}
-            <div>
-                <h4 class="text-white font-semibold mb-4">Kontak</h4>
-                <ul class="space-y-2 text-sm">
-                    @if($site['contact_address'])<li class="whitespace-pre-line">{{ $site['contact_address'] }}</li>@endif
-                    @if($site['contact_email'])<li><a href="mailto:{{ $site['contact_email'] }}" class="hover:text-orange-500">{{ $site['contact_email'] }}</a></li>@endif
-                    @if($site['contact_phone'])<li><a href="tel:{{ preg_replace('/[^0-9+]/', '', $site['contact_phone']) }}" class="hover:text-orange-500">{{ $site['contact_phone'] }}</a></li>@endif
-                    @if($site['contact_whatsapp'])<li><a href="https://wa.me/{{ preg_replace('/\D/', '', $site['contact_whatsapp']) }}" target="_blank" rel="noopener noreferrer" class="hover:text-orange-500">WhatsApp</a></li>@endif
-                    @if(!$site['contact_address'] && !$site['contact_email'] && !$site['contact_phone'] && !$site['contact_whatsapp'])
-                        <li><a href="{{ route('contact.index') }}" class="hover:text-orange-500">Kirim pesan</a></li>
-                    @endif
-                </ul>
-
-                @php
-                    $socials = ['Instagram' => $site['social_instagram'], 'Facebook' => $site['social_facebook'], 'TikTok' => $site['social_tiktok'], 'YouTube' => $site['social_youtube']];
-                @endphp
-                @if(collect($socials)->filter()->isNotEmpty())
-                    <div class="flex flex-wrap gap-x-4 gap-y-1 mt-4 text-sm">
-                        @foreach($socials as $label => $url)
-                            @if($url)<a href="{{ $url }}" target="_blank" rel="noopener noreferrer" class="hover:text-orange-500">{{ $label }}</a>@endif
-                        @endforeach
-                    </div>
-                @endif
-            </div>
+            @if($socials)
+                <div class="mt-6 flex flex-wrap gap-2.5">
+                    @foreach($socials as $name => $url)
+                        <a href="{{ $url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ ucfirst($name) }}"
+                           class="flex h-11 w-11 items-center justify-center rounded-full border border-stone-200 bg-white text-orange-600 shadow-sm transition hover:-translate-y-0.5 hover:border-orange-500 hover:bg-orange-50">
+                            <x-ui-icon :name="$name" class="h-5 w-5" />
+                        </a>
+                    @endforeach
+                </div>
+            @endif
         </div>
 
-        <div class="border-t border-stone-800 mt-8 pt-8 text-sm text-center">
-            &copy; {{ date('Y') }} {{ $site['site_name'] }}. All rights reserved.
+        {{-- Navigasi --}}
+        <div>
+            <h4 class="mb-4 text-xs font-semibold uppercase tracking-[0.12em] text-stone-900">Navigasi</h4>
+            <ul class="space-y-2.5 text-sm">
+                @foreach($nav as [$label, $route])
+                    <li><a href="{{ route($route) }}" class="text-stone-600 transition hover:text-orange-600">{{ $label }}</a></li>
+                @endforeach
+            </ul>
+        </div>
+
+        {{-- Kontak --}}
+        <div>
+            <h4 class="mb-4 text-xs font-semibold uppercase tracking-[0.12em] text-stone-900">Hubungi Kami</h4>
+            <ul class="space-y-3.5 text-sm">
+                @forelse($contacts as [$icon, $text, $href])
+                    <li class="flex items-start gap-3">
+                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-stone-200 bg-white text-orange-500">
+                            <x-ui-icon :name="$icon" class="h-[18px] w-[18px]" />
+                        </span>
+                        @if($href)
+                            <a href="{{ $href }}" @if(str_starts_with($href, 'http')) target="_blank" rel="noopener noreferrer" @endif
+                               class="self-center break-all text-stone-700 transition hover:text-orange-600">{{ $text }}</a>
+                        @else
+                            <span class="self-center whitespace-pre-line leading-relaxed text-stone-700">{{ $text }}</span>
+                        @endif
+                    </li>
+                @empty
+                    <li><a href="{{ route('contact.index') }}" class="text-stone-700 hover:text-orange-600">Kirim pesan kepada kami</a></li>
+                @endforelse
+            </ul>
+        </div>
+    </div>
+
+    <div class="border-t border-stone-200">
+        <div class="container-x py-5 text-xs text-stone-500">
+            &copy; {{ date('Y') }} {{ $site['site_name'] }}. Seluruh hak cipta dilindungi.
         </div>
     </div>
 </footer>

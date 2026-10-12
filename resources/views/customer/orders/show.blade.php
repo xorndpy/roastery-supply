@@ -3,15 +3,14 @@
 @section('title', 'Detail Pesanan ' . $order->order_number)
 
 @section('content')
-<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    
-    <nav class="text-sm text-stone-500 mb-6">
-        <a href="{{ route('home') }}" class="hover:text-orange-500">Beranda</a>
-        <span class="mx-2">/</span>
-        <a href="{{ route('customer.orders.index') }}" class="hover:text-orange-500">Pesanan Saya</a>
-        <span class="mx-2">/</span>
+<div class="border-b border-stone-200 bg-stone-100">
+    <div class="container-x py-5 text-[13px] text-stone-500">
+        <a href="{{ route('home') }}" class="hover:text-stone-900">Beranda</a> <span class="mx-1">/</span>
+        <a href="{{ route('customer.orders.index') }}" class="hover:text-stone-900">Pesanan Saya</a> <span class="mx-1">/</span>
         <span class="text-stone-900">{{ $order->order_number }}</span>
-    </nav>
+    </div>
+</div>
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
     @if(session('success'))
         <div class="mb-6 p-4 bg-green-50 border border-green-200 text-green-800 rounded-lg">
@@ -38,9 +37,9 @@
                 @php
                     $statusColors = [
                         'menunggu_bayar' => 'bg-yellow-100 text-yellow-800',
-                        'dikonfirmasi' => 'bg-blue-100 text-blue-800',
-                        'diproses' => 'bg-purple-100 text-purple-800',
-                        'dikirim' => 'bg-indigo-100 text-indigo-800',
+                        'dikonfirmasi' => 'bg-orange-100 text-orange-800',
+                        'diproses' => 'bg-orange-200 text-orange-900',
+                        'dikirim' => 'bg-stone-200 text-stone-800',
                         'selesai' => 'bg-green-100 text-green-800',
                         'batal' => 'bg-red-100 text-red-800',
                     ];

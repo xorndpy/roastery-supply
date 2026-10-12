@@ -3,111 +3,82 @@
 @section('title', 'Katalog Produk')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    
-    <h1 class="text-4xl font-bold mb-2">Katalog Produk</h1>
-    <p class="text-stone-600 mb-8">Mesin kopi profesional untuk kedai kopi serius.</p>
+<x-page-header title="Katalog Produk" :subtitle="$site['tagline']" :crumbs="[['Beranda', route('home')], ['Katalog Produk']]" />
 
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        
-        {{-- Filter Sidebar --}}
-        <aside class="lg:col-span-1">
-            <form method="GET" action="{{ route('products.index') }}" class="space-y-6">
-                
-                {{-- Search --}}
-                <div>
-                    <label class="block text-sm font-medium mb-2">Cari Produk</label>
-                    <input type="text" name="search" value="{{ request('search') }}"
-                           class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:ring-orange-500 focus:border-orange-500"
-                           placeholder="Nama produk...">
-                </div>
+<div class="container-x grid gap-10 py-10 lg:grid-cols-[240px_1fr]" x-data="{ filters: false }">
 
-                {{-- Kategori --}}
-                <div>
-                    <label class="block text-sm font-medium mb-2">Kategori</label>
-                    <select name="category" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm">
-                        <option value="">Semua Kategori</option>
-                        @foreach($categories as $cat)
-                            <option value="{{ $cat->slug }}" {{ request('category') == $cat->slug ? 'selected' : '' }}>
-                                {{ $cat->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+    {{-- Filter --}}
+    <aside class="lg:sticky lg:top-24 lg:self-start">
+        <button type="button" @click="filters = !filters" class="btn btn-outline btn-sm mb-4 w-full lg:hidden">
+            <span x-text="filters ? 'Tutup Filter' : 'Tampilkan Filter'"></span>
+        </button>
 
-                {{-- Merek --}}
-                <div>
-                    <label class="block text-sm font-medium mb-2">Merek</label>
-                    <select name="brand" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm">
-                        <option value="">Semua Merek</option>
-                        @foreach($brands as $brand)
-                            <option value="{{ $brand->slug }}" {{ request('brand') == $brand->slug ? 'selected' : '' }}>
-                                {{ $brand->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+        <form id="filter-form" method="GET" action="{{ route('products.index') }}"
+              class="space-y-5 rounded-xl border border-stone-200 bg-white p-5 lg:block"
+              :class="filters ? 'block' : 'hidden lg:block'">
+            <div class="flex items-center justify-between">
+                <b class="text-sm">Filter</b>
+                <a href="{{ route('products.index') }}" class="text-[13px] text-orange-600 hover:underline">Reset</a>
+            </div>
 
-                {{-- Sort --}}
-                <div>
-                    <label class="block text-sm font-medium mb-2">Urutkan</label>
-                    <select name="sort" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm">
-                        <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>Terbaru</option>
-                        <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Harga Terendah</option>
-                        <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Harga Tertinggi</option>
-                        <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>Nama A-Z</option>
-                    </select>
-                </div>
+            <div>
+                <label for="f-search" class="mb-1.5 block text-xs font-semibold uppercase tracking-[0.08em] text-stone-500">Cari</label>
+                <input id="f-search" type="text" name="search" value="{{ request('search') }}" placeholder="Nama produk…" class="field">
+            </div>
 
-                <button type="submit" 
-                        class="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-lg font-medium transition">
-                    Terapkan Filter
-                </button>
-                <a href="{{ route('products.index') }}" 
-                   class="block text-center text-sm text-stone-500 hover:text-stone-700">
-                    Reset
-                </a>
-            </form>
-        </aside>
-
-        {{-- Product Grid --}}
-        <div class="lg:col-span-3">
-            @if($products->count())
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    @foreach($products as $product)
-                        <a href="{{ route('products.show', $product->slug) }}"
-                           class="bg-white rounded-lg overflow-hidden border border-stone-200 hover:shadow-lg transition group">
-                            <div class="aspect-square bg-stone-100 overflow-hidden">
-                                @if($product->images->first())
-                                    <img src="{{ asset('storage/' . $product->images->first()->image) }}"
-                                         alt="{{ $product->name }}"
-                                         class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                                @else
-                                    <div class="w-full h-full flex items-center justify-center text-stone-400 text-sm">
-                                        No Image
-                                    </div>
-                                @endif
-                            </div>
-                            <div class="p-4">
-                                <div class="text-xs text-stone-500 uppercase">{{ $product->brand->name ?? '' }}</div>
-                                <div class="font-medium text-stone-900 mt-1 line-clamp-2">{{ $product->name }}</div>
-                                <div class="text-orange-500 font-bold mt-2">
-                                    Rp {{ number_format($product->price, 0, ',', '.') }}
-                                </div>
-                            </div>
-                        </a>
+            <div>
+                <label for="f-cat" class="mb-1.5 block text-xs font-semibold uppercase tracking-[0.08em] text-stone-500">Kategori</label>
+                <select id="f-cat" name="category" class="field">
+                    <option value="">Semua Kategori</option>
+                    @foreach($categories as $cat)
+                        <option value="{{ $cat->slug }}" @selected(request('category') == $cat->slug)>{{ $cat->name }}</option>
                     @endforeach
-                </div>
+                </select>
+            </div>
 
-                <div class="mt-8">
-                    {{ $products->links() }}
-                </div>
-            @else
-                <div class="text-center py-16 bg-white rounded-lg border border-stone-200">
-                    <p class="text-stone-500">Belum ada produk.</p>
-                </div>
-            @endif
+            <div>
+                <label for="f-brand" class="mb-1.5 block text-xs font-semibold uppercase tracking-[0.08em] text-stone-500">Merek</label>
+                <select id="f-brand" name="brand" class="field">
+                    <option value="">Semua Merek</option>
+                    @foreach($brands as $brand)
+                        <option value="{{ $brand->slug }}" @selected(request('brand') == $brand->slug)>{{ $brand->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-full">Terapkan Filter</button>
+        </form>
+    </aside>
+
+    {{-- Hasil --}}
+    <div class="min-w-0">
+        <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+            <span class="text-sm text-stone-500">{{ $products->total() }} produk</span>
+            <div class="flex items-center gap-2 text-sm">
+                <label for="f-sort" class="text-stone-500">Urutkan</label>
+                <select id="f-sort" name="sort" form="filter-form" onchange="this.form.submit()" class="field !h-10 !w-auto pr-8">
+                    <option value="latest" @selected(request('sort', 'latest') == 'latest')>Terbaru</option>
+                    <option value="price_asc" @selected(request('sort') == 'price_asc')>Harga Terendah</option>
+                    <option value="price_desc" @selected(request('sort') == 'price_desc')>Harga Tertinggi</option>
+                    <option value="name_asc" @selected(request('sort') == 'name_asc')>Nama A–Z</option>
+                </select>
+            </div>
         </div>
+
+        @if($products->count())
+            <div class="grid grid-cols-2 gap-4 xl:grid-cols-3 lg:gap-5">
+                @foreach($products as $product)
+                    <x-product-card :product="$product" />
+                @endforeach
+            </div>
+
+            <div class="mt-10">{{ $products->links() }}</div>
+        @else
+            <div class="rounded-xl border border-stone-200 bg-white py-16 text-center">
+                <p class="text-stone-500">Produk tidak ditemukan.</p>
+                <a href="{{ route('products.index') }}" class="mt-3 inline-block text-sm text-orange-600 hover:underline">Reset filter</a>
+            </div>
+        @endif
     </div>
 </div>
 @endsection

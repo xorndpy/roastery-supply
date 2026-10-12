@@ -13,12 +13,12 @@
     <div class="flex gap-2">
         <a href="{{ route('admin.reports.export-excel', ['period' => $period]) }}"
            class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
-            📊 Export Excel
+            Export Excel
         </a>
         <a href="{{ route('admin.reports.export-pdf', ['period' => $period]) }}"
            target="_blank"
            class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
-            📄 Export PDF
+            Export PDF
         </a>
     </div>
 </div>
@@ -56,7 +56,6 @@
     <div class="bg-white p-5 rounded-lg border border-stone-200">
         <div class="flex items-center justify-between mb-2">
             <div class="text-xs text-stone-500 uppercase">Total Pendapatan</div>
-            <div class="text-2xl">💰</div>
         </div>
         <div class="text-2xl font-bold text-stone-900">
             Rp {{ number_format($stats['total_revenue'], 0, ',', '.') }}
@@ -67,7 +66,6 @@
     <div class="bg-white p-5 rounded-lg border border-stone-200">
         <div class="flex items-center justify-between mb-2">
             <div class="text-xs text-stone-500 uppercase">Total Pesanan</div>
-            <div class="text-2xl">🛒</div>
         </div>
         <div class="text-2xl font-bold text-stone-900">
             {{ number_format($stats['total_orders']) }}
@@ -77,7 +75,6 @@
     <div class="bg-white p-5 rounded-lg border border-stone-200">
         <div class="flex items-center justify-between mb-2">
             <div class="text-xs text-stone-500 uppercase">Rata-rata Order</div>
-            <div class="text-2xl">📊</div>
         </div>
         <div class="text-2xl font-bold text-stone-900">
             Rp {{ number_format($stats['avg_order_value'], 0, ',', '.') }}
@@ -87,7 +84,6 @@
     <div class="bg-white p-5 rounded-lg border border-stone-200">
         <div class="flex items-center justify-between mb-2">
             <div class="text-xs text-stone-500 uppercase">Produk Terjual</div>
-            <div class="text-2xl">📦</div>
         </div>
         <div class="text-2xl font-bold text-stone-900">
             {{ number_format($stats['total_products_sold']) }}
@@ -97,7 +93,6 @@
     <div class="bg-white p-5 rounded-lg border border-stone-200">
         <div class="flex items-center justify-between mb-2">
             <div class="text-xs text-stone-500 uppercase">Pelanggan Baru</div>
-            <div class="text-2xl">👥</div>
         </div>
         <div class="text-2xl font-bold text-stone-900">
             {{ number_format($stats['new_customers']) }}
@@ -107,7 +102,6 @@
     <div class="bg-white p-5 rounded-lg border border-stone-200">
         <div class="flex items-center justify-between mb-2">
             <div class="text-xs text-stone-500 uppercase">Menunggu Bayar</div>
-            <div class="text-2xl">⏳</div>
         </div>
         <div class="text-2xl font-bold text-orange-500">
             {{ number_format($stats['pending_orders']) }}
@@ -128,7 +122,7 @@
 
     {{-- Top Products --}}
     <div class="lg:col-span-2 bg-white p-6 rounded-lg border border-stone-200">
-        <h2 class="font-bold mb-4">🏆 Produk Terlaris</h2>
+        <h2 class="font-bold mb-4">Produk Terlaris</h2>
 
         @if($topProducts->count())
             <div class="overflow-x-auto">
@@ -166,7 +160,7 @@
 
     {{-- Status Breakdown --}}
     <div class="bg-white p-6 rounded-lg border border-stone-200">
-        <h2 class="font-bold mb-4">📋 Status Pesanan</h2>
+        <h2 class="font-bold mb-4">Status Pesanan</h2>
 
         @php
             $statusLabels = [
@@ -192,7 +186,7 @@
         </div>
 
         <div class="border-t border-stone-200 mt-6 pt-6">
-            <h3 class="font-bold mb-3 text-sm">💳 Pembayaran</h3>
+            <h3 class="font-bold mb-3 text-sm">Pembayaran</h3>
             <div class="space-y-2 text-sm">
                 <div class="flex justify-between">
                     <span class="text-stone-600">Menunggu</span>
