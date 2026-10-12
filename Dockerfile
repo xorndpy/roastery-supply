@@ -1,4 +1,4 @@
-FROM php:8.2-fpm-alpine
+FROM php:8.4-fpm-alpine
 
 # Install system dependencies
 RUN apk add --no-cache \
@@ -12,10 +12,11 @@ RUN apk add --no-cache \
     nodejs \
     npm \
     nginx \
-    supervisor
+    supervisor \
+    libzip-dev
 
 # Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd xml
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd xml zip
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
