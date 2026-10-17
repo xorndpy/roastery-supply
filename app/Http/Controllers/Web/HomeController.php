@@ -44,7 +44,9 @@ class HomeController extends Controller
 
     public function about()
     {
-        return view('customer.about');
+        $partners = Partner::active()->orderBy('sort_order')->orderBy('name')->get();
+
+        return view('customer.about', compact('partners'));
     }
 
     public function faq()

@@ -36,6 +36,10 @@ class DashboardController extends Controller
         $lowStockProducts = Product::whereColumn('stock', '<=', 'stock_threshold')->where('is_active', true)->count();
         $pendingPayments = Payment::where('status', 'pending')->count();
 
+        // Antrean kerja admin: pesanan yang sudah dibayar tapi belum diproses / belum dikirim (semua waktu).
+        $ordersToProcess = Order::where('status', 'dikonfirmasi')->count();
+        $ordersToShip = Order::where('status', 'diproses')->count();
+
         // ---- Periode terpilih vs periode sebelumnya ----
         $revenue = (float) Order::whereIn('status', self::PAID)->where('created_at', '>=', $start)->sum('total');
         $revenuePrev = (float) Order::whereIn('status', self::PAID)->whereBetween('created_at', [$prevStart, $start])->sum('total');
@@ -52,9 +56,11 @@ class DashboardController extends Controller
             ->pluck('total', 'd');
 
         $chartLabels = [];
+        $chartDates = [];
         $chartData = [];
         foreach (CarbonPeriod::create($start, now()->startOfDay()) as $day) {
-            $chartLabels[] = $day->translatedFormat('j M');
+            $chartLabels[] = $day->copy()->locale('id')->translatedFormat('j M');
+            $chartDates[] = $day->toDateString();
             $chartData[] = (float) ($daily[$day->toDateString()] ?? 0);
         }
 
@@ -101,7 +107,7 @@ class DashboardController extends Controller
 
         return view('admin.dashboard', compact(
             'range', 'revenue', 'revenueDelta', 'orders', 'ordersDelta',
-            'chartLabels', 'chartData', 'statusChart', 'topProducts',
+            'chartLabels', 'chartDates', 'chartData', 'statusChart', 'topProducts', 'ordersToProcess', 'ordersToShip',
             'unreadMessages', 'pendingTestimonials', 'pendingReturns', 'shippingConfigured',
             'totalRefund', 'totalRevenue', 'totalOrders', 'pendingOrders', 'totalProducts',
             'totalCustomers', 'lowStockProducts', 'pendingPayments', 'recentOrders', 'lowStockList'

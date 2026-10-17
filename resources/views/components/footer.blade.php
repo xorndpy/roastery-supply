@@ -13,8 +13,6 @@
         ['pin',   $site['contact_address'] ?? null, null],
         ['mail',  $site['contact_email'] ?? null, !empty($site['contact_email']) ? 'mailto:' . $site['contact_email'] : null],
         ['phone', $site['contact_phone'] ?? null, !empty($site['contact_phone']) ? 'tel:' . preg_replace('/[^0-9+]/', '', $site['contact_phone']) : null],
-        ['whatsapp', $wa ? 'Chat via WhatsApp' : null, $wa ? 'https://wa.me/' . $wa : null],
-        ['clock', $site['contact_hours'] ?? null, null],
     ], fn ($c) => filled($c[1]));
 @endphp
 

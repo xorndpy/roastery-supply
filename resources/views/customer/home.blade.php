@@ -12,17 +12,19 @@
 @endphp
 <section class="relative overflow-hidden bg-gradient-to-br from-[#24150e] to-brand text-white">
     @if(!empty($site['hero_bg']))
-        {{-- Background hero (Admin > Pengaturan > Tampilan > Background Beranda) --}}
-        {{-- Foto dibuat "ambient": sedikit blur, desaturasi, dan overlay gelap agar tidak bersaing dengan teks dan model 3D. --}}
-        <img src="{{ asset('storage/' . $site['hero_bg']) }}" alt="" class="absolute inset-0 h-full w-full scale-110 object-cover blur-[3px] saturate-[.75]">
-        <div class="absolute inset-0 bg-[#24150e]/70"></div>
-        <div class="absolute inset-0 bg-gradient-to-r from-[#24150e]/95 via-[#24150e]/70 to-[#24150e]/55"></div>
+        {{-- Background hero (Admin > Pengaturan > Tampilan > Background Beranda). --}}
+        {{-- Foto dibiarkan jelas (tanpa blur). Gelap hanya di belakang teks, lalu memudar ke kanan agar foto tetap terlihat. --}}
+        <img src="{{ asset('storage/' . $site['hero_bg']) }}" alt="" class="absolute inset-0 h-full w-full object-cover" fetchpriority="high">
+        {{-- Mobile: tata letak bertumpuk, jadi overlay merata. Desktop: gradasi horizontal. --}}
+        <div class="absolute inset-0 bg-gradient-to-b from-[#1a0f0a]/90 via-[#1a0f0a]/80 via-[52%] to-[#1a0f0a]/25 lg:hidden"></div>
+        <div class="absolute inset-0 hidden bg-gradient-to-r from-[#1a0f0a]/90 via-[#1a0f0a]/75 via-[44%] to-[#1a0f0a]/0 lg:block"></div>
+        <div class="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-[#1a0f0a]/55 to-transparent"></div>
     @endif
     <div class="container-x relative grid items-center gap-12 py-14 lg:grid-cols-[1.1fr_1fr] lg:py-20">
         <div>
             <div class="text-xs font-semibold uppercase tracking-[0.14em] text-orange-300">{{ $site['site_name'] }}</div>
             <h1 class="heading mt-4 text-4xl leading-[1.12] sm:text-5xl">{{ $site['tagline'] }}</h1>
-            <p class="mt-5 max-w-md text-base text-stone-300">
+            <p class="mt-5 max-w-md text-base leading-relaxed text-stone-100">
                 Espresso machine, grinder, dan perlengkapan barista dengan garansi resmi serta layanan sparepart.
             </p>
             <div class="mt-8 flex flex-wrap gap-3">
@@ -34,8 +36,9 @@
         {{-- Model 3D (three.js). Ganti dengan <model-viewer> + file .glb produk bila sudah ada. --}}
         <div id="hero3d" @if($modelProduct) data-model="1" @endif class="relative aspect-[5/4]">
             {{-- Latar transparan: model melayang di atas background hero. Cahaya hangat tipis memberi kedalaman. --}}
-            <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_55%,rgba(168,100,58,0.28),transparent_62%)]"></div>
-            <span class="pointer-events-none absolute left-4 top-3.5 z-10 text-[11px] uppercase tracking-[0.1em] text-white/60">Geser untuk memutar</span>
+            {{-- Dengan foto: vignette gelap tipis agar model tetap terpisah dari latar. Tanpa foto: cahaya hangat. --}}
+            <div class="pointer-events-none absolute inset-0 {{ !empty($site['hero_bg']) ? 'bg-[radial-gradient(ellipse_at_50%_55%,rgba(26,15,10,0.55),transparent_68%)]' : 'bg-[radial-gradient(ellipse_at_50%_55%,rgba(168,100,58,0.28),transparent_62%)]' }}"></div>
+            <span class="pointer-events-none absolute left-4 top-3.5 z-10 text-[11px] uppercase tracking-[0.1em] text-white/80 [text-shadow:0_1px_8px_rgba(0,0,0,.5)]">Geser untuk memutar</span>
             @if($modelProduct)
                 <model-viewer src="{{ asset('storage/' . $modelProduct->model_3d) }}" alt="{{ $modelProduct->name }}"
                               camera-controls auto-rotate rotation-per-second="18deg" interaction-prompt="none"
@@ -44,9 +47,9 @@
             @endif
             @if($spot)
                 <a href="{{ route('products.show', $spot->slug) }}"
-                   class="absolute inset-x-4 bottom-4 z-10 flex items-center justify-between rounded-lg border border-white/15 bg-white/10 px-4 py-3 backdrop-blur transition hover:bg-white/15">
+                   class="absolute inset-x-4 bottom-4 z-10 flex items-center justify-between rounded-lg border border-white/15 bg-[#1a0f0a]/55 px-4 py-3 backdrop-blur-md transition hover:bg-[#1a0f0a]/70">
                     <div>
-                        <div class="text-[11px] uppercase tracking-[0.08em] text-stone-300">{{ $spot->brand->name ?? 'Unggulan' }}</div>
+                        <div class="text-[11px] uppercase tracking-[0.08em] text-stone-200">{{ $spot->brand->name ?? 'Unggulan' }}</div>
                         <div class="text-sm">{{ $spot->name }}</div>
                     </div>
                     <div class="text-sm font-semibold text-orange-200">Rp {{ number_format($spot->price, 0, ',', '.') }}</div>
@@ -71,20 +74,36 @@
     </section>
 @endif
 
-{{-- ============ KEUNGGULAN ============ --}}
-<section class="container-x pt-10">
-    <div class="grid overflow-hidden rounded-xl border border-stone-200 bg-white sm:grid-cols-2 lg:grid-cols-4">
-        @foreach([
-            ['Produk Original', 'Mesin bergaransi resmi dari distributor.'],
-            ['Sparepart & Servis', 'Suku cadang dan teknisi tersedia.'],
-            ['Pengiriman Aman', 'Dikemas rapi dan diasuransikan.'],
-            ['Konsultasi Setup', 'Dibantu memilih sesuai kebutuhan kedai.'],
-        ] as $i => [$title, $desc])
-            <div class="border-stone-200 p-5 {{ $i > 0 ? 'lg:border-l' : '' }} {{ $i > 0 ? 'border-t sm:border-t-0' : '' }}">
-                <div class="text-sm font-semibold">{{ $title }}</div>
-                <div class="mt-1 text-xs text-stone-500">{{ $desc }}</div>
-            </div>
-        @endforeach
+{{-- ============ LAYANAN ============ --}}
+{{-- Isi daftar ini boleh diubah langsung. Hanya tuliskan hal yang memang berlaku untuk usaha Anda. --}}
+@php
+    $services = [
+        ['Konsultasi kebutuhan', 'Rekomendasi mesin dan peralatan disesuaikan dengan kapasitas, konsep usaha, dan anggaran Anda.'],
+        ['Produk resmi bergaransi', 'Setiap unit dipasok dari distributor resmi dan dilengkapi garansi resmi.'],
+        ['Pengiriman terasuransi', 'Unit dikemas rapi dan diasuransikan selama proses pengiriman hingga lokasi Anda.'],
+        ['Instalasi, servis, dan suku cadang', 'Pemasangan di lokasi, pelatihan dasar bagi barista, serta teknisi dan suku cadang untuk perawatan jangka panjang.'],
+    ];
+@endphp
+<section class="container-x pt-20" aria-labelledby="layanan-title">
+    <div class="grid gap-10 lg:grid-cols-[5fr_7fr] lg:gap-20">
+        <div class="lg:sticky lg:top-28 lg:self-start">
+            <p class="eyebrow">Layanan kami</p>
+            <h2 id="layanan-title" class="heading mt-3 text-3xl leading-[1.15] sm:text-[2.25rem] [text-wrap:balance]">Peralatan yang tepat, didampingi hingga purna jual.</h2>
+            <p class="mt-4 max-w-md text-[15px] leading-relaxed text-stone-600">Kami mendampingi pemilik kedai kopi dan roastery sejak tahap perencanaan hingga peralatan beroperasi dengan baik.</p>
+            <a href="{{ route('about') }}" class="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-orange-700 transition hover:gap-2.5 hover:underline">Kenali kami lebih jauh <span aria-hidden="true">→</span></a>
+        </div>
+
+        <ol class="svc-list">
+            @foreach($services as $i => [$title, $desc])
+                <li class="svc-row" data-reveal style="--d: {{ $i * 90 }}ms">
+                    <span class="svc-no" aria-hidden="true">0{{ $i + 1 }}</span>
+                    <div>
+                        <h3 class="svc-title">{{ $title }}</h3>
+                        <p class="svc-desc">{{ $desc }}</p>
+                    </div>
+                </li>
+            @endforeach
+        </ol>
     </div>
 </section>
 
