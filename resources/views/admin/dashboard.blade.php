@@ -26,7 +26,7 @@
         'star' => '<path d="M12 3.8l2.5 5.1 5.6.8-4.1 4 1 5.6-5-2.7-5 2.7 1-5.6-4.1-4 5.6-.8L12 3.8z"/>',
     ];
     $tasks = collect([
-        ['count' => $pendingPayments, 'label' => 'Pembayaran menunggu verifikasi', 'hint' => 'Bukti transfer sudah masuk', 'href' => route('admin.payments.index', ['status' => 'pending']), 'can' => 'verify_payments', 'icon' => 'card'],
+        ['count' => $pendingPayments, 'label' => 'Pembayaran perlu perhatian', 'hint' => 'Bukti transfer atau pengecualian gateway', 'href' => route('admin.payments.index', ['tab' => 'perhatian']), 'can' => 'verify_payments', 'icon' => 'card'],
         ['count' => $ordersToProcess, 'label' => 'Pesanan siap diproses', 'hint' => 'Sudah dibayar, belum dikemas', 'href' => route('admin.orders.index', ['status' => 'dikonfirmasi']), 'can' => 'view_orders', 'icon' => 'box'],
         ['count' => $ordersToShip, 'label' => 'Pesanan siap dikirim', 'hint' => 'Sudah dikemas, belum dikirim', 'href' => route('admin.orders.index', ['status' => 'diproses']), 'can' => 'view_orders', 'icon' => 'truck'],
         ['count' => $pendingReturns, 'label' => 'Retur menunggu keputusan', 'hint' => 'Perlu disetujui atau ditolak', 'href' => route('admin.returns.index'), 'can' => 'view_returns', 'icon' => 'undo'],
@@ -101,7 +101,7 @@
                     <div>
                         <dt>Total keseluruhan</dt>
                         <dd class="is-money"><span>{{ $rp($totalRevenue) }}</span></dd>
-                        <dd class="sub">{{ $totalRefund > 0 ? 'Setelah retur ' . $rp($totalRefund) : 'Sejak toko dibuka' }}</dd>
+                        <dd class="sub">{{ $totalRefund > 0 ? 'Sejak toko dibuka, setelah refund ' . $rp($totalRefund) : 'Sejak toko dibuka' }}</dd>
                     </div>
                     <div>
                         <dt>Produk aktif</dt>
@@ -226,6 +226,34 @@
                     @endforeach
                 </ul>
             </section>
+
+            @can('verify_payments')
+            <section class="dash-card dash-rise" style="--d:360ms" aria-labelledby="auto-title">
+                <div class="dash-card-head">
+                    <div>
+                        <h2 id="auto-title">Pembayaran online</h2>
+                        <p class="dash-sub">{{ $autoPaymentsWeek }} dikonfirmasi tanpa campur tangan admin (7 hari)</p>
+                    </div>
+                    <a href="{{ route('admin.payments.index', ['tab' => 'otomatis']) }}" class="dash-link">Lihat →</a>
+                </div>
+                @forelse($recentGatewayPayments as $gp)
+                    @if($loop->first)<ul class="dash-stock">@endif
+                    <li>
+                        <div class="min-w-0 flex-1">
+                            <a href="{{ route('admin.payments.show', $gp->id) }}" class="dash-order-no block truncate text-[13px]">{{ $gp->order->order_number }}</a>
+                            <p class="text-xs text-stone-500">{{ $gp->methodLabel() }} · {{ $gp->updated_at->locale('id')->diffForHumans() }}</p>
+                        </div>
+                        <div class="shrink-0 text-right">
+                            <p class="text-sm font-medium tabular-nums">{{ $rp($gp->amount) }}</p>
+                            <span class="dash-badge" style="--c: {{ ['verified' => '#5b7f4b', 'review' => '#b3402f', 'duplicate' => '#b3402f', 'expired' => '#a8998b'][$gp->status] ?? '#a8998b' }}"><i></i>{{ $gp->status === 'verified' ? 'Otomatis' : $gp->statusLabel() }}</span>
+                        </div>
+                    </li>
+                    @if($loop->last)</ul>@endif
+                @empty
+                    <p class="dash-empty">Belum ada pembayaran online.</p>
+                @endforelse
+            </section>
+            @endcan
 
             <section class="dash-card dash-rise" style="--d:380ms" aria-labelledby="top-title">
                 <div class="dash-card-head"><h2 id="top-title">Produk terlaris</h2></div>

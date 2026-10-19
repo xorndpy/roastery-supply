@@ -368,7 +368,7 @@ class CmsTest extends TestCase
         $m = $this->message();
         $this->message(['subject' => 'Kedua']);
 
-        $this->actingAs($staff)->get(route('admin.dashboard'))->assertOk()->assertSee('2')->assertSee('pesan kontak belum dibaca');
+        $this->actingAs($staff)->get(route('admin.dashboard'))->assertOk()->assertSee('2')->assertSee('Pesan belum dibaca');
         $this->actingAs($staff)->get(route('admin.messages.index', ['status' => 'unread']))->assertOk()->assertSee('Tanya mesin')->assertSee('Kedua');
 
         $this->actingAs($staff)->get(route('admin.messages.show', $m->id))->assertOk()->assertSee('Ada stok grinder?')->assertSee('mailto:budi@test.com', false);

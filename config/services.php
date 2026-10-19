@@ -42,4 +42,24 @@ return [
         ],
     ],
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Midtrans (payment gateway)
+    |--------------------------------------------------------------------------
+    | Sandbox untuk pengembangan/demo (kunci dari dashboard sandbox Midtrans).
+    | Produksi: isi kunci produksi dan set MIDTRANS_IS_PRODUCTION=true.
+    | verify_status_api: konfirmasi status ke API Midtrans sebelum mengubah pesanan.
+    |   null = otomatis (aktif hanya di produksi, supaya perintah payments:simulate tetap bisa dipakai di lokal).
+    */
+    'midtrans' => [
+        'server_key'        => env('MIDTRANS_SERVER_KEY'),
+        'client_key'        => env('MIDTRANS_CLIENT_KEY'),
+        'is_production'     => (bool) env('MIDTRANS_IS_PRODUCTION', false),
+        'verify_status_api' => env('MIDTRANS_VERIFY_STATUS_API'),
+        'expiry_minutes'    => (int) env('MIDTRANS_EXPIRY_MINUTES', 1440),
+        // true = notifikasi diproses langsung di dalam request (tanpa worker). false = lewat antrean (butuh queue:work).
+        'process_inline'    => (bool) env('MIDTRANS_PROCESS_INLINE', true),
+    ],
+
 ];

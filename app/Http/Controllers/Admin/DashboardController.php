@@ -34,7 +34,10 @@ class DashboardController extends Controller
         $totalProducts = Product::where('is_active', true)->count();
         $totalCustomers = Customer::count();
         $lowStockProducts = Product::whereColumn('stock', '<=', 'stock_threshold')->where('is_active', true)->count();
-        $pendingPayments = Payment::where('status', 'pending')->count();
+        // Perlu perhatian = bukti transfer manual menunggu dicek + pengecualian pembayaran gateway yang belum ditinjau.
+        $pendingPayments = Payment::needsAttention()->count();
+        $autoPaymentsWeek = Payment::gateway()->where('status', 'verified')->whereNull('verified_by')->where('verified_at', '>=', now()->subDays(7))->count();
+        $recentGatewayPayments = Payment::gateway()->with('order')->whereIn('status', ['verified', 'review', 'duplicate', 'expired'])->latest('updated_at')->limit(5)->get();
 
         // Antrean kerja admin: pesanan yang sudah dibayar tapi belum diproses / belum dikirim (semua waktu).
         $ordersToProcess = Order::where('status', 'dikonfirmasi')->count();
@@ -107,7 +110,7 @@ class DashboardController extends Controller
 
         return view('admin.dashboard', compact(
             'range', 'revenue', 'revenueDelta', 'orders', 'ordersDelta',
-            'chartLabels', 'chartDates', 'chartData', 'statusChart', 'topProducts', 'ordersToProcess', 'ordersToShip',
+            'chartLabels', 'chartDates', 'chartData', 'statusChart', 'topProducts', 'ordersToProcess', 'ordersToShip', 'autoPaymentsWeek', 'recentGatewayPayments',
             'unreadMessages', 'pendingTestimonials', 'pendingReturns', 'shippingConfigured',
             'totalRefund', 'totalRevenue', 'totalOrders', 'pendingOrders', 'totalProducts',
             'totalCustomers', 'lowStockProducts', 'pendingPayments', 'recentOrders', 'lowStockList'

@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Shipment;
 use App\Models\StockMovement;
 use App\Notifications\OrderStatusChanged;
+use App\Services\Payments\MidtransService;
 use DomainException;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -37,7 +38,9 @@ class OrderService
      */
     public function confirmPayment(Order $order, ?int $actorId = null, ?Payment $payment = null): Order
     {
-        $order = DB::transaction(function () use ($order, $actorId, $payment) {
+        $closeAtGateway = [];
+
+        $order = DB::transaction(function () use ($order, $actorId, $payment, &$closeAtGateway) {
             $order = $this->lock($order);
             $this->assertStatus($order, ['menunggu_bayar'], 'Pesanan tidak dalam status menunggu pembayaran.');
 
@@ -92,11 +95,17 @@ class OrderService
                 'verified_at' => now(),
             ]);
 
+            // Sesi gateway yang masih menunggu ditutup agar pelanggan tidak membayar lagi setelah ini.
+            $waiting = Payment::where('order_id', $order->id)->where('status', 'waiting');
+            $closeAtGateway = (clone $waiting)->pluck('provider_order_id')->filter()->all();
+            $waiting->update(['status' => 'expired', 'note' => 'Digantikan oleh verifikasi pembayaran manual.']);
+
             $order->update(['status' => 'dikonfirmasi']);
 
             return $order;
         });
 
+        $this->closeAtGateway($closeAtGateway);
         $this->notify($order, 'dikonfirmasi');
 
         return $order;
@@ -196,7 +205,9 @@ class OrderService
         ?int $actorId = null,
         array $allowedFrom = ['menunggu_bayar', 'dikonfirmasi', 'diproses'],
     ): Order {
-        $order = DB::transaction(function () use ($order, $reason, $actorId, $allowedFrom) {
+        $gatewayToClose = [];
+
+        $order = DB::transaction(function () use ($order, $reason, $actorId, $allowedFrom, &$gatewayToClose) {
             $order = $this->lock($order);
             $this->assertStatus($order, $allowedFrom, 'Pesanan pada status ini tidak bisa dibatalkan.');
 
@@ -238,6 +249,13 @@ class OrderService
                 'note'   => 'Order dibatalkan.',
             ]);
 
+            // Sesi pembayaran gateway yang belum dibayar ikut ditutup (dan dimatikan di gateway setelah commit).
+            $gatewayToClose = $order->payments()->where('status', 'waiting')->pluck('provider_order_id')->filter()->all();
+            $order->payments()->where('status', 'waiting')->update([
+                'status' => 'expired',
+                'note'   => 'Pesanan dibatalkan.',
+            ]);
+
             $order->update([
                 'status' => 'batal',
                 'note'   => $reason ? trim($order->note . "\nBatal: " . $reason) : $order->note,
@@ -246,6 +264,7 @@ class OrderService
             return $order;
         });
 
+        $this->closeAtGateway($gatewayToClose);
         $this->notify($order, 'batal', $reason);
 
         return $order;
@@ -258,8 +277,12 @@ class OrderService
 
         $expired = Order::where('status', 'menunggu_bayar')
             ->where('created_at', '<=', now()->subHours(self::PAYMENT_WINDOW_HOURS))
-            // Jangan batalkan kalau ada bukti bayar yang sedang menunggu dicek admin.
-            ->whereDoesntHave('payments', fn ($q) => $q->where('status', 'pending'))
+            // Jangan batalkan kalau ada pembayaran yang masih hidup: bukti manual menunggu dicek, pembayaran gateway
+            // yang perlu ditinjau admin, atau sesi gateway yang belum kedaluwarsa (bisa saja sedang dibayar).
+            ->whereDoesntHave('payments', fn ($q) => $q->where(function ($w) {
+                $w->whereIn('status', ['pending', 'review'])
+                  ->orWhere(fn ($x) => $x->where('status', 'waiting')->where('expires_at', '>', now()));
+            }))
             ->pluck('id');
 
         foreach ($expired as $id) {
@@ -277,6 +300,158 @@ class OrderService
     }
 
     // ------------------------------------------------------------------
+
+    /**
+     * Terapkan pembayaran gateway yang sudah LUNAS di sisi gateway ke pesanan.
+     *
+     * Ini pintu yang sama dengan konfirmasi manual (confirmPayment): satu transaksi database, kunci baris
+     * pesanan lebih dulu, lalu pembayaran, lalu produk (urutan kunci sama, jadi tidak ada deadlock).
+     * Karena status dicek DI DALAM kunci, pemanggilan bersamaan dari webhook, antrean, pengecekan terjadwal,
+     * atau klik admin tidak bisa mengurangi stok dua kali: yang datang kedua menemukan pembayaran sudah final.
+     *
+     * Kasus yang butuh manusia TIDAK dilempar sebagai error (uang sudah masuk!), tetapi dicatat sebagai
+     * pembayaran "review"/"duplicate" lengkap dengan alasannya.
+     *
+     * @param  array{gross_amount?: float|int|string, paid_at?: \DateTimeInterface|string|null}  $facts
+     * @return array{outcome: string, reason: ?string}   outcome: dikonfirmasi | sudah_diproses | pembayaran_ganda | perlu_perhatian
+     */
+    public function settleGatewayPayment(int $paymentId, array $facts = [], ?int $actorId = null): array
+    {
+        $orderId = Payment::whereKey($paymentId)->value('order_id');
+        if (!$orderId) {
+            throw new DomainException('Pembayaran tidak ditemukan.');
+        }
+
+        $closeAtGateway = [];
+
+        $result = DB::transaction(function () use ($orderId, $paymentId, $facts, $actorId, &$closeAtGateway) {
+            $order = Order::whereKey($orderId)->lockForUpdate()->firstOrFail();
+            $payment = Payment::whereKey($paymentId)->lockForUpdate()->firstOrFail();
+
+            // Idempotensi: notifikasi/klik yang datang belakangan menemukan pembayaran sudah final -> tidak melakukan apa pun.
+            if (in_array($payment->status, ['verified', 'duplicate', 'refunded'], true)) {
+                return ['outcome' => 'sudah_diproses', 'reason' => $payment->review_reason, 'confirmed' => false];
+            }
+            // Sudah ditandai butuh tinjauan manusia: pemrosesan otomatis tidak boleh menimpa keputusan itu.
+            if ($payment->status === 'review' && $actorId === null && !in_array($payment->review_reason, [null, 'gagal_diproses', 'fraud_challenge'], true)) {
+                return ['outcome' => 'perlu_perhatian', 'reason' => $payment->review_reason, 'confirmed' => false];
+            }
+
+            $paidAt = $facts['paid_at'] ?? $payment->paid_at ?? now();
+
+            $hold = function (string $status, string $reason, string $note) use ($payment, $paidAt) {
+                $payment->update([
+                    'status'        => $status,
+                    'review_reason' => $reason,
+                    'reviewed_at'   => null,
+                    'paid_at'       => $paidAt,
+                    'note'          => $note,
+                ]);
+
+                return ['outcome' => $status === 'duplicate' ? 'pembayaran_ganda' : 'perlu_perhatian', 'reason' => $reason, 'confirmed' => false];
+            };
+
+            // 1) Nominal harus sama dengan tagihan (admin yang menyetujui sengaja boleh melewati).
+            if ($actorId === null && isset($facts['gross_amount'])
+                && (int) round((float) $facts['gross_amount']) !== (int) round((float) $payment->amount)) {
+                return $hold('review', 'nominal_tidak_cocok', 'Dibayar Rp ' . number_format((float) $facts['gross_amount'], 0, ',', '.') . ', tagihan Rp ' . number_format((float) $payment->amount, 0, ',', '.') . '.');
+            }
+
+            // 2) Status pesanan menentukan apakah pembayaran ini boleh diterapkan.
+            if ($order->status === 'batal') {
+                return $hold('review', 'dibayar_setelah_batal', 'Pesanan sudah dibatalkan sebelum pembayaran ini diterima.');
+            }
+            if ($order->status !== 'menunggu_bayar') {
+                return $hold('duplicate', 'pembayaran_ganda', 'Pesanan sudah berstatus "' . $order->status . '" lewat pembayaran lain.');
+            }
+
+            // 3) Stok. Tidak cukup -> jangan dilempar; uang sudah masuk, jadi tahan dan minta keputusan admin.
+            $items = $order->items()->get();
+            $products = Product::whereIn('id', $items->pluck('product_id')->filter())
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->get()
+                ->keyBy('id');
+
+            $short = [];
+            foreach ($items as $item) {
+                $product = $products->get($item->product_id);
+                if (!$product) {
+                    $short[] = "{$item->product_name} (produk sudah tidak tersedia)";
+                } elseif ($product->stock < $item->quantity) {
+                    $short[] = "{$product->name} (sisa {$product->stock}, dipesan {$item->quantity})";
+                }
+            }
+            if ($short) {
+                return $hold('review', 'stok_kurang', 'Stok tidak mencukupi: ' . implode('; ', $short) . '.');
+            }
+
+            foreach ($items as $item) {
+                $product = $products->get($item->product_id);
+                $product->decrement('stock', $item->quantity);
+
+                StockMovement::create([
+                    'product_id'     => $product->id,
+                    'type'           => 'out',
+                    'quantity'       => $item->quantity,
+                    'reference_type' => 'order',
+                    'reference_id'   => $order->id,
+                    'note'           => 'Pesanan ' . $order->order_number,
+                    'user_id'        => $actorId,
+                ]);
+            }
+
+            $payment->update([
+                'status'      => 'verified',
+                'verified_by' => $actorId,
+                'verified_at' => now(),
+                'paid_at'     => $paidAt,
+                'reviewed_at' => $payment->review_reason ? now() : null,
+                'note'        => $actorId ? 'Disetujui admin.' : 'Dikonfirmasi otomatis oleh gateway.',
+            ]);
+
+            // Sesi pembayaran lain untuk pesanan ini (mis. pelanggan membuka dua tab) ditutup agar tidak dibayar dua kali.
+            $others = Payment::where('order_id', $order->id)->where('id', '!=', $payment->id)->where('status', 'waiting');
+            $closeAtGateway = (clone $others)->pluck('provider_order_id')->filter()->all();
+            $others->update(['status' => 'expired', 'note' => 'Digantikan oleh pembayaran lain yang sudah lunas.']);
+
+            // Bukti transfer manual yang belum dicek: pelanggan mungkin benar-benar transfer juga (bayar ganda).
+            // Jangan dibiarkan menggantung; tahan untuk diperiksa admin terhadap mutasi bank.
+            Payment::where('order_id', $order->id)->where('status', 'pending')->update([
+                'status'        => 'review',
+                'review_reason' => 'pembayaran_ganda',
+                'reviewed_at'   => null,
+                'note'          => 'Pesanan sudah lunas lewat gateway. Periksa mutasi bank; bila uang transfer ini masuk, lakukan refund.',
+            ]);
+
+            $order->update(['status' => 'dikonfirmasi']);
+
+            return ['outcome' => 'dikonfirmasi', 'reason' => null, 'confirmed' => true];
+        });
+
+        $this->closeAtGateway($closeAtGateway);
+
+        if ($result['confirmed']) {
+            $this->notify(Order::find($orderId), 'dikonfirmasi');
+        }
+
+        return ['outcome' => $result['outcome'], 'reason' => $result['reason']];
+    }
+
+    /** Matikan sesi pembayaran di gateway (best-effort, di luar transaksi database). */
+    private function closeAtGateway(array $providerOrderIds): void
+    {
+        if (!$providerOrderIds) {
+            return;
+        }
+        $midtrans = app(MidtransService::class);
+        if (!$midtrans->configured()) {
+            return;
+        }
+        foreach ($providerOrderIds as $id) {
+            $midtrans->expire($id);
+        }
+    }
 
     private function transition(Order $order, array $from, string $to, string $message): Order
     {

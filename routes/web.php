@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Webhooks\MidtransWebhookController;
+use App\Http\Controllers\Web\OnlinePaymentController;
 use Illuminate\Support\Facades\Route;
 
 // =========================================================================
@@ -122,6 +124,8 @@ Route::prefix('customer')
             Route::get('/', [CustomerOrderController::class, 'index'])->name('index');
             Route::get('/{orderNumber}', [CustomerOrderController::class, 'show'])->name('show');
             Route::post('/{orderNumber}/pay', [CustomerOrderController::class, 'pay'])->name('pay');
+            Route::post('/{orderNumber}/pay-online', [OnlinePaymentController::class, 'start'])->middleware('throttle:20,1')->name('pay-online');
+            Route::get('/{orderNumber}/payment-status', [OnlinePaymentController::class, 'status'])->middleware('throttle:90,1')->name('payment-status');
             Route::post('/{orderNumber}/cancel', [CustomerOrderController::class, 'cancel'])->name('cancel');
             Route::post('/{orderNumber}/received', [CustomerOrderController::class, 'received'])->name('received');
             Route::get('/{orderNumber}/invoice', [CustomerOrderController::class, 'invoice'])->name('invoice');
@@ -209,6 +213,9 @@ Route::prefix('admin')
             Route::get('/{payment}', [PaymentController::class, 'show'])->name('show')->middleware('can:verify_payments');
             Route::post('/{payment}/verify', [PaymentController::class, 'verify'])->name('verify')->middleware('can:verify_payments');
             Route::post('/{payment}/reject', [PaymentController::class, 'reject'])->name('reject')->middleware('can:reject_payments');
+            Route::post('/{payment}/sync', [PaymentController::class, 'sync'])->name('sync')->middleware('can:verify_payments');
+            Route::post('/{payment}/approve', [PaymentController::class, 'approve'])->name('approve')->middleware('can:verify_payments');
+            Route::post('/{payment}/resolve', [PaymentController::class, 'resolve'])->name('resolve')->middleware('can:verify_payments');
         });
 
         // Penjualan - Shipments
@@ -304,3 +311,6 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+// Notifikasi payment gateway (publik; keaslian dijamin tanda tangan, bukan sesi login).
+Route::post('/webhooks/midtrans', MidtransWebhookController::class)->middleware('throttle:600,1')->name('webhooks.midtrans');

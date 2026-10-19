@@ -30,7 +30,7 @@
             <div>
                 <h1 class="text-2xl font-bold">{{ $order->order_number }}</h1>
                 <div class="text-sm text-stone-500 mt-1">
-                    {{ $order->created_at->format('d M Y, H:i') }}
+                    {{ $order->created_at->copy()->timezone('Asia/Jakarta')->locale('id')->translatedFormat('d M Y, H:i') . ' WIB' }}
                 </div>
             </div>
             <div class="text-right">
@@ -101,16 +101,48 @@
     {{-- Pembayaran --}}
     @if($order->status === 'menunggu_bayar')
         @php
-            $payment = $order->payment;
+            // Bukti manual dan percobaan online dipisah: "terbaru" bisa saja sesi online yang belum dibayar.
+            $allPayments = $order->payments()->orderByDesc('id')->get();
+            $payment = $allPayments->whereNull('provider')->first();            // bukti manual terbaru
             $isPending = $payment && $payment->status === 'pending';
-            $isRejected = $payment && $payment->status === 'rejected';
+            $isRejected = !$isPending && $payment && $payment->status === 'rejected';
+            $online = $allPayments->whereNotNull('provider')->first();           // sesi online terbaru
+            $reviewing = $allPayments->first(fn ($p) => $p->status === 'review' && !$p->reviewed_at);
+            $midtrans = app(\App\Services\Payments\MidtransService::class);
+            $onlineEnabled = $midtrans->configured() && !$isPending && !$reviewing;
+            $hasLive = $online && $online->status === 'waiting' && $online->snap_token && $online->expires_at && $online->expires_at->isFuture();
         @endphp
         <div class="bg-white rounded-lg border border-stone-200 p-6 mb-6">
             <h2 class="font-bold mb-1">Pembayaran</h2>
             <p class="text-sm text-stone-500 mb-4">
-                Bayar sebelum <strong>{{ $order->payment_deadline->format('d M Y, H:i') }}</strong>.
+                Bayar sebelum <strong>{{ $order->payment_deadline->copy()->timezone('Asia/Jakarta')->locale('id')->translatedFormat('d M Y, H:i') . ' WIB' }}</strong>.
                 Pesanan yang belum dibayar akan dibatalkan otomatis.
             </p>
+
+            {{-- Status pembayaran real-time (diumumkan ke pembaca layar, tidak merebut fokus) --}}
+            <div id="payLive" role="status" aria-live="polite" class="hidden mb-4 rounded-lg border p-4 text-sm"></div>
+
+            @if($reviewing)
+                <div class="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+                    <div class="font-medium">Pembayaran Anda sedang kami tinjau</div>
+                    <p class="mt-1">Dana sudah kami terima dan tim kami sedang memprosesnya. Anda tidak perlu membayar lagi; kami akan menghubungi Anda bila diperlukan.</p>
+                </div>
+            @endif
+
+            @if($onlineEnabled)
+                <div class="mb-6 rounded-lg border border-stone-200 p-5" id="onlineBox">
+                    <div class="font-medium">Bayar online</div>
+                    <p class="mt-1 text-sm text-stone-600">Virtual Account, QRIS, e-wallet, atau kartu. Pembayaran terkonfirmasi otomatis dalam hitungan detik, tanpa perlu mengunggah bukti.</p>
+                    <div class="mt-4 flex flex-wrap items-center gap-4">
+                        <button type="button" id="payBtn" data-start="{{ route('customer.orders.pay-online', $order->order_number) }}"
+                                class="rounded-lg bg-orange-500 px-6 py-3 font-medium text-white transition hover:bg-orange-600 disabled:cursor-wait disabled:opacity-70">
+                            {{ $hasLive ? 'Lanjutkan pembayaran' : 'Bayar Sekarang' }}
+                        </button>
+                        <button type="button" id="checkBtn" class="text-sm text-stone-600 underline hover:text-stone-900">Cek status pembayaran</button>
+                    </div>
+                    <p class="mt-3 text-xs text-stone-500">Sudah membayar? Status terbarui otomatis. Jangan bayar dua kali; bila ragu, tekan “Cek status pembayaran”.</p>
+                </div>
+            @endif
 
             @if($isPending)
                 <div class="bg-yellow-50 border border-yellow-200 p-4 rounded-lg mb-4">
@@ -130,6 +162,8 @@
                 </div>
             @endif
 
+            <details class="group" @if(!$onlineEnabled || $isPending || $isRejected) open @endif>
+                @if($onlineEnabled)<summary class="mb-4 cursor-pointer text-sm font-medium text-stone-700 hover:text-stone-900">Atau bayar dengan transfer manual (unggah bukti)</summary>@endif
             @unless($isPending)
                 <div class="bg-orange-50 border border-orange-200 p-4 rounded-lg mb-6">
                     <div class="font-medium text-orange-900">Instruksi Pembayaran</div>
@@ -186,6 +220,8 @@
                     {{ $isPending ? 'Ganti Bukti Pembayaran' : 'Upload Bukti Pembayaran' }}
                 </button>
             </form>
+
+            </details>
 
             <form method="POST" action="{{ route('customer.orders.cancel', $order->order_number) }}" class="mt-4">
                 @csrf
@@ -273,4 +309,51 @@
         </a>
     </div>
 </div>
+
+@if(($onlineEnabled ?? false))
+    <script src="{{ $midtrans->snapJsUrl() }}" data-client-key="{{ $midtrans->clientKey() }}"></script>
+    <script>
+    (function () {
+        const payBtn = document.getElementById('payBtn'), checkBtn = document.getElementById('checkBtn'), live = document.getElementById('payLive');
+        if (!payBtn) return;
+        const statusUrl = @json(route('customer.orders.payment-status', $order->order_number));
+        const csrf = document.querySelector('meta[name=csrf-token]')?.content;
+        const tones = { ok: 'border-green-200 bg-green-50 text-green-800', wait: 'border-blue-200 bg-blue-50 text-blue-800', warn: 'border-amber-200 bg-amber-50 text-amber-900', error: 'border-red-200 bg-red-50 text-red-800', info: 'border-stone-200 bg-stone-50 text-stone-700' };
+        let timer = null, polls = 0;
+        const MAX_POLLS = 100;                       // sekitar 5 menit
+
+        function say(msg, tone) { live.className = 'mb-4 rounded-lg border p-4 text-sm ' + (tones[tone] || tones.info); live.textContent = msg; }
+        function stop() { if (timer) { clearInterval(timer); timer = null; } }
+        function resetBtn() { payBtn.disabled = false; payBtn.textContent = 'Bayar Sekarang'; }
+
+        async function poll() {
+            try {
+                const j = await (await fetch(statusUrl, { headers: { Accept: 'application/json' } })).json();
+                if (j.state === 'paid') { say(j.message, 'ok'); stop(); setTimeout(() => location.reload(), 1200); return; }
+                if (j.done) { say(j.message, j.state === 'review' ? 'warn' : 'info'); stop(); if (['expired', 'failed'].includes(j.state)) resetBtn(); return; }
+                say(j.message || 'Menunggu konfirmasi pembayaran…', 'wait');
+            } catch (e) { /* jaringan putus sesaat: coba lagi pada putaran berikutnya */ }
+            if (++polls >= MAX_POLLS) { stop(); say('Belum ada konfirmasi. Jika Anda sudah membayar, status akan terbarui otomatis dan Anda tidak perlu membayar lagi. Tekan “Cek status pembayaran” untuk memeriksa lagi.', 'info'); }
+        }
+        function startPolling() { stop(); polls = 0; poll(); timer = setInterval(poll, 3000); }
+
+        payBtn.addEventListener('click', async () => {
+            payBtn.disabled = true; payBtn.textContent = 'Menyiapkan…';
+            try {
+                const res = await fetch(payBtn.dataset.start, { method: 'POST', headers: { Accept: 'application/json', 'X-CSRF-TOKEN': csrf } });
+                const j = await res.json();
+                if (!res.ok) { say(j.message || 'Gagal memulai pembayaran.', 'error'); resetBtn(); return; }
+                payBtn.disabled = false; payBtn.textContent = 'Lanjutkan pembayaran';
+                if (window.snap) {
+                    window.snap.pay(j.token, { onSuccess: startPolling, onPending: startPolling, onClose: startPolling, onError: () => say('Pembayaran gagal. Silakan coba lagi.', 'error') });
+                } else if (j.redirect_url) {
+                    window.open(j.redirect_url, '_blank', 'noopener'); startPolling();
+                }
+            } catch (e) { say('Koneksi bermasalah. Silakan coba lagi.', 'error'); resetBtn(); }
+        });
+        checkBtn.addEventListener('click', startPolling);
+        @if(request('payment') === 'finish' || ($hasLive ?? false)) startPolling(); @endif
+    })();
+    </script>
+@endif
 @endsection

@@ -431,7 +431,7 @@ class ReturnTest extends TestCase
         $admin = $this->userAs('admin');
         $r = $this->makeReturn();
 
-        $this->actingAs($admin)->get(route('admin.dashboard'))->assertOk()->assertSee('pengajuan retur menunggu');
+        $this->actingAs($admin)->get(route('admin.dashboard'))->assertOk()->assertSee('Retur menunggu keputusan');
 
         $this->actingAs($admin)->post(route('admin.returns.approve', $r->id));
         $this->assertTrue(Activity::where('log_name', 'retur')->where('causer_id', $admin->id)->exists());

@@ -25,7 +25,7 @@ class PaymentProofController extends Controller
             ->where('user_id', auth()->id())
             ->firstOrFail();
 
-        return $this->serve($order->payments()->latest('id')->firstOrFail());
+        return $this->serve($order->payments()->whereNotNull('proof_image')->latest('id')->firstOrFail());
     }
 
     private function serve(Payment $payment)

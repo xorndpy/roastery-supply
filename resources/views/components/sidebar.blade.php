@@ -106,7 +106,7 @@
     // Badge angka di menu: hal yang menunggu tindakan.
     $navBadges = [
         'admin.messages.index' => $unreadMessages,
-        'admin.payments.index' => auth()->user()->can('verify_payments') ? \App\Models\Payment::where('status', 'pending')->count() : 0,
+        'admin.payments.index' => auth()->user()->can('verify_payments') ? \App\Models\Payment::needsAttention()->count() : 0,
     ];
 
     $menus = collect($menus)

@@ -266,7 +266,7 @@
     .dash-card-head h2 { font-size: 1.0625rem; line-height: 1.3; }
     .dash-sub { margin-top: .1rem; font-size: 12px; color: var(--muted); }
     .dash-big { font-family: theme('fontFamily.display'); font-size: 1.75rem; font-weight: 600; line-height: 1; font-variant-numeric: lining-nums tabular-nums; }
-    .dash-link { font-size: 12.5px; font-weight: 500; color: var(--copper-d); border-radius: 4px; }
+    .dash-link { white-space: nowrap; font-size: 12.5px; font-weight: 500; color: var(--copper-d); border-radius: 4px; }
     .dash-link:hover { text-decoration: underline; }
     .dash-link:focus-visible { outline: 2px solid var(--copper); outline-offset: 2px; }
     .dash-pill { min-width: 1.75rem; padding: .1rem .55rem; border-radius: 999px; background: var(--copper); color: #fff; font-size: 12px; font-weight: 600; text-align: center; font-variant-numeric: tabular-nums; }
@@ -367,4 +367,37 @@
     .js-reveal [data-reveal] { opacity: 1 !important; transform: none !important; transition: none !important; }
     .svc-no { transition: none; }
     .svc-row:hover .svc-no { transform: none; }
+}
+
+/* =========================================================================
+ * ADMIN: halaman Pembayaran (tab, badge status, kartu tindakan, riwayat notifikasi)
+ * ====================================================================== */
+@layer components {
+    .pay-tabs { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.25rem; }
+    .pay-tab { display: inline-flex; align-items: center; gap: .5rem; padding: .45rem .9rem; border: 1px solid var(--rule, #e8dfd5); border-radius: 999px; background: #fff; font-size: 13px; font-weight: 500; color: #5f5046; transition: background-color .15s, border-color .15s; }
+    .pay-tab:hover { background: #f6efe7; }
+    .pay-tab[aria-current="true"] { border-color: #26180f; background: #26180f; color: #f4e3d3; }
+    .pay-tab:focus-visible { outline: 2px solid #a8643a; outline-offset: 2px; }
+    .pay-tab b { min-width: 1.4rem; padding: .05rem .4rem; border-radius: 999px; background: #f1e9df; color: #26180f; font-size: 11.5px; font-weight: 600; text-align: center; font-variant-numeric: tabular-nums; }
+    .pay-tab[aria-current="true"] b { background: rgb(236 208 176 / .2); color: #f4e3d3; }
+    .pay-tab.is-alert b { background: #a8643a; color: #fff; }
+    .pay-reason { display: block; margin-top: .25rem; font-size: 12px; line-height: 1.35; color: #8f2f22; }
+    .pay-flag { display: flex; gap: .85rem; padding: 1.1rem 1.25rem; border: 1px solid #ecc9c2; border-left: 4px solid #b3402f; border-radius: 12px; background: #fff7f5; }
+    .pay-flag h2 { font-size: 1.05rem; }
+    .pay-flag p { margin-top: .25rem; font-size: 13.5px; line-height: 1.55; color: #5f5046; }
+    .pay-btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; padding: .55rem 1rem; border-radius: 9px; font-size: 13.5px; font-weight: 500; transition: background-color .15s, border-color .15s; }
+    .pay-btn:focus-visible { outline: 2px solid #a8643a; outline-offset: 2px; }
+    .pay-btn.is-primary { background: #26180f; color: #f4e3d3; }
+    .pay-btn.is-primary:hover { background: #3a2619; }
+    .pay-btn.is-quiet { border: 1px solid #d9cdbf; background: #fff; color: #3a2619; }
+    .pay-btn.is-quiet:hover { background: #f6efe7; }
+    .pay-kv { display: grid; grid-template-columns: 9.5rem 1fr; gap: .45rem 1rem; font-size: 13.5px; }
+    .pay-kv dt { color: #7a6a5d; }
+    .pay-kv dd { margin: 0; min-width: 0; word-break: break-word; }
+    .pay-timeline { margin: 0 -1.25rem -1.1rem; border-top: 1px solid #e8dfd5; }
+    .pay-timeline table { width: 100%; font-size: 13px; border-collapse: collapse; }
+    .pay-timeline th, .pay-timeline td { padding: .65rem .9rem; text-align: left; vertical-align: top; }
+    .pay-timeline th:first-child, .pay-timeline td:first-child { padding-left: 1.25rem; }
+    .pay-timeline tbody tr { border-top: 1px solid #f1e9df; }
+    .pay-src { display: inline-block; padding: .05rem .5rem; border-radius: 999px; background: #f1e9df; color: #5f5046; font-size: 11.5px; font-weight: 500; }
 }

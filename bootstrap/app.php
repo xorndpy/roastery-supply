@@ -15,6 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => RoleMiddleware::class,
         ]);
+
+        // Webhook payment gateway tidak membawa token CSRF; keasliannya dijamin tanda tangan (lihat MidtransWebhookController).
+        $middleware->validateCsrfTokens(except: ['webhooks/*']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

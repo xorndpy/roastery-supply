@@ -73,6 +73,10 @@ class OrderController extends Controller
                     throw new DomainException('Pesanan ini sudah tidak menunggu pembayaran.');
                 }
 
+                if ($order->payments()->where('status', 'review')->whereNull('reviewed_at')->exists()) {
+                    throw new DomainException('Pembayaran online Anda sedang kami tinjau. Tidak perlu mengunggah bukti lagi.');
+                }
+
                 $pending = $order->payments()->where('status', 'pending')->lockForUpdate()->first();
 
                 $attributes = [
