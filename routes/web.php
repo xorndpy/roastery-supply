@@ -313,4 +313,3 @@ Route::middleware('auth')->group(function () {
 require __DIR__.'/auth.php';
 
 // Notifikasi payment gateway (publik; keaslian dijamin tanda tangan, bukan sesi login).
-Route::post('/webhooks/midtrans', MidtransWebhookController::class)->middleware('throttle:600,1')->name('webhooks.midtrans');
