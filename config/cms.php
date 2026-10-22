@@ -49,6 +49,10 @@ return [
         'Tampilan' => [
             'hero_bg'         => ['label' => 'Background Beranda (Hero)', 'type' => 'image', 'help' => 'Disarankan 1920 x 1000 px (JPG/WEBP, ideal di bawah 400 KB, maks 2 MB). Tampil di belakang judul dan model 3D di beranda. Kosongkan untuk memakai gradasi coklat.'],
             'header_bg'       => ['label' => 'Background Header Halaman', 'type' => 'image', 'help' => 'Disarankan 1920 x 500 px (JPG/WEBP, ideal di bawah 300 KB, maks 2 MB). Dipakai di Katalog, Kontak, FAQ, dan halaman lain. Kosongkan untuk memakai latar polos.'],
+            'header_bg_katalog' => ['label' => 'Header Katalog (opsional)', 'type' => 'image', 'help' => 'Foto khusus halaman Katalog. Kosongkan untuk memakai Background Header Halaman.'],
+            'header_bg_kontak'  => ['label' => 'Header Kontak (opsional)', 'type' => 'image', 'help' => 'Foto khusus halaman Kontak. Kosongkan untuk memakai Background Header Halaman.'],
+            'header_bg_faq'     => ['label' => 'Header FAQ (opsional)', 'type' => 'image', 'help' => 'Foto khusus halaman FAQ. Kosongkan untuk memakai Background Header Halaman.'],
+            'header_bg_cabang'  => ['label' => 'Header Cabang (opsional)', 'type' => 'image', 'help' => 'Foto khusus halaman Cabang. Kosongkan untuk memakai Background Header Halaman.'],
             'about_header_bg' => ['label' => 'Foto Utama Halaman Tentang', 'type' => 'image', 'help' => 'Tampil di sisi kanan bagian atas halaman Tentang. Disarankan 1600 x 1000 px (JPG/WEBP, ideal di bawah 350 KB). Kosongkan untuk memakai pola biji kopi.'],
         ],
         'SEO' => [

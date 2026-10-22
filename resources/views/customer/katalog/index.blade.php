@@ -3,7 +3,7 @@
 @section('title', 'Katalog Produk')
 
 @section('content')
-<x-page-header title="Katalog Produk" :subtitle="$site['tagline']" :crumbs="[['Beranda', route('home')], ['Katalog Produk']]" />
+<x-page-header page="katalog" title="Katalog Produk" :subtitle="$site['tagline']" :crumbs="[['Beranda', route('home')], ['Katalog Produk']]" />
 
 <div class="container-x grid gap-10 py-10 lg:grid-cols-[240px_1fr]" x-data="{ filters: false }">
 

@@ -3,7 +3,7 @@
 @section('title', 'Checkout')
 
 @section('content')
-<x-page-header title="Checkout" :crumbs="[['Beranda', route('home')], ['Checkout']]" />
+<x-page-header plain title="Checkout" :crumbs="[['Beranda', route('home')], ['Checkout']]" />
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
     @if(session('error'))

@@ -3,7 +3,7 @@
 @section('title', 'Keranjang Belanja')
 
 @section('content')
-<x-page-header title="Keranjang" :crumbs="[['Beranda', route('home')], ['Keranjang']]" />
+<x-page-header plain title="Keranjang" :crumbs="[['Beranda', route('home')], ['Keranjang']]" />
 
 <div class="container-x py-10">
     @if(session('success'))<div class="mb-5 rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800">{{ session('success') }}</div>@endif

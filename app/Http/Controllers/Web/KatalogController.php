@@ -17,8 +17,10 @@ class KatalogController extends Controller
 
         // Filter kategori
         if ($request->category) {
+            // Kategori induk juga menampilkan produk dari sub-kategorinya.
             $query->whereHas('category', function ($q) use ($request) {
-                $q->where('slug', $request->category);
+                $q->where('slug', $request->category)
+                  ->orWhereHas('parent', fn ($p) => $p->where('slug', $request->category));
             });
         }
 

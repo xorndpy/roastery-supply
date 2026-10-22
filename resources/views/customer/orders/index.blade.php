@@ -3,7 +3,7 @@
 @section('title', 'Pesanan Saya')
 
 @section('content')
-<x-page-header title="Pesanan Saya" :crumbs="[['Beranda', route('home')], ['Pesanan Saya']]" />
+<x-page-header plain title="Pesanan Saya" :crumbs="[['Beranda', route('home')], ['Pesanan Saya']]" />
 
 @php
     $statusBadge = ['menunggu_bayar' => 'bg-amber-100 text-amber-800', 'dikonfirmasi' => 'bg-orange-100 text-orange-800', 'diproses' => 'bg-orange-200 text-orange-900', 'dikirim' => 'bg-stone-200 text-stone-800', 'selesai' => 'bg-green-100 text-green-800', 'batal' => 'bg-red-100 text-red-800'];

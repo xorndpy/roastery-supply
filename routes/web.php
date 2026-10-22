@@ -263,6 +263,7 @@ Route::prefix('admin')
             Route::get('/{testimonial}/edit', [TestimonialController::class, 'edit'])->name('edit')->middleware('can:approve_testimonials');
             Route::put('/{testimonial}', [TestimonialController::class, 'update'])->name('update')->middleware('can:approve_testimonials');
             Route::patch('/{testimonial}/toggle-approval', [TestimonialController::class, 'toggleApproval'])->name('toggle-approval')->middleware('can:approve_testimonials');
+            Route::patch('/{testimonial}/toggle-featured', [TestimonialController::class, 'toggleFeatured'])->name('toggle-featured')->middleware('can:approve_testimonials');
             Route::delete('/{testimonial}', [TestimonialController::class, 'destroy'])->name('destroy')->middleware('can:delete_testimonials');
         });
 
@@ -313,3 +314,4 @@ Route::middleware('auth')->group(function () {
 require __DIR__.'/auth.php';
 
 // Notifikasi payment gateway (publik; keaslian dijamin tanda tangan, bukan sesi login).
+Route::post('/webhooks/midtrans', MidtransWebhookController::class)->middleware('throttle:600,1')->name('webhooks.midtrans');

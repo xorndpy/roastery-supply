@@ -116,17 +116,26 @@
         </div>
         <div class="grid grid-cols-2 gap-3.5 md:auto-rows-[168px] md:grid-cols-4">
             @foreach($categories->take(5) as $i => $c)
+                @php $big = $i === 0; $hasImg = !empty($c->image); @endphp
                 <a href="{{ route('products.index', ['category' => $c->slug]) }}"
-                   class="group flex flex-col justify-between rounded-xl p-5 transition
-                          {{ $i === 0 ? 'col-span-2 min-h-[200px] bg-brand p-7 text-white hover:bg-brand-dark md:row-span-2' : 'min-h-[120px] bg-stone-100 hover:bg-stone-200' }}">
-                    <div class="flex justify-between text-xs {{ $i === 0 ? 'text-white/70' : 'text-stone-500' }}">
-                        <span>{{ isset($c->products_count) ? $c->products_count . ' produk' : 'Kategori' }}</span>
-                        <span class="transition group-hover:translate-x-1">→</span>
+                   class="group relative isolate flex flex-col justify-between overflow-hidden rounded-xl transition
+                          {{ $big ? 'col-span-2 min-h-[200px] p-7 md:row-span-2' : 'min-h-[120px] p-5' }}
+                          {{ $hasImg ? 'bg-[#24150e] text-white' : ($big ? 'bg-brand text-white hover:bg-brand-dark' : 'bg-stone-100 hover:bg-stone-200') }}">
+                    @if($hasImg)
+                        {{-- Foto kategori (Admin > Kategori). Gradasi gelap di bawah menjaga teks putih tetap terbaca di foto apa pun. --}}
+                        <img src="{{ asset('storage/' . $c->image) }}" alt="" loading="lazy"
+                             class="absolute inset-0 -z-20 h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                        <div class="absolute inset-0 -z-10 bg-gradient-to-t from-[#1a0f0a]/90 via-[#1a0f0a]/45 to-[#1a0f0a]/25"></div>
+                    @endif
+                    {{-- Di atas foto, label diberi latar gelap tipis agar tetap terbaca di foto seterang apa pun. --}}
+                    <div class="flex items-start justify-between text-xs {{ $hasImg || $big ? 'text-white/90' : 'text-stone-500' }}">
+                        <span class="{{ $hasImg ? 'rounded-full bg-[#1a0f0a]/60 px-2.5 py-1 text-white backdrop-blur-sm' : '' }}">{{ $c->products_count }} produk</span>
+                        <span class="{{ $hasImg ? 'flex h-6 w-6 items-center justify-center rounded-full bg-[#1a0f0a]/60 text-white backdrop-blur-sm' : '' }} transition group-hover:translate-x-1" aria-hidden="true">→</span>
                     </div>
                     <div>
-                        <div class="heading {{ $i === 0 ? 'text-3xl leading-tight' : 'text-lg' }}">{{ $c->name }}</div>
-                        @if($i === 0 && !empty($c->description))
-                            <p class="mt-2 max-w-xs text-sm text-white/70">{{ \Illuminate\Support\Str::limit($c->description, 90) }}</p>
+                        <div class="heading {{ $big ? 'text-3xl leading-tight' : 'text-lg' }}">{{ $c->name }}</div>
+                        @if($big && !empty($c->description))
+                            <p class="mt-2 max-w-xs text-sm text-white/80">{{ \Illuminate\Support\Str::limit($c->description, 90) }}</p>
                         @endif
                     </div>
                 </a>

@@ -19,6 +19,7 @@ class Testimonial extends Model
         'content',
         'rating',
         'is_approved',
+        'is_featured',
     ];
 
     protected function casts(): array
@@ -26,6 +27,7 @@ class Testimonial extends Model
         return [
             'rating' => 'integer',
             'is_approved' => 'boolean',
+            'is_featured' => 'boolean',
         ];
     }
 

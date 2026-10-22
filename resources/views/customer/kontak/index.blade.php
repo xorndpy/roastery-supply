@@ -27,7 +27,7 @@
     })->values();
 @endphp
 
-<x-page-header :title="'Hubungi ' . $site['site_name']" subtitle="Ada pertanyaan seputar produk, harga, atau ingin konsultasi kebutuhan kedai Anda? Tim kami siap membantu." eyebrow="Kontak" :crumbs="[['Beranda', route('home')], ['Hubungi ' . $site['site_name']]]" />
+<x-page-header page="kontak" :title="'Hubungi ' . $site['site_name']" subtitle="Ada pertanyaan seputar produk, harga, atau ingin konsultasi kebutuhan kedai Anda? Tim kami siap membantu." eyebrow="Kontak" :crumbs="[['Beranda', route('home')], ['Hubungi ' . $site['site_name']]]" />
 
 <div class="container-x grid items-start gap-8 py-12 lg:grid-cols-[380px_1fr]">
 

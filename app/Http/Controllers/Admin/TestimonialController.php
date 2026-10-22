@@ -66,9 +66,30 @@ class TestimonialController extends Controller
     }
 
     /** Approve / sembunyikan. Hanya yang approved tampil di website (PRD 6.4). */
+    /** Sematkan / lepas sematan di beranda. Hanya testimoni yang tampil, dan maksimal 6 yang disematkan. */
+    public function toggleFeatured(Testimonial $testimonial)
+    {
+        if (!$testimonial->is_featured) {
+            if (!$testimonial->is_approved) {
+                return back()->with('error', 'Setujui testimoni ini dulu sebelum disematkan.');
+            }
+            if (Testimonial::where('is_featured', true)->count() >= 6) {
+                return back()->with('error', 'Maksimal 6 testimoni disematkan. Lepas salah satu terlebih dulu.');
+            }
+        }
+
+        $testimonial->update(['is_featured' => !$testimonial->is_featured]);
+
+        activity('testimoni')->performedOn($testimonial)
+            ->log($testimonial->is_featured ? 'Testimoni disematkan di beranda' : 'Sematan testimoni dilepas');
+
+        return back()->with('success', $testimonial->is_featured ? 'Testimoni disematkan di beranda.' : 'Sematan dilepas.');
+    }
+
     public function toggleApproval(Testimonial $testimonial)
     {
-        $testimonial->update(['is_approved' => !$testimonial->is_approved]);
+        // Disembunyikan = otomatis tidak lagi disematkan.
+        $testimonial->update(['is_approved' => !$testimonial->is_approved] + ($testimonial->is_approved ? ['is_featured' => false] : []));
 
         activity('testimoni')->performedOn($testimonial)
             ->log($testimonial->is_approved ? 'Testimoni disetujui' : 'Testimoni disembunyikan');

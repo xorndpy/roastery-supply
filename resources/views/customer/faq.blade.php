@@ -3,7 +3,7 @@
 @section('title', 'FAQ')
 
 @section('content')
-<x-page-header title="Pertanyaan Umum" :crumbs="[['Beranda', route('home')], ['Pertanyaan Umum']]" />
+<x-page-header page="faq" title="Pertanyaan Umum" :crumbs="[['Beranda', route('home')], ['Pertanyaan Umum']]" />
 
 <div class="container-x py-10">
     @forelse($faqs as $category => $items)

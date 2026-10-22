@@ -25,6 +25,11 @@
 </form>
 
 <div class="space-y-3">
+<p class="mb-4 rounded-lg border border-stone-200 bg-white p-4 text-sm text-stone-600">
+    Beranda menampilkan maksimal 6 testimoni. <strong>Yang disematkan</strong> tampil lebih dulu; sisa slot diisi otomatis dari ulasan
+    berating tinggi (4 ke atas) yang cukup informatif, satu per nama, tanpa isi yang sama persis. Ulasan baru tidak menggeser yang disematkan.
+    Disematkan saat ini: <strong>{{ \App\Models\Testimonial::where('is_featured', true)->count() }} / 6</strong>.
+</p>
 @forelse($testimonials as $t)
     <div class="bg-white p-5 rounded-lg border border-stone-200">
         <div class="flex flex-wrap justify-between gap-3">
@@ -34,9 +39,12 @@
                 </div>
                 <div class="text-xs text-stone-400">{{ $t->created_at->format('d M Y') }}@if($t->order_id) · dari pesanan #{{ $t->order_id }}@else · input manual @endif</div>
             </div>
-            <span class="self-start px-2 py-0.5 rounded text-xs {{ $t->is_approved ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700' }}">
-                {{ $t->is_approved ? 'Tampil' : 'Menunggu' }}
-            </span>
+            <div class="flex gap-2 self-start">
+                @if($t->is_featured)<span class="px-2 py-0.5 rounded text-xs bg-orange-100 text-orange-800">Disematkan</span>@endif
+                <span class="px-2 py-0.5 rounded text-xs {{ $t->is_approved ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700' }}">
+                    {{ $t->is_approved ? 'Tampil' : 'Menunggu' }}
+                </span>
+            </div>
         </div>
         <p class="text-stone-700 mt-3 whitespace-pre-line">{{ $t->content }}</p>
         <div class="flex gap-4 mt-4 text-sm">
@@ -45,6 +53,12 @@
                 @csrf @method('PATCH')
                 <button class="{{ $t->is_approved ? 'text-stone-600' : 'text-green-700 font-medium' }} hover:underline">{{ $t->is_approved ? 'Sembunyikan' : 'Setujui & tampilkan' }}</button>
             </form>
+            @if($t->is_approved)
+            <form method="POST" action="{{ route('admin.testimonials.toggle-featured', $t->id) }}">
+                @csrf @method('PATCH')
+                <button class="{{ $t->is_featured ? 'text-orange-700 font-medium' : 'text-stone-600' }} hover:underline">{{ $t->is_featured ? 'Lepas sematan' : 'Sematkan di beranda' }}</button>
+            </form>
+            @endif
             <a href="{{ route('admin.testimonials.edit', $t->id) }}" class="text-orange-600 hover:underline">Edit</a>
             @endcan
             @can('delete_testimonials')

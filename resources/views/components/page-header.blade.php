@@ -1,7 +1,9 @@
-@props(['title', 'subtitle' => null, 'eyebrow' => null, 'crumbs' => [], 'bg' => null])
+@props(['title', 'subtitle' => null, 'eyebrow' => null, 'crumbs' => [], 'bg' => null, 'page' => null, 'plain' => false])
 @php
-    // Gambar: parameter bg, lalu pengaturan "header_bg" (Admin > Pengaturan > Tampilan).
-    $img = $bg ?: ($site['header_bg'] ?? null);
+    // Gambar, urutan: parameter bg -> foto khusus halaman ("header_bg_{page}") -> foto umum "header_bg"
+    // (Admin > Pengaturan > Tampilan). plain=true untuk halaman transaksi (keranjang, checkout, pesanan):
+    // tanpa foto agar fokus pada tugas dan tidak memakan ruang layar.
+    $img = $plain ? null : ($bg ?: (($page ? ($site['header_bg_' . $page] ?? null) : null) ?: ($site['header_bg'] ?? null)));
 @endphp
 
 <div class="relative overflow-hidden border-b {{ $img ? 'border-transparent bg-[#24150e]' : 'border-stone-200 bg-stone-100' }}">
