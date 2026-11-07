@@ -66,6 +66,17 @@
     </div>
 </section>
 
+{{-- ============ PERJALANAN (milestone, Admin > Milestone) ============ --}}
+@if($milestones->isNotEmpty())
+    <section id="perjalanan" class="container-x pb-16 sm:pb-24" aria-labelledby="perjalanan-title">
+        <div class="mx-auto max-w-2xl text-center" data-reveal>
+            <p class="eyebrow">Perjalanan kami</p>
+            <h2 id="perjalanan-title" class="heading mt-3 text-3xl leading-[1.15] [text-wrap:balance] sm:text-[2.25rem]">Dari satu langkah ke langkah berikutnya.</h2>
+        </div>
+        <div class="mt-14"><x-milestones :items="$milestones" /></div>
+    </section>
+@endif
+
 {{-- ============ NILAI ============ --}}
 <section class="border-y border-stone-200 bg-stone-100/70 py-16 sm:py-24" aria-labelledby="nilai-title">
     <div class="container-x">
@@ -87,21 +98,33 @@
 
 {{-- ============ MEREK & REKANAN (dari Admin > Partner) ============ --}}
 @if($partners->isNotEmpty())
-    <section class="container-x py-16 sm:py-24" aria-labelledby="brand-title">
+    <section class="container-x py-16 sm:py-24" aria-labelledby="brand-title" x-data="{ scroll(d) { $refs.track.scrollBy({ left: d * $refs.track.clientWidth * 0.8, behavior: 'smooth' }) } }">
         <div class="text-center" data-reveal>
             <p class="eyebrow">Merek &amp; rekanan</p>
-            <h2 id="brand-title" class="heading mt-3 text-3xl leading-[1.15] sm:text-[2.25rem] [text-wrap:balance]">Merek yang kami layani.</h2>
+            <h2 id="brand-title" class="heading mt-3 text-3xl leading-[1.15] sm:text-[2.25rem]">Merek yang kami layani.</h2>
         </div>
-        <div class="mx-auto mt-10 grid max-w-4xl grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-4" data-reveal style="--d: 100ms">
+
+        <div x-ref="track" class="mt-10 grid grid-flow-col grid-rows-2 justify-center gap-3.5 overflow-x-auto scroll-smooth pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden auto-cols-[calc(50%-7px)] sm:auto-cols-[calc(33.333%-9.5px)] lg:auto-cols-[calc(16.666%-11.7px)]" data-reveal style="--d: 100ms">
             @foreach($partners as $p)
-                @php $logo = '<img src="' . e(asset('storage/' . $p->logo)) . '" alt="' . e($p->name) . '" loading="lazy" class="max-h-12 max-w-[130px] object-contain opacity-60 grayscale transition group-hover:opacity-100 group-hover:grayscale-0">'; @endphp
+                @php $logo = '<img src="' . e(asset('storage/' . $p->logo)) . '" alt="' . e($p->name) . '" loading="lazy" class="max-h-16 max-w-[75%] object-contain opacity-70 grayscale transition group-hover:opacity-100 group-hover:grayscale-0">'; @endphp
                 @if($p->link)
-                    <a href="{{ $p->link }}" target="_blank" rel="noopener noreferrer" class="group flex h-28 items-center justify-center rounded-xl border border-stone-200 bg-white p-3 transition hover:border-orange-500">{!! $logo !!}</a>
+                    <a href="{{ $p->link }}" target="_blank" rel="noopener noreferrer" class="group flex h-32 min-w-[180px] items-center justify-center rounded-xl border border-stone-200 bg-white p-4 transition hover:border-orange-500">{!! $logo !!}</a>
                 @else
-                    <div class="group flex h-28 items-center justify-center rounded-xl border border-stone-200 bg-white p-3">{!! $logo !!}</div>
+                    <div class="group flex h-32 min-w-[180px] items-center justify-center rounded-xl border border-stone-200 bg-white p-4">{!! $logo !!}</div>
                 @endif
             @endforeach
         </div>
+
+        @if($partners->count() > 6)
+            <div class="mt-6 flex justify-center gap-3">
+                <button type="button" @click="scroll(-1)" class="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-white hover:border-orange-500" aria-label="Sebelumnya">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+                </button>
+                <button type="button" @click="scroll(1)" class="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-white hover:border-orange-500" aria-label="Berikutnya">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+                </button>
+            </div>
+        @endif
     </section>
 @endif
 

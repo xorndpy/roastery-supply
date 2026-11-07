@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.shop')
 
 @section('title', 'Checkout')
 
@@ -87,18 +87,28 @@
                             <p x-show="cityId && loading" class="text-sm text-stone-500">Menghitung ongkos kirim…</p>
                             <p x-show="cityId && !loading && message" x-text="message" class="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3"></p>
 
-                            <div class="space-y-3" x-show="methods.length > 0">
-                                <template x-for="m in methods" :key="m.id">
-                                    <label class="flex items-start gap-3 border rounded-lg p-4 cursor-pointer"
-                                           :class="String(methodId) === String(m.id) ? 'border-orange-500 bg-orange-50' : 'border-stone-200'">
-                                        <input type="radio" name="shipping_method_id" :value="m.id" x-model="methodId" class="mt-1">
-                                        <span class="flex-1">
-                                            <span class="font-medium" x-text="m.name"></span>
-                                            <span class="block text-xs text-stone-500" x-show="m.etd" x-text="'Estimasi ' + m.etd"></span>
-                                            <span class="block text-xs text-stone-500" x-show="m.description" x-text="m.description"></span>
-                                        </span>
-                                        <span class="font-medium" x-text="m.free ? 'Gratis' : rp(m.cost)"></span>
-                                    </label>
+                            <div class="space-y-6" x-show="methods.length > 0">
+                                <template x-for="g in groups" :key="g.key">
+                                    <div>
+                                        <div class="mb-2 flex flex-wrap items-baseline justify-between gap-x-3">
+                                            <h3 class="text-sm font-semibold text-stone-900" x-text="g.label"></h3>
+                                            <span class="text-xs text-stone-500" x-text="g.hint"></span>
+                                        </div>
+                                        <div class="space-y-3">
+                                            <template x-for="m in g.items" :key="m.id">
+                                                <label class="flex items-start gap-3 border rounded-lg p-4 cursor-pointer"
+                                                       :class="String(methodId) === String(m.id) ? 'border-orange-500 bg-orange-50' : 'border-stone-200'">
+                                                    <input type="radio" name="shipping_method_id" :value="m.id" x-model="methodId" class="mt-1">
+                                                    <span class="flex-1">
+                                                        <span class="font-medium" x-text="m.name"></span>
+                                                        <span class="block text-xs text-stone-500" x-show="m.etd" x-text="'Estimasi ' + m.etd"></span>
+                                                        <span class="block text-xs text-stone-500" x-show="m.description" x-text="m.description"></span>
+                                                    </span>
+                                                    <span class="font-medium" x-text="m.free ? 'Gratis' : rp(m.cost)"></span>
+                                                </label>
+                                            </template>
+                                        </div>
+                                    </div>
                                 </template>
                             </div>
                             @error('shipping_method_id') <p class="text-red-500 text-xs mt-2">{{ $message }}</p> @enderror
@@ -108,6 +118,15 @@
 
                 <div class="bg-white p-6 rounded-lg border border-stone-200">
                     <h2 class="text-xl font-bold mb-4">Metode Pembayaran</h2>
+                    @if(app(\App\Services\Payments\MidtransService::class)->configured())
+                        <div class="bg-orange-50 border border-orange-200 p-4 rounded-lg">
+                            <div class="font-medium text-orange-900">Pembayaran Online</div>
+                            <p class="text-sm text-orange-700 mt-1">
+                                Setelah pesanan dibuat, klik Bayar Sekarang untuk memilih Virtual Account bank, QRIS, e-wallet, atau kartu.
+                                Status pesanan diperbarui otomatis setelah pembayaran berhasil.
+                            </p>
+                        </div>
+                    @else
                     <div class="bg-orange-50 border border-orange-200 p-4 rounded-lg">
                         <div class="font-medium text-orange-900">Transfer Manual</div>
                         <p class="text-sm text-orange-700 mt-1">
@@ -115,6 +134,7 @@
                             Upload bukti bayar di halaman pesanan.
                         </p>
                     </div>
+                    @endif
                 </div>
             </div>
 
@@ -194,6 +214,13 @@
             message: '',
             configured: cfg.configured,
             base: cfg.base,
+            get groups() {
+                const g = [
+                    { key: 'own', label: 'Kargo Kami', hint: 'Armada pengiriman toko', items: this.methods.filter(m => m.type === 'own') },
+                    { key: 'external', label: 'Ekspedisi Lain', hint: 'JNE, J&T, dan kurir lainnya', items: this.methods.filter(m => m.type !== 'own') },
+                ];
+                return g.filter(x => x.items.length);
+            },
             get selected() { return this.methods.find(m => String(m.id) === String(this.methodId)) || null; },
             get total() { return this.base + (this.selected ? this.selected.cost : 0); },
             rp(n) { return 'Rp ' + Number(n).toLocaleString('id-ID'); },

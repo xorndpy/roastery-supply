@@ -506,7 +506,7 @@ class CmsTest extends TestCase
             $this->get($url)->assertOk(); // kosong: tidak boleh error
         }
 
-        // beranda dengan produk unggulan + kategori
+        // toko dengan produk unggulan + kategori
         $cat = \App\Models\Category::unguarded(fn () => \App\Models\Category::create(['name' => 'Espresso Machine', 'slug' => 'espresso-machine', 'is_active' => true]));
         \App\Models\Product::unguarded(fn () => \App\Models\Product::create([
             'category_id' => $cat->id, 'name' => 'Mesin Unggulan X', 'slug' => 'mesin-unggulan-x', 'sku' => 'U-1',
@@ -515,7 +515,9 @@ class CmsTest extends TestCase
         Setting::set('about_body', "Paragraf satu.\n\nParagraf dua dengan <b>tag</b>.");
         Setting::set('about_title', 'Cerita Kami');
 
-        $this->get(route('home'))->assertOk()->assertSee('Mesin Unggulan X')->assertSee('Espresso Machine')->assertSee('15.000.000');
+        // Produk unggulan dan kategori kini ada di toko (/katalog); beranda adalah company profile tanpa produk.
+        $this->get(route('products.index'))->assertOk()->assertSee('Mesin Unggulan X')->assertSee('Espresso Machine')->assertSee('15.000.000');
+        $this->get(route('home'))->assertOk()->assertDontSee('Mesin Unggulan X');
         $this->get(route('about'))->assertOk()->assertSee('Cerita Kami')->assertSee('Paragraf satu.')->assertSee('&lt;b&gt;tag&lt;/b&gt;', false);
 
         $this->seed(\Database\Seeders\FaqSeeder::class);

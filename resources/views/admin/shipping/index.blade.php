@@ -21,18 +21,19 @@
 
 <div class="bg-white rounded-lg border border-stone-200 overflow-x-auto">
     <table class="w-full text-sm">
-        <thead class="bg-stone-50 text-left text-stone-500"><tr><th class="px-4 py-3">Layanan</th><th class="px-4 py-3">Tarif</th><th class="px-4 py-3">Urutan</th><th class="px-4 py-3">Status</th><th class="px-4 py-3"></th></tr></thead>
+        <thead class="bg-stone-50 text-left text-stone-500"><tr><th class="px-4 py-3">Layanan</th><th class="px-4 py-3">Jenis</th><th class="px-4 py-3">Tarif</th><th class="px-4 py-3">Urutan</th><th class="px-4 py-3">Status</th><th class="px-4 py-3"></th></tr></thead>
         <tbody class="divide-y divide-stone-100">
         @forelse($methods as $m)
             <tr>
                 <td class="px-4 py-3"><div class="font-medium">{{ $m->name }}</div>@if($m->description)<div class="text-xs text-stone-500">{{ $m->description }}</div>@endif</td>
+                <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-xs {{ $m->type === 'own' ? 'bg-orange-100 text-orange-800' : 'bg-stone-100 text-stone-700' }}">{{ $m->type === 'own' ? 'Kargo Kami' : 'Ekspedisi luar' }}</span></td>
                 <td class="px-4 py-3">{{ $m->rates_count }} tarif wilayah</td>
                 <td class="px-4 py-3">{{ $m->sort_order }}</td>
                 <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-xs {{ $m->is_active ? 'bg-green-100 text-green-700' : 'bg-stone-100 text-stone-600' }}">{{ $m->is_active ? 'Aktif' : 'Nonaktif' }}</span></td>
                 <td class="px-4 py-3 text-right"><a href="{{ route('admin.shipping.edit', $m->id) }}" class="text-orange-600 hover:underline">Atur tarif</a></td>
             </tr>
         @empty
-            <tr><td colspan="5" class="px-4 py-10 text-center text-stone-500">Belum ada layanan pengiriman.</td></tr>
+            <tr><td colspan="6" class="px-4 py-10 text-center text-stone-500">Belum ada layanan pengiriman.</td></tr>
         @endforelse
         </tbody>
     </table>

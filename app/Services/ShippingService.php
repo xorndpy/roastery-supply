@@ -108,6 +108,7 @@ class ShippingService
             'id'          => $method->id,
             'name'        => $method->name,
             'description' => $method->description,
+            'type'        => $method->type ?: 'external',
             'cost'        => $free ? 0 : $cost,
             'etd'         => $rate->etd_label,
             'free'        => $free,

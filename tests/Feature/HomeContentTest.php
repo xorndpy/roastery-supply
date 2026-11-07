@@ -44,7 +44,7 @@ class HomeContentTest extends TestCase
 
     // ---------------------------------------------------------------- kategori
 
-    public function test_home_hides_empty_categories_counts_subcategory_products_and_shows_photo(): void
+    public function test_shop_hides_empty_categories_counts_subcategory_products_and_shows_photo(): void
     {
         $parent = $this->category('Sparepart');
         $child = $this->category('Grinder', ['parent_id' => $parent->id]);
@@ -53,7 +53,7 @@ class HomeContentTest extends TestCase
         $this->product($child, 'Grinder A');
         $this->product($with, 'Mesin A');
 
-        $html = $this->get('/')->assertOk()->getContent();
+        $html = $this->get(route('products.index'))->assertOk()->getContent();
 
         $this->assertStringNotContainsString('>Kosong<', $html, 'kategori tanpa produk tidak ditampilkan');
         $this->assertStringContainsString('Sparepart', $html);                 // induk memuat produk sub-kategorinya
@@ -132,9 +132,9 @@ class HomeContentTest extends TestCase
     public function test_page_header_uses_page_photo_then_shared_photo_and_stays_plain_on_transaction_pages(): void
     {
         $this->setting('header_bg', 'umum/umum.jpg');
-        $this->setting('header_bg_katalog', 'khusus/katalog.jpg');
+        $this->setting('header_bg_kontak', 'khusus/kontak.jpg');
 
-        $this->get(route('products.index'))->assertOk()->assertSee('storage/khusus/katalog.jpg')->assertDontSee('storage/umum/umum.jpg');
+        $this->get(route('contact.index'))->assertOk()->assertSee('storage/khusus/kontak.jpg')->assertDontSee('storage/umum/umum.jpg');
         $this->get(route('faq'))->assertOk()->assertSee('storage/umum/umum.jpg');                 // cadangan: foto umum
         $this->get(route('customer.cart.index'))->assertOk()->assertDontSee('storage/umum/umum.jpg');       // transaksi: polos
     }

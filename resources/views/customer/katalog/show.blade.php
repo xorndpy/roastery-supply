@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.shop')
 
 @section('title', $product->name)
 
@@ -22,7 +22,7 @@
 
 <div class="container-x py-10">
     <div class="grid gap-12 lg:grid-cols-[1.05fr_1fr]"
-         x-data='{ view: @json($product->model_3d ? "3d" : "img"), img: @json($imgs->first()), qty: 1, max: {{ max($product->stock, 1) }} }'>
+         x-data='{ view: @json($product->model_3d ? "3d" : "img"), img: @json($imgs->first()), qty: 1, msg: "", max: {{ max($product->stock, 1) }} }'>
 
         {{-- Galeri --}}
         <div>
@@ -78,14 +78,17 @@
 
                 <div class="flex gap-3">
                     <div class="flex h-11 items-center rounded-md border border-stone-300 bg-white">
-                        <button type="button" @click="qty = Math.max(1, qty - 1)" class="h-full w-10 text-lg hover:text-orange-500" aria-label="Kurangi">−</button>
-                        <span class="min-w-[2rem] text-center text-sm font-medium" x-text="qty"></span>
-                        <button type="button" @click="qty = Math.min(max, qty + 1)" class="h-full w-10 text-lg hover:text-orange-500" aria-label="Tambah">+</button>
+                        <button type="button" @click="qty = Math.max(1, qty - 1); msg = ''" class="h-full w-10 text-lg hover:text-orange-500" aria-label="Kurangi">−</button>
+                        <input type="text" inputmode="numeric" autocomplete="off" :value="qty" aria-label="Jumlah"
+                               @change="let v = parseInt($event.target.value.replace(/\D/g, ''), 10); if (isNaN(v) || v < 1) v = 1; if (v > max) { v = max; msg = 'Stok tersedia hanya ' + max + ' unit.' } else { msg = '' } qty = v; $event.target.value = v"
+                               class="h-full w-12 border-0 bg-transparent p-0 text-center text-sm font-medium focus:ring-0">
+                        <button type="button" @click="if (qty >= max) { msg = 'Stok tersedia hanya ' + max + ' unit.' } else { qty++; msg = '' }" class="h-full w-10 text-lg hover:text-orange-500" aria-label="Tambah">+</button>
                     </div>
                     <button type="submit" @disabled($soldOut) class="btn btn-primary flex-1">
                         {{ $soldOut ? 'Stok Habis' : 'Tambah ke Keranjang' }}
                     </button>
                 </div>
+                <p x-show="msg" x-cloak x-text="msg" role="status" class="mt-2 text-[13px] text-red-600"></p>
             </form>
 
             @if($wa)

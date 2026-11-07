@@ -8,7 +8,7 @@
         'facebook'  => $site['social_facebook'] ?? null,
         'youtube'   => $site['social_youtube'] ?? null,
     ]);
-    $nav = [['Beranda', 'home'], ['Katalog', 'products.index'], ['Tentang Kami', 'about'], ['Cabang', 'branches.index'], ['FAQ', 'faq'], ['Kontak', 'contact.index']];
+    $nav = [['Beranda', 'home'], ['Katalog', 'products.index'], ['Tentang Kami', 'about'], ['Artikel', 'articles.index'], ['Cabang', 'branches.index'], ['FAQ', 'faq'], ['Kontak', 'contact.index']];
     $contacts = array_filter([
         ['pin',   $site['contact_address'] ?? null, null],
         ['mail',  $site['contact_email'] ?? null, !empty($site['contact_email']) ? 'mailto:' . $site['contact_email'] : null],

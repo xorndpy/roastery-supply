@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             WilayahSeeder::class,
             SettingSeeder::class,
             FaqSeeder::class,
+            ContentSeeder::class,
         ]);
     }
 }

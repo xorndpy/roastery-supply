@@ -77,12 +77,18 @@ class CartController extends Controller
     {
         $request->validate([
             'quantity' => 'required|integer|min:1|max:999',
+        ], [
+            'quantity.required' => 'Jumlah wajib diisi.',
+            'quantity.integer'  => 'Jumlah harus berupa angka.',
+            'quantity.min'      => 'Jumlah minimal 1.',
+            'quantity.max'      => 'Jumlah maksimal 999.',
         ]);
 
+        $json = $request->expectsJson();
         $cart = session()->get('cart', []);
 
         if (!isset($cart[$id])) {
-            return back()->with('error', 'Produk tidak ada di keranjang.');
+            return $json ? response()->json(['message' => 'Produk tidak ada di keranjang.'], 404) : back()->with('error', 'Produk tidak ada di keranjang.');
         }
 
         $product = Product::where('is_active', true)->find($id);
@@ -91,17 +97,41 @@ class CartController extends Controller
             unset($cart[$id]);
             session()->put('cart', $cart);
 
-            return back()->with('error', 'Produk sudah tidak tersedia dan dihapus dari keranjang.');
+            return $json ? response()->json(['message' => 'Produk sudah tidak tersedia dan dihapus dari keranjang.'], 404) : back()->with('error', 'Produk sudah tidak tersedia dan dihapus dari keranjang.');
         }
 
-        if ($request->quantity > $product->stock) {
-            return back()->with('error', "Stok tidak mencukupi (tersisa {$product->stock}).");
+        $requested = (int) $request->quantity;
+
+        if ($requested > $product->stock) {
+            // Gaya marketplace: dari layar keranjang, jumlah otomatis disesuaikan ke stok yang ada (bukan ditolak).
+            if ($json && $product->stock >= 1) {
+                $message = "Stok tersedia hanya {$product->stock}. Jumlah disesuaikan.";
+                $requested = (int) $product->stock;
+            } else {
+                $message = "Stok tidak mencukupi (tersisa {$product->stock}).";
+
+                return $json ? response()->json(['message' => $message], 422) : back()->with('error', $message);
+            }
         }
 
-        $cart[$id]['quantity'] = (int) $request->quantity;
+        $cart[$id]['quantity'] = $requested;
+        $cart[$id]['stock'] = (int) $product->stock;
         session()->put('cart', $cart);
 
-        return back()->with('success', 'Keranjang diperbarui.');
+        if (!$json) {
+            return back()->with('success', 'Keranjang diperbarui.');
+        }
+
+        $rp = fn ($n) => 'Rp ' . number_format($n, 0, ',', '.');
+        $total = collect($cart)->sum(fn ($i) => $i['price'] * $i['quantity']);
+
+        return response()->json([
+            'quantity'            => $requested,
+            'max'                 => (int) $product->stock,
+            'message'             => $message ?? null,
+            'line_subtotal_label' => $rp($cart[$id]['price'] * $requested),
+            'total_label'         => $rp($total),
+        ]);
     }
 
     /**

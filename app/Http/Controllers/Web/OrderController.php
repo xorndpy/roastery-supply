@@ -56,6 +56,11 @@ class OrderController extends Controller
             return back()->with('error', 'Pesanan ini sudah tidak menunggu pembayaran.');
         }
 
+        // Midtrans aktif: transfer manual baru ditutup (bukti lama yang masih diproses tetap boleh diganti).
+        if (app(\App\Services\Payments\MidtransService::class)->configured() && !$order->payments()->whereNull('provider')->exists()) {
+            return back()->with('error', 'Silakan bayar lewat tombol Bayar Sekarang.');
+        }
+
         $validated = $request->validate([
             'method' => 'required|string|max:50',
             'proof_image' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',

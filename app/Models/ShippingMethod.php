@@ -11,12 +11,15 @@ class ShippingMethod extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['name', 'description', 'sort_order', 'is_active'];
+    protected $fillable = ['name', 'description', 'type', 'sort_order', 'is_active'];
 
     protected function casts(): array
     {
         return ['is_active' => 'boolean', 'sort_order' => 'integer'];
     }
+
+    public const TYPE_OWN = 'own';
+    public const TYPE_EXTERNAL = 'external';
 
     public function rates(): HasMany
     {

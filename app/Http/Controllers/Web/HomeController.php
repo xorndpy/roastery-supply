@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Models\Article;
 use App\Models\Banner;
 use App\Models\Branch;
 use App\Models\Category;
 use App\Models\Faq;
+use App\Models\Milestone;
 use App\Models\Partner;
 use App\Models\Product;
 use App\Models\Testimonial;
@@ -16,45 +18,29 @@ use App\Models\Testimonial;
  */
 class HomeController extends Controller
 {
+    /** Beranda = COMPANY PROFILE. Belanja (kategori, produk) ada di toko: /katalog. */
     public function index()
     {
-        $featuredProducts = Product::where('is_active', true)
-            ->where('is_featured', true)
-            ->with(['category', 'brand', 'images'])
-            ->latest()
-            ->take(8)
-            ->get();
-
-        // Kategori utama yang punya produk (termasuk dari sub-kategorinya). Yang kosong tidak ditampilkan:
-        // kartu "0 produk" hanya mengarah ke halaman kosong. Yang terbanyak jadi kartu besar.
-        $withCount = ['products' => fn ($q) => $q->where('is_active', true)];
-        $categories = Category::where('is_active', true)
-            ->whereNull('parent_id')
-            ->withCount($withCount)
-            ->with(['children' => fn ($q) => $q->where('is_active', true)->withCount($withCount)])
-            ->orderBy('name')
-            ->get()
-            ->each(fn ($c) => $c->products_count += $c->children->sum('products_count'))
-            ->filter(fn ($c) => $c->products_count > 0)
-            ->sortByDesc('products_count')
-            ->values()
-            ->take(5);
-
         $testimonials = $this->homeTestimonials();
 
         // scopeActive: aktif DAN dalam jadwal tayang (PRD 6.4 "Banner tampil sesuai jadwal")
-        $banners = Banner::active()->orderBy('sort_order')->orderBy('id')->get();
+        $banners = Banner::active()->orderBy('sort_order')->orderBy('id')->take(2)->get();
 
         $partners = Partner::active()->orderBy('sort_order')->orderBy('name')->get();
 
-        return view('customer.home', compact('featuredProducts', 'categories', 'testimonials', 'banners', 'partners'));
+        $articles = Article::published()->latest('published_at')->take(3)->get();
+        $milestones = Milestone::active()->get();
+
+        return view('customer.home', compact('testimonials', 'banners', 'partners', 'articles', 'milestones'));
     }
 
     public function about()
     {
         $partners = Partner::active()->orderBy('sort_order')->orderBy('name')->get();
 
-        return view('customer.about', compact('partners'));
+        $milestones = Milestone::active()->get();
+
+        return view('customer.about', compact('partners', 'milestones'));
     }
 
     public function faq()

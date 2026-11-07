@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Product;
 use App\Models\ReturnOrder;
+use App\Models\StockMovement;
 use App\Models\Testimonial;
 use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
@@ -21,6 +22,12 @@ class DashboardController extends Controller
 
     public function index(Request $request)
     {
+        // Admin Gudang punya dashboard sendiri: fokus kemas, kirim, dan stok (tanpa omzet/pembayaran).
+        $u = $request->user();
+        if ($u->hasRole('gudang') && !$u->hasAnyRole(['super_admin', 'admin', 'staff'])) {
+            return $this->gudang();
+        }
+
         $range = in_array((int) $request->query('range'), [7, 30], true) ? (int) $request->query('range') : 7;
         $start = now()->subDays($range - 1)->startOfDay();
         $prevStart = $start->copy()->subDays($range);
@@ -114,6 +121,27 @@ class DashboardController extends Controller
             'unreadMessages', 'pendingTestimonials', 'pendingReturns', 'shippingConfigured',
             'totalRefund', 'totalRevenue', 'totalOrders', 'pendingOrders', 'totalProducts',
             'totalCustomers', 'lowStockProducts', 'pendingPayments', 'recentOrders', 'lowStockList'
+        ));
+    }
+
+    /** Dashboard khusus Admin Gudang. */
+    private function gudang()
+    {
+        $toPack = Order::where('status', 'dikonfirmasi')->count();
+        $toShip = Order::where('status', 'diproses')->count();
+        $inTransit = Order::where('status', 'dikirim')->count();
+        $returnsOpen = ReturnOrder::whereIn('status', ['pending', 'approved'])->count();
+
+        $lowStock = Product::where('is_active', true)->where('stock', '>', 0)->whereColumn('stock', '<=', 'stock_threshold')->count();
+        $outOfStock = Product::where('is_active', true)->where('stock', '<=', 0)->count();
+
+        // Antrean kerja: yang paling lama menunggu tampil duluan.
+        $queue = Order::with('items')->whereIn('status', ['dikonfirmasi', 'diproses'])->oldest()->take(8)->get();
+        $lowStockList = Product::where('is_active', true)->whereColumn('stock', '<=', 'stock_threshold')->orderBy('stock')->take(8)->get();
+        $movements = StockMovement::with('product')->latest()->take(8)->get();
+
+        return view('admin.dashboard-gudang', compact(
+            'toPack', 'toShip', 'inTransit', 'returnsOpen', 'lowStock', 'outOfStock', 'queue', 'lowStockList', 'movements'
         ));
     }
 }

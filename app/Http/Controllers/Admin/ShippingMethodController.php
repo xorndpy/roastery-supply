@@ -122,6 +122,7 @@ class ShippingMethodController extends Controller
         $data = $request->validate([
             'name'        => 'required|string|max:100',
             'description' => 'nullable|string|max:255',
+            'type'        => 'required|in:own,external',
             'sort_order'  => 'nullable|integer|min:0|max:9999',
         ]);
         $data['sort_order'] = $data['sort_order'] ?? 0;

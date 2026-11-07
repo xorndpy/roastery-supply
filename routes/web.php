@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\Webhooks\MidtransWebhookController;
+use App\Http\Controllers\Web\ArticleController;
+use App\Http\Controllers\Admin\ArticleController as AdminArticleController;
+use App\Http\Controllers\Admin\MilestoneController;
 use App\Http\Controllers\Web\OnlinePaymentController;
 use Illuminate\Support\Facades\Route;
 
@@ -67,6 +70,7 @@ use App\Http\Controllers\Web\TestimonialController as CustomerTestimonialControl
 // =========================================================================
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/katalog', [KatalogController::class, 'index'])->name('products.index');
+Route::get('/merek', [KatalogController::class, 'brands'])->name('products.brands');
 Route::get('/produk/{slug}', [KatalogController::class, 'show'])->name('products.show');
 Route::get('/tentang', [HomeController::class, 'about'])->name('about');
 Route::get('/faq', [HomeController::class, 'faq'])->name('faq');
@@ -81,7 +85,7 @@ Route::get('/cabang', [HomeController::class, 'branches'])->name('branches.index
 Route::get('/dashboard', function () {
     $user = auth()->user();
 
-    if ($user && $user->hasAnyRole(['super_admin', 'admin', 'staff'])) {
+    if ($user && $user->hasAnyRole(['super_admin', 'admin', 'staff', 'gudang'])) {
         return redirect()->route('admin.dashboard');
     }
 
@@ -90,6 +94,10 @@ Route::get('/dashboard', function () {
 
 
 // Keranjang Belanja: guest boleh belanja (session). Login baru diminta saat checkout.
+// Insight (blog)
+Route::get('/artikel', [ArticleController::class, 'index'])->name('articles.index');
+Route::get('/artikel/{slug}', [ArticleController::class, 'show'])->name('articles.show');
+
 // Nama route tetap customer.cart.* agar view lama tidak berubah.
 Route::prefix('customer/cart')->as('customer.cart.')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('index');
@@ -158,7 +166,7 @@ Route::prefix('customer')
 // =========================================================================
 Route::prefix('admin')
     ->as('admin.')
-    ->middleware(['auth', 'role:staff|admin|super_admin'])
+    ->middleware(['auth', 'role:staff|admin|super_admin|gudang'])
     ->group(function () {
 
         // Resource dengan izin terpisah per aksi. create harus terdaftar sebelum {param}.
@@ -268,6 +276,10 @@ Route::prefix('admin')
         });
 
         // Konten (CMS)
+        Route::post('articles/upload-image', [AdminArticleController::class, 'uploadImage'])->name('articles.upload-image')->middleware('can:edit_articles');
+        Route::patch('articles/{article}/toggle-publish', [AdminArticleController::class, 'togglePublish'])->name('articles.toggle-publish')->middleware('can:edit_articles');
+        $crud('articles', AdminArticleController::class, 'articles', ['show']);
+        $crud('milestones', MilestoneController::class, 'milestones', ['show']);
         $crud('faqs', FaqController::class, 'faqs', ['show']);
         $crud('partners', PartnerController::class, 'partners', ['show']);
         $crud('branches', BranchController::class, 'branches', ['show']);

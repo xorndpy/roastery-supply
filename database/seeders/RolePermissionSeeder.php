@@ -61,6 +61,17 @@ class RolePermissionSeeder extends Seeder
             $staffRole->syncPermissions($staffPermissions);
         }
 
+        // 3b. Gudang: stok, antrean kemas/kirim, retur masuk (tanpa pembayaran, laporan, pelanggan)
+        $gudangRole = Role::where('name', 'gudang')->first();
+        if ($gudangRole) {
+            $gudangRole->syncPermissions([
+                'view_products', 'view_categories', 'view_brands',
+                'view_stock', 'manage_stock',
+                'view_orders', 'edit_orders', 'manage_shipments',
+                'view_returns',
+            ]);
+        }
+
         // 4. Customer: Customer portal access
         $customerRole = Role::where('name', 'customer')->first();
         if ($customerRole) {

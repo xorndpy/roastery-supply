@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.shop')
 
 @section('title', 'Retur ' . $return->order->order_number)
 

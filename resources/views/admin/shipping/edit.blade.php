@@ -17,6 +17,12 @@
 <form method="POST" action="{{ route('admin.shipping.update', $method->id) }}" class="bg-white p-6 rounded-lg border border-stone-200 mb-6 grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
     @csrf @method('PUT')
     <div class="md:col-span-2"><label class="block text-sm font-medium mb-1.5">Nama</label><input type="text" name="name" value="{{ old('name', $method->name) }}" required maxlength="100" class="w-full border border-stone-300 rounded-lg px-3 py-2"></div>
+    <div><label class="block text-sm font-medium mb-1.5">Jenis</label>
+        <select name="type" class="w-full border border-stone-300 rounded-lg px-3 py-2">
+            <option value="own" @selected(old('type', $method->type) === 'own')>Kargo Kami</option>
+            <option value="external" @selected(old('type', $method->type) !== 'own')>Ekspedisi luar</option>
+        </select>
+    </div>
     <div><label class="block text-sm font-medium mb-1.5">Urutan</label><input type="number" name="sort_order" min="0" value="{{ old('sort_order', $method->sort_order) }}" class="w-full border border-stone-300 rounded-lg px-3 py-2"></div>
     <label class="flex items-center gap-2 text-sm pb-2"><input type="checkbox" name="is_active" value="1" @checked(old('is_active', $method->is_active))> Aktif</label>
     <div class="md:col-span-3"><label class="block text-sm font-medium mb-1.5">Keterangan</label><input type="text" name="description" value="{{ old('description', $method->description) }}" maxlength="255" class="w-full border border-stone-300 rounded-lg px-3 py-2"></div>

@@ -38,6 +38,8 @@
             'group' => 'CMS',
             'items' => [
                 ['label' => 'FAQ', 'route' => 'admin.faqs.index', 'icon' => 'help'],
+            ['label' => 'Artikel', 'route' => 'admin.articles.index', 'icon' => 'doc'],
+            ['label' => 'Milestone', 'route' => 'admin.milestones.index', 'icon' => 'flag'],
                 ['label' => 'Partner', 'route' => 'admin.partners.index', 'icon' => 'briefcase'],
                 ['label' => 'Cabang', 'route' => 'admin.branches.index', 'icon' => 'pin'],
                 ['label' => 'Pesan Masuk', 'route' => 'admin.messages.index', 'icon' => 'mail'],
@@ -67,6 +69,7 @@
         'admin.orders.index' => 'view_orders', 'admin.payments.index' => 'verify_payments',
         'admin.shipments.index' => 'manage_shipments', 'admin.shipping.index' => 'view_shipping_rates', 'admin.returns.index' => 'view_returns',
         'admin.customers.index' => 'view_customers', 'admin.vouchers.index' => 'view_vouchers',
+        'admin.articles.index' => 'view_articles', 'admin.milestones.index' => 'view_milestones',
         'admin.banners.index' => 'view_banners', 'admin.testimonials.index' => 'view_testimonials',
         'admin.faqs.index' => 'view_faqs', 'admin.partners.index' => 'view_partners',
         'admin.branches.index' => 'view_branches', 'admin.messages.index' => 'view_contact_messages',
@@ -101,6 +104,8 @@
         'user' => '<circle cx="12" cy="8" r="3.6"/><path d="M5 20c.8-3.6 3.5-5.5 7-5.5s6.2 1.9 7 5.5"/>',
         'shield' => '<path d="M12 3.5l7.5 3v5.4c0 4.4-3.1 7.6-7.5 8.6-4.4-1-7.5-4.2-7.5-8.6V6.5l7.5-3z"/>',
         'list' => '<rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M9 8.5h6M9 12h6M9 15.5h4"/>',
+        'doc' => '<path d="M14 3.5H7.5A1.5 1.5 0 0 0 6 5v14a1.5 1.5 0 0 0 1.5 1.5h9A1.5 1.5 0 0 0 18 19V7.5L14 3.5z"/><path d="M14 3.5V7.5h4M9 12h6M9 15.5h4"/>',
+        'flag' => '<path d="M5.5 20.5V4M5.5 5h11l-2 3.5 2 3.5h-11"/>',
     ];
 
     // Badge angka di menu: hal yang menunggu tindakan.

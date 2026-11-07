@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.shop')
 
 @section('title', 'Keranjang Belanja')
 
@@ -27,12 +27,20 @@
                             <div class="mt-0.5 text-sm text-stone-500">Rp {{ number_format($item['price'], 0, ',', '.') }}</div>
 
                             <div class="mt-3 flex flex-wrap items-center gap-4">
-                                <form method="POST" action="{{ route('customer.cart.update', $id) }}" class="flex items-center gap-2">
-                                    @csrf @method('PATCH')
-                                    <input type="number" name="quantity" value="{{ $item['quantity'] }}" min="1" max="{{ $item['stock'] }}"
-                                           class="h-9 w-16 rounded-md border-stone-300 text-center text-sm focus:border-orange-500 focus:ring-orange-500" aria-label="Jumlah">
-                                    <button type="submit" class="text-[13px] text-stone-500 hover:text-stone-900">Perbarui</button>
-                                </form>
+                                {{-- Gaya marketplace: ubah jumlah langsung tersimpan (tanpa tombol "Perbarui"). --}}
+                                <div x-data="cartLine({ url: @js(route('customer.cart.update', $id)), id: @js((string) $id), qty: {{ (int) $item['quantity'] }}, max: {{ max(1, (int) $item['stock']) }} })" class="flex flex-col">
+                                    <div class="flex items-center gap-3">
+                                        <div class="inline-flex h-9 items-center rounded-lg border border-stone-300 bg-white" role="group" aria-label="Jumlah {{ $item['name'] }}">
+                                            <button type="button" @click="step(-1)" :disabled="qty <= 1" class="h-full w-9 text-lg text-stone-700 transition hover:text-orange-600 disabled:cursor-not-allowed disabled:text-stone-300" aria-label="Kurangi jumlah">−</button>
+                                            <input type="text" inputmode="numeric" autocomplete="off" x-model="qty" @input="digits()" @change="commit()" @keydown.enter.prevent="commit()"
+                                                   class="h-full w-12 border-0 border-x border-stone-300 bg-transparent p-0 text-center text-sm font-medium focus:ring-1 focus:ring-orange-500" aria-label="Jumlah">
+                                            <button type="button" @click="step(1)" :disabled="qty >= max" class="h-full w-9 text-lg text-stone-700 transition hover:text-orange-600 disabled:cursor-not-allowed disabled:text-stone-300" aria-label="Tambah jumlah">+</button>
+                                        </div>
+                                        <span class="text-xs text-stone-500">Stok {{ (int) $item['stock'] }}</span>
+                                        <span x-show="busy" x-cloak class="text-xs text-stone-400">Menyimpan…</span>
+                                    </div>
+                                    <p x-show="msg" x-cloak x-text="msg" role="status" class="mt-1.5 text-[13px] text-red-600"></p>
+                                </div>
                                 <form method="POST" action="{{ route('customer.cart.destroy', $id) }}">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="text-[13px] text-stone-400 hover:text-red-600">Hapus</button>
@@ -42,7 +50,7 @@
 
                         <div class="text-right">
                             <div class="text-xs text-stone-500">Subtotal</div>
-                            <div class="font-semibold">Rp {{ number_format($item['price'] * $item['quantity'], 0, ',', '.') }}</div>
+                            <div class="font-semibold" id="line-{{ $id }}">Rp {{ number_format($item['price'] * $item['quantity'], 0, ',', '.') }}</div>
                         </div>
                     </div>
                 @endforeach
@@ -50,10 +58,10 @@
 
             <aside class="rounded-xl border border-stone-200 bg-white p-6 lg:sticky lg:top-24">
                 <h2 class="heading mb-4 text-lg">Ringkasan Pesanan</h2>
-                <div class="flex justify-between py-1.5 text-sm text-stone-500"><span>Subtotal</span><span>Rp {{ number_format($total, 0, ',', '.') }}</span></div>
+                <div class="flex justify-between py-1.5 text-sm text-stone-500"><span>Subtotal</span><span data-cart-total>Rp {{ number_format($total, 0, ',', '.') }}</span></div>
                 <div class="flex justify-between py-1.5 text-sm text-stone-500"><span>Ongkos kirim</span><span>Dihitung saat checkout</span></div>
                 <div class="mt-3 flex justify-between border-t border-stone-200 pt-4 text-[17px] font-semibold">
-                    <span>Total</span><span class="text-orange-500">Rp {{ number_format($total, 0, ',', '.') }}</span>
+                    <span>Total</span><span class="text-orange-500" data-cart-total>Rp {{ number_format($total, 0, ',', '.') }}</span>
                 </div>
                 <a href="{{ route('customer.checkout.index') }}" class="btn btn-primary mt-5 w-full">Lanjut ke Checkout</a>
                 <a href="{{ route('products.index') }}" class="mt-4 block text-center text-sm text-orange-600 hover:underline">Lanjut belanja</a>
@@ -68,3 +76,38 @@
     @endif
 </div>
 @endsection
+
+@push('scripts')
+<script>
+function cartLine(cfg) {
+    return {
+        qty: cfg.qty, max: cfg.max, busy: false, msg: '', timer: null, seq: 0,
+        digits() { this.qty = String(this.qty).replace(/\D/g, ''); },
+        step(d) { this.set(Number(this.qty) + d); },
+        commit() { this.set(this.qty); },
+        set(v) {
+            v = parseInt(v, 10);
+            if (isNaN(v) || v < 1) v = 1;
+            if (v > this.max) { v = this.max; this.msg = 'Stok tersedia hanya ' + this.max + '.'; } else { this.msg = ''; }
+            this.qty = v;
+            clearTimeout(this.timer);
+            this.timer = setTimeout(() => this.save(), 350);       // simpan otomatis setelah berhenti mengetik
+        },
+        async save() {
+            const mine = ++this.seq; this.busy = true;
+            try {
+                const res = await fetch(cfg.url, { method: 'PATCH', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content }, body: JSON.stringify({ quantity: this.qty }) });
+                const j = await res.json();
+                if (mine !== this.seq) return;                     // sudah ada perubahan yang lebih baru
+                if (!res.ok) { this.msg = j.message || 'Gagal memperbarui jumlah.'; return; }
+                this.qty = j.quantity; this.max = j.max;
+                if (j.message) this.msg = j.message;
+                document.getElementById('line-' + cfg.id).textContent = j.line_subtotal_label;
+                document.querySelectorAll('[data-cart-total]').forEach(e => e.textContent = j.total_label);
+            } catch (e) { this.msg = 'Koneksi bermasalah. Coba lagi.'; }
+            finally { if (mine === this.seq) this.busy = false; }
+        },
+    };
+}
+</script>
+@endpush

@@ -8,7 +8,7 @@ Alpine.start();
 
 // Efek muncul saat di-scroll untuk elemen [data-reveal]. Tanpa JS atau dengan prefers-reduced-motion, konten langsung tampil.
 (function () {
-    const els = [...document.querySelectorAll('[data-reveal]')];
+    const els = [...document.querySelectorAll('[data-reveal], [data-draw]')];
     if (!els.length || !('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     const io = new IntersectionObserver((entries) => {

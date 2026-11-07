@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.shop')
 
 @section('title', 'Detail Pesanan ' . $order->order_number)
 
@@ -110,6 +110,8 @@
             $reviewing = $allPayments->first(fn ($p) => $p->status === 'review' && !$p->reviewed_at);
             $midtrans = app(\App\Services\Payments\MidtransService::class);
             $onlineEnabled = $midtrans->configured() && !$isPending && !$reviewing;
+            // Transfer manual hanya tampil bila Midtrans belum diatur, atau sudah ada bukti manual yang menunggu/ditolak.
+            $manualAllowed = !$midtrans->configured() || $isPending || $isRejected;
             $hasLive = $online && $online->status === 'waiting' && $online->snap_token && $online->expires_at && $online->expires_at->isFuture();
         @endphp
         <div class="bg-white rounded-lg border border-stone-200 p-6 mb-6">
@@ -162,6 +164,7 @@
                 </div>
             @endif
 
+            @if($manualAllowed)
             <details class="group" @if(!$onlineEnabled || $isPending || $isRejected) open @endif>
                 @if($onlineEnabled)<summary class="mb-4 cursor-pointer text-sm font-medium text-stone-700 hover:text-stone-900">Atau bayar dengan transfer manual (unggah bukti)</summary>@endif
             @unless($isPending)
@@ -222,6 +225,7 @@
             </form>
 
             </details>
+            @endif
 
             <form method="POST" action="{{ route('customer.orders.cancel', $order->order_number) }}" class="mt-4">
                 @csrf

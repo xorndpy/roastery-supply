@@ -21,6 +21,14 @@
         <input type="text" name="description" value="{{ old('description') }}" maxlength="255" placeholder="Diantar ekspedisi kargo, asuransi termasuk" class="w-full border border-stone-300 rounded-lg px-3 py-2">
     </div>
     <div>
+        <label class="block text-sm font-medium mb-1.5">Jenis layanan *</label>
+        <select name="type" class="w-full border border-stone-300 rounded-lg px-3 py-2">
+            <option value="own" @selected(old('type') === 'own')>Kargo Kami (armada pengiriman toko)</option>
+            <option value="external" @selected(old('type', 'external') === 'external')>Ekspedisi luar (JNE, J&amp;T, kargo pihak ketiga, dll)</option>
+        </select>
+        <p class="text-xs text-stone-500 mt-1">Di checkout, pelanggan melihat dua kelompok: Kargo Kami dan Ekspedisi Lain.</p>
+    </div>
+    <div>
         <label class="block text-sm font-medium mb-1.5">Urutan tampil</label>
         <input type="number" name="sort_order" min="0" value="{{ old('sort_order', 0) }}" class="w-32 border border-stone-300 rounded-lg px-3 py-2">
     </div>
