@@ -18,7 +18,7 @@ class ProductService
         $category = \App\Models\Category::find($categoryId);
         $prefix = $category ? strtoupper(substr($category->slug, 0, 3)) : 'GEN';
 
-        $lastProduct = Product::where('sku', 'like', "RS-{$prefix}-%")
+        $lastProduct = Product::withTrashed()->where('sku', 'like', "RS-{$prefix}-%")
             ->orderBy('id', 'desc')
             ->first();
 
@@ -41,7 +41,7 @@ class ProductService
         $counter = 1;
 
         while (true) {
-            $query = Product::where('slug', $slug);
+            $query = Product::withTrashed()->where('slug', $slug);
             if ($excludeId) {
                 $query->where('id', '!=', $excludeId);
             }
