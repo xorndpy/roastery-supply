@@ -79,6 +79,8 @@ class SettingController extends Controller
                 ->log('Pengaturan situs diubah: ' . implode(', ', $changed));
         }
 
-        return back()->with('success', $changed ? 'Pengaturan disimpan.' : 'Tidak ada perubahan.');
+        // Tetap di tab yang sedang dibuka.
+        return redirect()->route('admin.settings.index', array_filter(['tab' => $request->input('tab')]))
+            ->with('success', $changed ? 'Pengaturan disimpan.' : 'Tidak ada perubahan.');
     }
 }

@@ -129,13 +129,13 @@ class HomeContentTest extends TestCase
 
     // ---------------------------------------------------------------- header halaman
 
-    public function test_page_header_uses_page_photo_then_shared_photo_and_stays_plain_on_transaction_pages(): void
+    public function test_page_header_uses_one_shared_photo_and_stays_plain_on_transaction_pages(): void
     {
         $this->setting('header_bg', 'umum/umum.jpg');
-        $this->setting('header_bg_kontak', 'khusus/kontak.jpg');
 
-        $this->get(route('contact.index'))->assertOk()->assertSee('storage/khusus/kontak.jpg')->assertDontSee('storage/umum/umum.jpg');
-        $this->get(route('faq'))->assertOk()->assertSee('storage/umum/umum.jpg');                 // cadangan: foto umum
-        $this->get(route('customer.cart.index'))->assertOk()->assertDontSee('storage/umum/umum.jpg');       // transaksi: polos
+        $this->get(route('contact.index'))->assertOk()->assertSee('storage/umum/umum.jpg');
+        $this->get(route('faq'))->assertOk()->assertSee('storage/umum/umum.jpg');
+        $this->get(route('products.index'))->assertOk()->assertSee('storage/umum/umum.jpg');             // Katalog ikut header yang sama
+        $this->get(route('customer.cart.index'))->assertOk()->assertDontSee('storage/umum/umum.jpg');    // transaksi: polos
     }
 }

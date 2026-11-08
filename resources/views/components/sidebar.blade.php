@@ -43,6 +43,7 @@
                 ['label' => 'Partner', 'route' => 'admin.partners.index', 'icon' => 'briefcase'],
                 ['label' => 'Cabang', 'route' => 'admin.branches.index', 'icon' => 'pin'],
                 ['label' => 'Pesan Masuk', 'route' => 'admin.messages.index', 'icon' => 'mail'],
+                ['label' => 'Hero Beranda', 'route' => 'admin.hero.index', 'icon' => 'image'],
                 ['label' => 'Pengaturan', 'route' => 'admin.settings.index', 'icon' => 'sliders'],
             ],
         ],
@@ -73,7 +74,7 @@
         'admin.banners.index' => 'view_banners', 'admin.testimonials.index' => 'view_testimonials',
         'admin.faqs.index' => 'view_faqs', 'admin.partners.index' => 'view_partners',
         'admin.branches.index' => 'view_branches', 'admin.messages.index' => 'view_contact_messages',
-        'admin.settings.index' => 'view_settings', 'admin.reports.index' => 'view_reports',
+        'admin.settings.index' => 'view_settings', 'admin.hero.index' => 'view_settings', 'admin.reports.index' => 'view_reports',
         'admin.users.index' => 'view_users', 'admin.roles.index' => 'view_roles',
         'admin.logs.index' => 'view_activity_logs',
     ];

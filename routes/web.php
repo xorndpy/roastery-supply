@@ -4,6 +4,7 @@ use App\Http\Controllers\Webhooks\MidtransWebhookController;
 use App\Http\Controllers\Web\ArticleController;
 use App\Http\Controllers\Admin\ArticleController as AdminArticleController;
 use App\Http\Controllers\Admin\MilestoneController;
+use App\Http\Controllers\Admin\HeroSlideController;
 use App\Http\Controllers\Web\OnlinePaymentController;
 use Illuminate\Support\Facades\Route;
 
@@ -283,6 +284,15 @@ Route::prefix('admin')
         $crud('faqs', FaqController::class, 'faqs', ['show']);
         $crud('partners', PartnerController::class, 'partners', ['show']);
         $crud('branches', BranchController::class, 'branches', ['show']);
+        // Hero beranda (slideshow foto) - memakai izin Pengaturan
+        Route::prefix('hero')->as('hero.')->group(function () {
+            Route::get('/', [HeroSlideController::class, 'index'])->name('index')->middleware('can:view_settings');
+            Route::post('/', [HeroSlideController::class, 'store'])->name('store')->middleware('can:edit_settings');
+            Route::post('/reorder', [HeroSlideController::class, 'reorder'])->name('reorder')->middleware('can:edit_settings');
+            Route::patch('/{slide}/toggle', [HeroSlideController::class, 'toggle'])->name('toggle')->middleware('can:edit_settings');
+            Route::delete('/{slide}', [HeroSlideController::class, 'destroy'])->name('destroy')->middleware('can:edit_settings');
+        });
+
         Route::prefix('settings')->as('settings.')->group(function () {
             Route::get('/', [SettingController::class, 'index'])->name('index')->middleware('can:view_settings');
             Route::put('/', [SettingController::class, 'update'])->name('update')->middleware('can:edit_settings');

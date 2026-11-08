@@ -28,7 +28,7 @@ class DashboardController extends Controller
             return $this->gudang();
         }
 
-        $range = in_array((int) $request->query('range'), [7, 30], true) ? (int) $request->query('range') : 7;
+        $range = in_array((int) $request->query('range'), [7, 30, 90], true) ? (int) $request->query('range') : 7;
         $start = now()->subDays($range - 1)->startOfDay();
         $prevStart = $start->copy()->subDays($range);
 
@@ -49,6 +49,29 @@ class DashboardController extends Controller
         // Antrean kerja admin: pesanan yang sudah dibayar tapi belum diproses / belum dikirim (semua waktu).
         $ordersToProcess = Order::where('status', 'dikonfirmasi')->count();
         $ordersToShip = Order::where('status', 'diproses')->count();
+
+        // Pesanan yang tertahan lebih dari 24 jam di tahapnya (updated_at = waktu terakhir status berubah).
+        $lateCutoff = now()->subDay();
+        $lateToProcess = Order::where('status', 'dikonfirmasi')->where('updated_at', '<=', $lateCutoff)->count();
+        $lateToShip = Order::where('status', 'diproses')->where('updated_at', '<=', $lateCutoff)->count();
+
+        // Follow-up: pelanggan yang pernah belanja tapi tidak ada pembelian dalam 90 hari terakhir.
+        $followUps = collect();
+        $followUpTotal = 0;
+        if ($request->user()->can('view_customers')) {
+            $paid = fn ($q) => $q->whereIn('status', self::PAID);
+            $lapsed = Customer::query()
+                ->whereHas('orders', $paid)
+                ->whereDoesntHave('orders', fn ($q) => $q->whereIn('status', self::PAID)->where('created_at', '>=', now()->subDays(90)));
+
+            $followUpTotal = (clone $lapsed)->count();
+            $followUps = $lapsed
+                ->withMax(['orders as last_paid_at' => $paid], 'created_at')
+                ->withSum(['orders as lifetime_total' => $paid], 'total')
+                ->orderByDesc('last_paid_at')
+                ->limit(5)
+                ->get();
+        }
 
         // ---- Periode terpilih vs periode sebelumnya ----
         $revenue = (float) Order::whereIn('status', self::PAID)->where('created_at', '>=', $start)->sum('total');
@@ -117,7 +140,7 @@ class DashboardController extends Controller
 
         return view('admin.dashboard', compact(
             'range', 'revenue', 'revenueDelta', 'orders', 'ordersDelta',
-            'chartLabels', 'chartDates', 'chartData', 'statusChart', 'topProducts', 'ordersToProcess', 'ordersToShip', 'autoPaymentsWeek', 'recentGatewayPayments',
+            'chartLabels', 'chartDates', 'chartData', 'statusChart', 'topProducts', 'ordersToProcess', 'ordersToShip', 'lateToProcess', 'lateToShip', 'followUps', 'followUpTotal', 'autoPaymentsWeek', 'recentGatewayPayments',
             'unreadMessages', 'pendingTestimonials', 'pendingReturns', 'shippingConfigured',
             'totalRefund', 'totalRevenue', 'totalOrders', 'pendingOrders', 'totalProducts',
             'totalCustomers', 'lowStockProducts', 'pendingPayments', 'recentOrders', 'lowStockList'

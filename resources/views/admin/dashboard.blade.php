@@ -29,8 +29,8 @@
     ];
     $tasks = collect([
         ['count' => $pendingPayments, 'label' => 'Pembayaran perlu perhatian', 'hint' => 'Bukti transfer atau pengecualian gateway', 'href' => route('admin.payments.index', ['tab' => 'perhatian']), 'can' => 'verify_payments', 'icon' => 'card'],
-        ['count' => $ordersToProcess, 'label' => 'Pesanan siap diproses', 'hint' => 'Sudah dibayar, belum dikemas', 'href' => route('admin.orders.index', ['status' => 'dikonfirmasi']), 'can' => 'view_orders', 'icon' => 'box'],
-        ['count' => $ordersToShip, 'label' => 'Pesanan siap dikirim', 'hint' => 'Sudah dikemas, belum dikirim', 'href' => route('admin.orders.index', ['status' => 'diproses']), 'can' => 'view_orders', 'icon' => 'truck'],
+        ['count' => $ordersToProcess, 'label' => 'Pesanan siap diproses', 'hint' => 'Sudah dibayar, belum dikemas' . ($lateToProcess > 0 ? ' · ' . $lateToProcess . ' lewat 24 jam' : ''), 'href' => route('admin.orders.index', ['status' => 'dikonfirmasi']), 'can' => 'view_orders', 'icon' => 'box'],
+        ['count' => $ordersToShip, 'label' => 'Pesanan siap dikirim', 'hint' => 'Sudah dikemas, belum dikirim' . ($lateToShip > 0 ? ' · ' . $lateToShip . ' lewat 24 jam' : ''), 'href' => route('admin.orders.index', ['status' => 'diproses']), 'can' => 'view_orders', 'icon' => 'truck'],
         ['count' => $pendingReturns, 'label' => 'Retur menunggu keputusan', 'hint' => 'Perlu disetujui atau ditolak', 'href' => route('admin.returns.index'), 'can' => 'view_returns', 'icon' => 'undo'],
         ['count' => $lowStockProducts, 'label' => 'Produk stok menipis', 'hint' => 'Di bawah batas minimum', 'href' => route('admin.stock.index'), 'can' => 'view_stock', 'icon' => 'archive'],
         ['count' => $unreadMessages, 'label' => 'Pesan belum dibaca', 'hint' => 'Dari formulir kontak', 'href' => route('admin.messages.index', ['status' => 'unread']), 'can' => 'view_contact_messages', 'icon' => 'mail'],
@@ -58,7 +58,7 @@
             <p class="dash-lede dash-rise" style="--d:80ms">{{ $lede }}</p>
         </div>
         <nav class="dash-range dash-rise" style="--d:120ms" aria-label="Rentang waktu">
-            @foreach([7, 30] as $r)
+            @foreach([7, 30, 90] as $r)
                 <a href="{{ route('admin.dashboard', ['range' => $r]) }}" @if($range === $r) aria-current="true" @endif>{{ $r }} hari</a>
             @endforeach
         </nav>
@@ -307,6 +307,36 @@
                     <p class="dash-empty is-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Semua stok di atas batas minimum.</p>
                 @endforelse
             </section>
+
+            @can('view_customers')
+            <section class="dash-card dash-rise" style="--d:460ms" aria-labelledby="fu-title">
+                <div class="dash-card-head">
+                    <h2 id="fu-title">Follow-up pelanggan</h2>
+                    <a href="{{ route('admin.customers.index', ['segment' => 'dormant']) }}" class="dash-link">{{ $followUpTotal }} dormant →</a>
+                </div>
+                @forelse($followUps as $c)
+                    @php
+                        $wa = preg_replace('/\D+/', '', (string) $c->phone);
+                        if (str_starts_with($wa, '0')) { $wa = '62' . substr($wa, 1); } elseif (str_starts_with($wa, '8')) { $wa = '62' . $wa; }
+                        $msg = 'Halo ' . $c->name . ', kami dari ' . \App\Models\Setting::get('site_name', config('app.name')) . '. Sudah cukup lama tidak mampir. Ada kebutuhan alat atau sparepart kopi? Kami siap bantu.';
+                    @endphp
+                    @if($loop->first)<ul class="dash-stock">@endif
+                    <li>
+                        <div class="min-w-0 flex-1">
+                            <p class="truncate text-sm font-medium">{{ $c->name }}</p>
+                            <p class="text-xs text-stone-500">Terakhir belanja {{ \Illuminate\Support\Carbon::parse($c->last_paid_at)->locale('id')->diffForHumans() }}@if($canFinance) · total {{ $rp($c->lifetime_total) }}@endif</p>
+                        </div>
+                        @if(strlen($wa) >= 9)
+                            <a href="https://wa.me/{{ $wa }}?text={{ rawurlencode($msg) }}" target="_blank" rel="noopener"
+                               class="shrink-0 rounded-full border border-green-300 bg-green-50 px-3 py-1 text-xs font-medium text-green-800 hover:bg-green-100">WhatsApp</a>
+                        @endif
+                    </li>
+                    @if($loop->last)</ul>@endif
+                @empty
+                    <p class="dash-empty is-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Semua pelanggan berbelanja dalam 90 hari terakhir.</p>
+                @endforelse
+            </section>
+            @endcan
         </div>
     </div>
 </div>

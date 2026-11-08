@@ -3,7 +3,7 @@
 
     // Foto panel brand. Urutan prioritas:
     //   1) public/images/auth-bg.{webp,jpg,jpeg,png}   <- taruh foto Anda di sini
-    //   2) Background Beranda dari Admin > Pengaturan > Tampilan (hero_bg)
+    //   2) Foto pertama slideshow dari Admin > Hero Beranda
     //   3) tanpa foto: gradasi espresso + pola biji kopi
     $authPhoto = null;
     foreach (['webp', 'jpg', 'jpeg', 'png'] as $ext) {
@@ -12,7 +12,12 @@
             break;
         }
     }
-    $authPhoto ??= !empty($site['hero_bg']) ? media_url($site['hero_bg']) : null;
+    try {
+        $heroFirst = \App\Models\HeroSlide::active()->value('image');
+    } catch (\Throwable) {
+        $heroFirst = null;
+    }
+    $authPhoto ??= $heroFirst ? media_url($heroFirst) : null;
 
     // Judul panel brand bisa diganti per halaman lewat <x-slot:headline>.
     $headline = $headline ?? ($site['tagline'] ?? 'Mesin kopi profesional untuk kedai kopi serius.');

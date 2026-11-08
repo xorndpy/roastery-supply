@@ -1,88 +1,93 @@
 @extends('layouts.shop')
 
-@section('title', isset($currentCategory) && $currentCategory ? $currentCategory->name : 'Katalog Produk')
+@section('title', 'Katalog Produk')
 
 @section('content')
-@php
-    $currentCategory = $currentCategory ?? null; // aman walau controller belum diperbarui
-    $subCategories = $subCategories ?? collect();
-@endphp
 
 @if($landing)
-    {{-- HERO: foto besar polos (Admin > Pengaturan > Tampilan > hero_bg), tanpa tulisan/kartu di atasnya --}}
-    <section class="relative isolate flex min-h-[320px] flex-col overflow-hidden bg-[#1a0f0a] text-white sm:min-h-[460px] lg:min-h-[70vh]">
-        @if(!empty($site['hero_bg']))
-            <img src="{{ media_url($site['hero_bg']) }}" alt="" class="absolute inset-0 -z-20 h-full w-full object-cover" fetchpriority="high">
-            <div class="absolute inset-0 -z-10 bg-[#1a0f0a]/20"></div>
-            <div class="absolute inset-x-0 bottom-0 -z-10 h-1/4 bg-gradient-to-t from-[#1a0f0a]/50 to-transparent"></div>
-        @else
-            <div class="absolute inset-0 -z-20 bg-gradient-to-br from-[#24150e] via-[#35200f] to-brand"></div>
-            <div class="auth-beans absolute inset-0 -z-10"></div>
-            <div class="absolute -right-24 top-1/4 -z-10 h-[28rem] w-[28rem] rounded-full bg-white/5 blur-3xl"></div>
+    {{-- HERO --}}
+    <section class="relative overflow-hidden bg-[#26180f] text-white">
+        @if(!empty($site['header_bg']))
+            <img src="{{ media_url($site['header_bg']) }}" alt="" class="absolute inset-0 h-full w-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-r from-[#26180f]/90 via-[#26180f]/70 to-[#26180f]/40"></div>
         @endif
-        {{-- Judul disembunyikan dari tampilan (tetap dibaca mesin pencari & pembaca layar) --}}
-        <h1 class="sr-only">Toko {{ $site['site_name'] }}: lengkapi kedai kopi Anda dari satu toko.</h1>
+        <div class="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-orange-500/25 blur-3xl"></div>
+        <div class="container-x relative pb-10 pt-12 sm:pb-14 sm:pt-16">
+            <p class="eyebrow !text-orange-300">Toko {{ $site['site_name'] }}</p>
+            <h1 class="heading mt-3 max-w-3xl text-[2rem] leading-[1.1] [text-wrap:balance] sm:text-5xl">
+                <span class="text-orange-300">Eksplor.</span> Lengkapi kedai kopi Anda dari satu toko.
+            </h1>
+            <p class="mt-4 max-w-xl text-[15px] text-stone-300">{{ $site['tagline'] }}</p>
+
+            @if($categoryCards->isNotEmpty())
+                <div class="mt-10">
+                    <x-rail>
+                        @foreach($categoryCards as $c)
+                            <a href="{{ route('products.index', ['category' => $c->slug]) }}" class="group w-[104px] shrink-0 snap-start text-center sm:w-[132px]">
+                                <div class="aspect-square overflow-hidden rounded-2xl bg-white/10 ring-1 ring-white/10 transition group-hover:ring-orange-300">
+                                    @if(!empty($c->image))
+                                        <img src="{{ media_url($c->image) }}" alt="" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                                    @else
+                                        <div class="heading flex h-full w-full items-center justify-center text-3xl text-orange-300">{{ \Illuminate\Support\Str::substr($c->name, 0, 1) }}</div>
+                                    @endif
+                                </div>
+                                <span class="mt-2.5 block text-[13px] font-medium text-stone-200 group-hover:text-white">{{ $c->name }}</span>
+                            </a>
+                        @endforeach
+                    </x-rail>
+                </div>
+            @endif
+        </div>
     </section>
 
-    {{-- KATEGORI: baris ikon ringkas tepat di bawah hero --}}
-    @if($categoryCards->isNotEmpty())
-        <section class="container-x pt-14" aria-label="Kategori">
-            <div class="flex flex-wrap justify-center gap-x-5 gap-y-8 sm:gap-x-9">
-                @foreach($categoryCards as $c)
-                    @php $cardImg = $c->card_image ?? $c->image ?? null; @endphp
-                    <a href="{{ route('products.index', ['category' => $c->slug]) }}" class="group w-[88px] text-center sm:w-[120px]">
-                        <div class="relative isolate mx-auto flex aspect-square items-center justify-center overflow-hidden rounded-xl border border-stone-200 bg-white p-3 transition-colors group-hover:border-stone-400">
-                            @if($cardImg)
-                                <img src="{{ media_url($cardImg) }}" alt="" loading="lazy" class="h-full w-full object-contain">
-                            @else
-                                <div class="absolute inset-0 -z-10 bg-gradient-to-br from-[#35200f] to-[#1a0f0a]"></div>
-                                <div class="auth-beans absolute inset-0 -z-10"></div>
-                            @endif
-                        </div>
-                        <span class="mt-3 block text-sm font-medium leading-tight text-stone-800 transition group-hover:text-brand">{{ $c->name }}</span>
-                    </a>
-                @endforeach
+    {{-- TERBARU --}}
+    @if($latest->isNotEmpty())
+        <section class="container-x pt-14" aria-labelledby="terbaru-title">
+            <div class="mb-6 flex items-end justify-between gap-4">
+                <h2 id="terbaru-title" class="heading text-2xl sm:text-3xl"><span class="text-orange-500">Terbaru.</span> Temukan sekarang.</h2>
+                <a href="#semua" class="hidden text-sm font-medium text-orange-700 hover:underline sm:block">Lihat semua →</a>
             </div>
+            <x-rail>
+                @foreach($latest as $product)
+                    <div class="w-[176px] shrink-0 snap-start sm:w-[230px] lg:w-[250px]"><x-product-card :product="$product" /></div>
+                @endforeach
+            </x-rail>
         </section>
     @endif
 
-    {{-- UNGGULAN: satu panel, foto di kiri, teks di kanan; ganti sendiri tiap 6 detik --}}
+    {{-- SOROTAN (slider produk unggulan) --}}
     @if($featured->isNotEmpty())
-        <section class="container-x pb-16 pt-20 sm:pb-20" aria-label="Produk unggulan"
+        <section class="container-x py-16 sm:py-20" aria-label="Produk unggulan"
                  x-data="{ i: 0, n: {{ $featured->count() }}, timer: null,
                            next() { this.i = (this.i + 1) % this.n },
-                           play() { if (this.n > 1 && !this.timer && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.timer = setInterval(() => this.next(), 6000) },
-                           stop() { clearInterval(this.timer); this.timer = null } }"
-                 x-init="play()" @mouseenter="stop()" @mouseleave="play()" @focusin="stop()" @focusout="play()">
-            <div class="overflow-hidden rounded-2xl border border-stone-200 bg-white">
-                <div class="grid">
-                    @foreach($featured as $spot)
-                        @php $spotImg = $spot->images->first(); @endphp
-                        <div class="col-start-1 row-start-1 grid transition-opacity duration-500 md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]"
-                             :class="i === {{ $loop->index }} ? 'opacity-100' : 'pointer-events-none opacity-0'"
-                             :aria-hidden="i !== {{ $loop->index }}">
-                            <a href="{{ route('products.show', $spot->slug) }}" class="flex items-center justify-center border-stone-200 bg-white p-8 sm:p-12 md:min-h-[380px] md:border-r" :tabindex="i === {{ $loop->index }} ? 0 : -1" aria-label="{{ $spot->name }}">
-                                @if($spotImg)
-                                    <img src="{{ media_url($spotImg->image) }}" alt="" loading="lazy" class="max-h-72 w-full object-contain">
-                                @endif
-                            </a>
-                            <div class="flex flex-col justify-center border-t border-stone-200 p-7 sm:p-10 md:border-t-0 lg:p-14">
-                                @if($spot->brand)
-                                    <p class="text-sm text-stone-500">{{ $spot->brand->name }}</p>
-                                @endif
-                                <h2 class="heading mt-2 text-2xl leading-tight sm:text-3xl">{{ $spot->name }}</h2>
-                                <p class="mt-4 max-w-md text-[15px] leading-relaxed text-stone-600">{{ \Illuminate\Support\Str::limit(strip_tags((string) $spot->description), 160) }}</p>
-                                <div class="mt-6 text-xl font-semibold text-stone-900">Rp {{ number_format($spot->price, 0, ',', '.') }}</div>
-                                <a href="{{ route('products.show', $spot->slug) }}" class="btn btn-primary mt-7 w-fit px-7" :tabindex="i === {{ $loop->index }} ? 0 : -1">Lihat produk</a>
-                            </div>
+                           play() { if (this.n > 1) this.timer = setInterval(() => this.next(), 6000) },
+                           stop() { clearInterval(this.timer) } }"
+                 x-init="play()" @mouseenter="stop()" @mouseleave="play()">
+            <div class="relative grid rounded-3xl border border-stone-200 bg-white p-5 sm:p-6 md:py-10 md:pl-8 md:pr-14">
+                @foreach($featured as $spot)
+                    @php $spotImg = $spot->images->first(); @endphp
+                    <div class="col-start-1 row-start-1 grid items-center gap-6 transition-opacity duration-500 md:grid-cols-[minmax(0,300px)_1fr] md:gap-12"
+                         :class="i === {{ $loop->index }} ? 'opacity-100' : 'pointer-events-none opacity-0'"
+                         :aria-hidden="i !== {{ $loop->index }}">
+                        <a href="{{ route('products.show', $spot->slug) }}" class="block aspect-[4/5] overflow-hidden rounded-2xl bg-stone-100 shadow-xl shadow-stone-900/15 md:-my-16 lg:-ml-10" :tabindex="i === {{ $loop->index }} ? 0 : -1">
+                            @if($spotImg)
+                                <img src="{{ media_url($spotImg->image) }}" alt="{{ $spot->name }}" loading="lazy" class="h-full w-full object-cover">
+                            @endif
+                        </a>
+                        <div>
+                            <span class="eyebrow">Unggulan</span>
+                            <h2 class="heading mt-2 text-2xl leading-tight sm:text-3xl">{{ $spot->name }}</h2>
+                            <p class="mt-3 max-w-md text-[15px] leading-relaxed text-stone-600">{{ \Illuminate\Support\Str::limit(strip_tags((string) $spot->description), 170) }}</p>
+                            <div class="mt-4 text-xl font-semibold text-orange-500">Rp {{ number_format($spot->price, 0, ',', '.') }}</div>
+                            <a href="{{ route('products.show', $spot->slug) }}" class="btn btn-primary mt-5 !h-12 !rounded-full px-7" :tabindex="i === {{ $loop->index }} ? 0 : -1">Jelajahi sekarang</a>
                         </div>
-                    @endforeach
-                </div>
+                    </div>
+                @endforeach
 
                 @if($featured->count() > 1)
-                    <div class="flex justify-center gap-2 border-t border-stone-200 py-4">
+                    <div class="absolute bottom-3 left-1/2 flex -translate-x-1/2 flex-row gap-2 md:bottom-auto md:left-auto md:right-5 md:top-1/2 md:-translate-y-1/2 md:translate-x-0 md:flex-col">
                         @foreach($featured as $spot)
-                            <button type="button" @click="i = {{ $loop->index }}" class="h-2 rounded-full transition-all" :class="i === {{ $loop->index }} ? 'w-6 bg-brand' : 'w-2 bg-stone-300 hover:bg-stone-400'" aria-label="Tampilkan unggulan {{ $loop->iteration }}"></button>
+                            <button type="button" @click="i = {{ $loop->index }}" class="h-2 w-2 rounded-full transition" :class="i === {{ $loop->index }} ? 'bg-orange-400' : 'bg-stone-300 hover:bg-stone-400'" aria-label="Tampilkan unggulan {{ $loop->iteration }}"></button>
                         @endforeach
                     </div>
                 @endif
@@ -91,8 +96,8 @@
     @endif
 
     {{-- KELEBIHAN (edit teks di array $perks sesuai kebutuhan) --}}
-    <section class="container-x {{ $featured->isEmpty() ? 'pt-20' : '' }} pb-16 sm:pb-20" aria-labelledby="plus-title">
-        <h2 id="plus-title" class="heading mb-8 text-2xl sm:text-3xl">Kelebihan berbelanja di {{ $site['site_name'] }}</h2>
+    <section class="container-x {{ $featured->isEmpty() ? 'pt-14' : '' }} pb-4" aria-labelledby="plus-title">
+        <h2 id="plus-title" class="heading mb-6 text-2xl sm:text-3xl">Kelebihan berbelanja di <span class="text-orange-500">{{ $site['site_name'] }}</span></h2>
         @php
             $perks = [
                 ['Rangkaian produk lengkap untuk kedai dan roastery Anda.', 'M3 9l1.5-5h15L21 9M4 9v11h16V9M9 20v-6h6v6'],
@@ -106,148 +111,151 @@
         @endphp
         <x-rail>
             @foreach($perks as [$text, $icon])
-                <div class="w-[250px] shrink-0 snap-start rounded-xl border border-stone-200 bg-white p-6 sm:w-[calc(25%-12px)]">
-                    <svg class="h-6 w-6 text-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ $icon }}"/></svg>
-                    <p class="mt-5 text-[15px] leading-snug text-stone-700">{{ $text }}</p>
+                <div class="w-[240px] shrink-0 snap-start rounded-2xl bg-gradient-to-br from-orange-400 to-orange-600 p-5 text-white sm:w-[calc(25%-12px)]">
+                    <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ $icon }}"/></svg>
+                    <p class="mt-4 text-[15px] font-medium leading-snug">{{ $text }}</p>
                 </div>
             @endforeach
         </x-rail>
     </section>
 @else
-    @if($currentCategory)
-        {{-- BANNER KATEGORI (gaya Toffin): nama kategori di atas foto --}}
-        <section class="container-x pt-6 sm:pt-8">
-            <nav class="mb-3 text-[13px] text-stone-500" aria-label="Breadcrumb">
-                <a href="{{ route('products.index') }}" class="hover:text-brand">Toko</a>
-                @if($currentCategory->parent)
-                    <span class="mx-1.5">/</span><a href="{{ route('products.index', ['category' => $currentCategory->parent->slug]) }}" class="hover:text-brand">{{ $currentCategory->parent->name }}</a>
-                @endif
-                <span class="mx-1.5">/</span><span class="text-stone-800">{{ $currentCategory->name }}</span>
-            </nav>
-            <div class="relative isolate flex h-40 items-center justify-center overflow-hidden rounded-2xl bg-[#26180f] sm:h-60 lg:h-72">
-                @if($currentCategory->image)
-                    <img src="{{ media_url($currentCategory->image) }}" alt="" class="absolute inset-0 -z-20 h-full w-full object-cover">
-                    <div class="absolute inset-0 -z-10 bg-black/45"></div>
-                @else
-                    <div class="absolute inset-0 -z-20 bg-gradient-to-br from-[#24150e] via-[#35200f] to-brand"></div>
-                    <div class="auth-beans absolute inset-0 -z-10"></div>
-                @endif
-                <h1 class="heading px-4 text-center text-4xl text-white sm:text-6xl">{{ $currentCategory->name }}</h1>
-            </div>
-        </section>
-    @else
-        @php $brandName = $brands->firstWhere('slug', request('brand'))->name ?? null; @endphp
-        <div class="border-b border-stone-200 bg-white">
-            <div class="container-x py-6">
-                <h1 class="heading text-2xl sm:text-[1.9rem]">{{ request('search') ? 'Hasil untuk “' . request('search') . '”' : ($brandName ? 'Merek ' . $brandName : 'Katalog Produk') }}</h1>
-                <p class="mt-1 text-sm text-stone-600">{{ $site['tagline'] }}</p>
-            </div>
+    <div class="border-b border-stone-200 bg-white">
+        <div class="container-x py-6">
+            <h1 class="heading text-2xl sm:text-[1.9rem]">{{ request('search') ? 'Hasil untuk “' . request('search') . '”' : 'Katalog Produk' }}</h1>
+            <p class="mt-1 text-sm text-stone-600">{{ $site['tagline'] }}</p>
         </div>
-    @endif
+    </div>
 @endif
 
-{{-- DAFTAR PRODUK --}}
-<div id="semua" class="container-x {{ $landing ? 'pb-24 pt-2' : 'pb-16 pt-8' }}"
-     x-data="{ filters: {{ request()->hasAny(['brand', 'min_price', 'max_price']) || request()->boolean('in_stock') ? 'true' : 'false' }} }">
+{{-- SEMUA PRODUK --}}
+<div id="semua" class="container-x py-10 {{ $landing ? '' : 'grid gap-10 lg:grid-cols-[240px_1fr]' }}" x-data="{ filters: false }">
 
     @unless($landing)
-        {{-- Kartu filter: chip sub-kategori + cari + tombol Filter --}}
-        <form id="filter-form" method="GET" action="{{ route('products.index') }}" class="mb-10 rounded-2xl border border-stone-200 bg-white p-4 sm:p-5">
-            @if(request('category'))
-                <input type="hidden" name="category" value="{{ request('category') }}">
-            @endif
+    <aside class="lg:sticky lg:top-24 lg:self-start">
+        <button type="button" @click="filters = true" class="btn btn-outline btn-sm mb-4 w-full !rounded-full lg:hidden">Filter &amp; Urutkan</button>
 
-            @if($currentCategory && $subCategories->isNotEmpty())
-                @php $root = $currentCategory->parent ?? $currentCategory; @endphp
-                <div class="flex flex-wrap gap-2 border-b border-stone-200 pb-4 text-[13px]">
-                    <a href="{{ route('products.index', ['category' => $root->slug]) }}"
-                       class="rounded-full border px-4 py-1.5 transition {{ $currentCategory->id === $root->id ? 'border-brand bg-brand text-white' : 'border-stone-300 bg-white text-stone-700 hover:border-stone-400' }}">Semua</a>
-                    @foreach($subCategories as $sc)
-                        <a href="{{ route('products.index', ['category' => $sc->slug]) }}"
-                           class="rounded-full border px-4 py-1.5 transition {{ $currentCategory->id === $sc->id ? 'border-brand bg-brand text-white' : 'border-stone-300 bg-white text-stone-700 hover:border-stone-400' }}">{{ $sc->name }}</a>
-                    @endforeach
+        <div x-show="filters" x-cloak x-transition.opacity @click="filters = false" class="fixed inset-0 z-50 bg-black/40 lg:hidden"></div>
+
+        <form id="filter-form" method="GET" action="{{ route('products.index') }}"
+              class="space-y-5 bg-white p-5 lg:static lg:block lg:rounded-xl lg:border lg:border-stone-200"
+              :class="filters ? 'fixed inset-x-0 bottom-0 z-[60] block max-h-[85vh] overflow-y-auto rounded-t-2xl shadow-2xl' : 'hidden'">
+            <div class="flex items-center justify-between">
+                <b class="text-sm">Filter</b>
+                <div class="flex items-center gap-4">
+                    <a href="{{ route('products.index') }}" class="text-[13px] text-orange-600 hover:underline">Reset</a>
+                    <button type="button" @click="filters = false" class="text-sm text-stone-500 lg:hidden" aria-label="Tutup">✕</button>
                 </div>
-            @endif
+            </div>
 
-            <div class="flex flex-wrap items-center gap-2 {{ $currentCategory && $subCategories->isNotEmpty() ? 'pt-4' : '' }}">
-                <input id="f-search" type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama, SKU, deskripsi…" class="field !h-10 min-w-[180px] flex-1" aria-label="Cari produk">
-                <button type="submit" class="btn btn-primary btn-sm !h-10 !rounded-full px-5">Cari</button>
-                <button type="button" @click="filters = !filters" class="btn btn-outline btn-sm !h-10 !rounded-full px-5" :aria-expanded="filters">Filter</button>
-                <select id="f-sort" name="sort" onchange="this.form.submit()" class="field !h-10 !w-auto pr-8" aria-label="Urutkan">
+            <div>
+                <label for="f-search" class="mb-1.5 block text-xs font-semibold uppercase tracking-[0.08em] text-stone-500">Cari</label>
+                <input id="f-search" type="text" name="search" value="{{ request('search') }}" placeholder="Nama, SKU, deskripsi…" class="field">
+            </div>
+
+            <div>
+                <label for="f-cat" class="mb-1.5 block text-xs font-semibold uppercase tracking-[0.08em] text-stone-500">Kategori</label>
+                <select id="f-cat" name="category" class="field">
+                    <option value="">Semua Kategori</option>
+                    @foreach($categories as $cat)
+                        <option value="{{ $cat->slug }}" @selected(request('category') == $cat->slug)>{{ $cat->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div>
+                <label for="f-brand" class="mb-1.5 block text-xs font-semibold uppercase tracking-[0.08em] text-stone-500">Merek</label>
+                <select id="f-brand" name="brand" class="field">
+                    <option value="">Semua Merek</option>
+                    @foreach($brands as $brand)
+                        <option value="{{ $brand->slug }}" @selected(request('brand') == $brand->slug)>{{ $brand->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div>
+                <label class="mb-1.5 block text-xs font-semibold uppercase tracking-[0.08em] text-stone-500">Harga (Rp)</label>
+                <div class="flex items-center gap-2">
+                    <input type="number" name="min_price" min="0" value="{{ request('min_price') }}" placeholder="Min" class="field" aria-label="Harga minimum">
+                    <span class="text-stone-400">–</span>
+                    <input type="number" name="max_price" min="0" value="{{ request('max_price') }}" placeholder="Maks" class="field" aria-label="Harga maksimum">
+                </div>
+            </div>
+
+            <label class="flex items-center gap-2 text-sm text-stone-700">
+                <input type="checkbox" name="in_stock" value="1" @checked(request()->boolean('in_stock')) class="rounded border-stone-300 text-orange-600 focus:ring-orange-500">
+                Hanya yang stoknya tersedia
+            </label>
+
+            <button type="submit" class="btn btn-primary w-full">Terapkan Filter</button>
+        </form>
+    </aside>
+    @endunless
+
+    <div class="min-w-0">
+        @unless($landing)
+        {{-- Chip kategori (HP) --}}
+        <div class="-mx-4 mb-4 flex gap-2 overflow-x-auto px-4 pb-1 text-sm [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:hidden">
+            <a href="{{ route('products.index', request()->except('page', 'category')) }}" class="shrink-0 rounded-full px-4 py-1.5 {{ !request('category') ? 'bg-brand text-white' : 'border border-stone-300 bg-white text-stone-600' }}">Semua</a>
+            @foreach($categories as $cat)
+                <a href="{{ route('products.index', array_merge(request()->except('page'), ['category' => $cat->slug])) }}" class="shrink-0 rounded-full px-4 py-1.5 {{ request('category') === $cat->slug ? 'bg-brand text-white' : 'border border-stone-300 bg-white text-stone-600' }}">{{ $cat->name }}</a>
+            @endforeach
+        </div>
+
+        @endunless
+
+        @if($landing)
+            <div class="mb-6 flex items-end justify-between gap-4">
+                <h2 class="heading text-2xl sm:text-3xl">Semua produk</h2>
+                <span class="text-sm text-stone-500">{{ $products->total() }} produk</span>
+            </div>
+        @else
+        <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+            <span class="text-sm text-stone-500">{{ $products->total() }} produk</span>
+            <div class="flex items-center gap-2 text-sm">
+                <label for="f-sort" class="text-stone-500">Urutkan</label>
+                <select id="f-sort" name="sort" form="filter-form" onchange="this.form.submit()" class="field !h-10 !w-auto pr-8">
                     <option value="latest" @selected(request('sort', 'latest') == 'latest')>Terbaru</option>
                     <option value="price_asc" @selected(request('sort') == 'price_asc')>Harga Terendah</option>
                     <option value="price_desc" @selected(request('sort') == 'price_desc')>Harga Tertinggi</option>
                     <option value="name_asc" @selected(request('sort') == 'name_asc')>Nama A–Z</option>
                 </select>
             </div>
+        </div>
+        @endif
 
-            <div x-show="filters" x-cloak x-transition class="mt-4 grid gap-4 border-t border-stone-200 pt-4 sm:grid-cols-2 lg:grid-cols-4">
-                <div>
-                    <label for="f-brand" class="mb-1.5 block text-sm font-medium text-stone-700">Merek</label>
-                    <select id="f-brand" name="brand" class="field">
-                        <option value="">Semua Merek</option>
-                        @foreach($brands as $brand)
-                            <option value="{{ $brand->slug }}" @selected(request('brand') == $brand->slug)>{{ $brand->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="sm:col-span-2 lg:col-span-1">
-                    <label class="mb-1.5 block text-sm font-medium text-stone-700">Harga (Rp)</label>
-                    <div class="flex items-center gap-2">
-                        <input type="number" name="min_price" min="0" value="{{ request('min_price') }}" placeholder="Min" class="field" aria-label="Harga minimum">
-                        <span class="text-stone-400">–</span>
-                        <input type="number" name="max_price" min="0" value="{{ request('max_price') }}" placeholder="Maks" class="field" aria-label="Harga maksimum">
-                    </div>
-                </div>
-                <label class="flex items-center gap-2 self-end pb-2 text-sm text-stone-700">
-                    <input type="checkbox" name="in_stock" value="1" @checked(request()->boolean('in_stock')) class="rounded border-stone-300 text-brand focus:ring-brand">
-                    Hanya yang stoknya tersedia
-                </label>
-                <div class="flex items-end gap-3">
-                    <button type="submit" class="btn btn-primary w-full">Terapkan</button>
-                    <a href="{{ request('category') ? route('products.index', ['category' => request('category')]) : route('products.index') }}" class="text-[13px] text-brand underline-offset-2 hover:underline">Reset</a>
-                </div>
+        @php
+            $chips = array_filter([
+                'category'  => $categories->firstWhere('slug', request('category'))->name ?? null,
+                'brand'     => $brands->firstWhere('slug', request('brand'))->name ?? null,
+                'search'    => request('search') ? '“' . request('search') . '”' : null,
+                'min_price' => request('min_price') ? 'Min Rp ' . number_format((int) request('min_price'), 0, ',', '.') : null,
+                'max_price' => request('max_price') ? 'Maks Rp ' . number_format((int) request('max_price'), 0, ',', '.') : null,
+                'in_stock'  => request()->boolean('in_stock') ? 'Stok tersedia' : null,
+            ]);
+        @endphp
+        @if($chips)
+            <div class="mb-5 flex flex-wrap gap-2">
+                @foreach($chips as $key => $label)
+                    <a href="{{ route('products.index', request()->except($key, 'page')) }}" class="inline-flex items-center gap-1.5 rounded-full border border-stone-300 bg-white px-3 py-1 text-xs text-stone-700 transition hover:border-orange-500">
+                        {{ $label }} <span aria-hidden="true">×</span>
+                    </a>
+                @endforeach
             </div>
-        </form>
-    @endunless
+        @endif
 
-    @if($landing)
-        <div class="mb-8 flex items-end justify-between gap-4">
-            <h2 class="heading text-2xl sm:text-3xl">Semua produk</h2>
-            <span class="text-sm text-stone-500">{{ $products->total() }} produk</span>
-        </div>
-    @else
-        <div class="mb-5 flex flex-wrap items-center gap-2">
-            <span class="mr-2 text-sm text-stone-500">{{ $products->total() }} produk</span>
-            @php
-                $chips = array_filter([
-                    'brand'     => $brands->firstWhere('slug', request('brand'))->name ?? null,
-                    'search'    => request('search') ? '“' . request('search') . '”' : null,
-                    'min_price' => request('min_price') ? 'Min Rp ' . number_format((int) request('min_price'), 0, ',', '.') : null,
-                    'max_price' => request('max_price') ? 'Maks Rp ' . number_format((int) request('max_price'), 0, ',', '.') : null,
-                    'in_stock'  => request()->boolean('in_stock') ? 'Stok tersedia' : null,
-                ]);
-            @endphp
-            @foreach($chips as $key => $label)
-                <a href="{{ route('products.index', request()->except($key, 'page')) }}" class="inline-flex items-center gap-1.5 rounded-full border border-stone-300 bg-white px-3 py-1 text-xs text-stone-700 transition hover:border-stone-400">
-                    {{ $label }} <span aria-hidden="true">×</span>
-                </a>
-            @endforeach
-        </div>
-    @endif
-
-    @if($products->count())
-        <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4 lg:gap-6">
-            @foreach($products as $product)
-                <x-product-card :product="$product" />
-            @endforeach
-        </div>
-        <div class="mt-10">{{ $products->links() }}</div>
-    @else
-        <div class="rounded-xl border border-stone-200 bg-white py-16 text-center">
-            <p class="text-stone-500">Produk tidak ditemukan.</p>
-            <a href="{{ request('category') ? route('products.index', ['category' => request('category')]) : route('products.index') }}" class="mt-3 inline-block text-sm text-brand underline-offset-2 hover:underline">Reset filter</a>
-        </div>
-    @endif
+        @if($products->count())
+            <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:gap-5 {{ $landing ? 'sm:grid-cols-3 lg:grid-cols-4' : 'xl:grid-cols-3' }}">
+                @foreach($products as $product)
+                    <x-product-card :product="$product" />
+                @endforeach
+            </div>
+            <div class="mt-10">{{ $products->links() }}</div>
+        @else
+            <div class="rounded-xl border border-stone-200 bg-white py-16 text-center">
+                <p class="text-stone-500">Produk tidak ditemukan.</p>
+                <a href="{{ route('products.index') }}" class="mt-3 inline-block text-sm text-orange-600 hover:underline">Reset filter</a>
+            </div>
+        @endif
+    </div>
 </div>
 @endsection

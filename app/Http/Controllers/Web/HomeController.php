@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Models\Article;
 use App\Models\Banner;
+use App\Models\HeroSlide;
 use App\Models\Branch;
 use App\Models\Category;
 use App\Models\Faq;
@@ -26,12 +27,18 @@ class HomeController extends Controller
         // scopeActive: aktif DAN dalam jadwal tayang (PRD 6.4 "Banner tampil sesuai jadwal")
         $banners = Banner::active()->orderBy('sort_order')->orderBy('id')->take(2)->get();
 
+        try {
+            $heroSlides = HeroSlide::active()->get();
+        } catch (\Throwable) {
+            $heroSlides = collect(); // tabel belum dimigrasi: beranda tetap tampil
+        }
+
         $partners = Partner::active()->orderBy('sort_order')->orderBy('name')->get();
 
         $articles = Article::published()->latest('published_at')->take(3)->get();
         $milestones = Milestone::active()->get();
 
-        return view('customer.home', compact('testimonials', 'banners', 'partners', 'articles', 'milestones'));
+        return view('customer.home', compact('testimonials', 'banners', 'heroSlides', 'partners', 'articles', 'milestones'));
     }
 
     public function about()

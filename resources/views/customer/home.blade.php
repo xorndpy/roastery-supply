@@ -19,9 +19,25 @@
 @endphp
 
 {{-- ============ HERO ============ --}}
-<section class="relative isolate flex min-h-[640px] flex-col overflow-hidden bg-[#1a0f0a] text-white lg:min-h-[calc(100vh-4rem)]">
-    @if(!empty($site['hero_bg']))
-        <img src="{{ media_url($site['hero_bg']) }}" alt="" class="absolute inset-0 -z-20 h-full w-full object-cover" fetchpriority="high">
+@php $slides = $heroSlides ?? collect(); $multi = $slides->count() > 1; @endphp
+<section class="relative isolate flex min-h-[640px] flex-col overflow-hidden bg-[#1a0f0a] text-white lg:min-h-[calc(100vh-4rem)]"
+    @if($multi)
+        x-data="{ active: 0, n: {{ $slides->count() }}, paused: false, timer: null,
+                  init() { if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+                           this.timer = setInterval(() => { if (!this.paused && !document.hidden) this.active = (this.active + 1) % this.n }, 6000) },
+                  destroy() { clearInterval(this.timer) } }"
+        @mouseenter="paused = true" @mouseleave="paused = false"
+        aria-roledescription="carousel" aria-label="Foto hero"
+    @endif>
+    @if($slides->isNotEmpty())
+        @foreach($slides as $i => $slide)
+            <img src="{{ media_url($slide->image) }}" alt=""
+                 class="absolute inset-0 -z-20 h-full w-full object-cover transition-opacity duration-1000 {{ $i === 0 ? '' : 'opacity-0' }}"
+                 @if($i === 0) fetchpriority="high" @else loading="lazy" @endif
+                 @if($multi)
+                     @if($i === 0) :class="{ 'opacity-0': active !== 0 }" @else :class="{ 'opacity-100': active === {{ $i }} }" @endif
+                 @endif>
+        @endforeach
         <div class="absolute inset-0 -z-10 bg-[#1a0f0a]/80 lg:hidden"></div>
         <div class="absolute inset-0 -z-10 hidden bg-gradient-to-r from-[#1a0f0a]/90 via-[#1a0f0a]/75 via-[46%] to-[#1a0f0a]/0 lg:block"></div>
         <div class="absolute inset-x-0 bottom-0 -z-10 h-1/3 bg-gradient-to-t from-[#1a0f0a]/70 to-transparent"></div>
@@ -40,6 +56,17 @@
                 <a href="{{ route('products.index') }}" class="btn btn-light btn-lg">Lihat Katalog</a>
                 <a href="{{ route('about') }}" class="btn btn-ghost-light btn-lg">Kenali Kami</a>
             </div>
+            @if($multi)
+                <div class="mt-8 flex items-center gap-2" role="group" aria-label="Pilih foto latar">
+                    @foreach($slides as $i => $slide)
+                        <button type="button" @click="active = {{ $i }}"
+                                class="h-1.5 rounded-full transition-all duration-300"
+                                :class="active === {{ $i }} ? 'w-8 bg-orange-300' : 'w-4 bg-white/40 hover:bg-white/70'"
+                                :aria-current="active === {{ $i }} ? 'true' : 'false'"
+                                aria-label="Foto {{ $i + 1 }} dari {{ $slides->count() }}"></button>
+                    @endforeach
+                </div>
+            @endif
         </div>
     </div>
 
