@@ -20,6 +20,9 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Di belakang proxy Railway: percaya X-Forwarded-* agar IP klien & skema HTTPS terbaca benar.
+        $middleware->trustProxies(at: '*');
+
         $middleware->alias([
             'role' => RoleMiddleware::class,
             '2fa' => RequireTwoFactor::class,
