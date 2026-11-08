@@ -7,6 +7,7 @@
 @if($landing)
     {{-- HERO (besar, gaya beranda: pakai background dari Admin > Pengaturan > Tampilan) --}}
     @php
+        $brandCards = $brandCards ?? collect(); // aman walau controller belum diperbarui
         // Slide otomatis: produk terbaru (cadangan: unggulan) yang punya foto
         $heroSlides = ($latest->isNotEmpty() ? $latest : $featured)->filter(fn ($p) => $p->images->isNotEmpty())->take(6)->values();
         // Kartu kategori hanya tampil kalau sudah punya foto

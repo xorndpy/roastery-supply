@@ -68,6 +68,7 @@ class KatalogController extends Controller
         $categoryCards = collect();
         $featured = collect();
         $latest = collect();
+        $brandCards = collect();
         if ($landing) {
             $withCount = ['products' => fn ($q) => $q->where('is_active', true)];
             $categoryCards = Category::where('is_active', true)->whereNull('parent_id')
@@ -81,9 +82,13 @@ class KatalogController extends Controller
                 ->with(['category', 'brand', 'images'])->latest()->take(6)->get();
             $latest = Product::where('is_active', true)
                 ->with(['category', 'brand', 'images'])->latest()->take(10)->get();
+            // Merek di bawah hero: yang punya logo duluan, lalu urut nama.
+            $brandCards = Brand::where('is_active', true)
+                ->withCount(['products' => fn ($q) => $q->where('is_active', true)])
+                ->orderByRaw('logo is null')->orderBy('name')->take(12)->get();
         }
 
-        return view('customer.katalog.index', compact('products', 'categories', 'brands', 'landing', 'categoryCards', 'featured', 'latest'));
+        return view('customer.katalog.index', compact('products', 'categories', 'brands', 'landing', 'categoryCards', 'featured', 'latest', 'brandCards'));
     }
 
     public function brands()
