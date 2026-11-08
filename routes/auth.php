@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\TwoFactorController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
@@ -62,4 +63,15 @@ Route::middleware('auth')->group(function () {
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
+
+    // Autentikasi dua faktor (TOTP)
+    Route::prefix('two-factor')->as('two-factor.')->group(function () {
+        Route::get('challenge', [TwoFactorController::class, 'challenge'])->name('challenge');
+        Route::post('challenge', [TwoFactorController::class, 'verify'])->middleware('throttle:6,1')->name('verify');
+        Route::get('setup', [TwoFactorController::class, 'setup'])->name('setup');
+        Route::post('setup', [TwoFactorController::class, 'confirm'])->middleware('throttle:6,1')->name('confirm');
+        Route::get('manage', [TwoFactorController::class, 'manage'])->name('manage');
+        Route::post('recovery-codes', [TwoFactorController::class, 'regenerate'])->middleware('throttle:6,1')->name('recovery');
+        Route::post('reset', [TwoFactorController::class, 'reset'])->middleware('throttle:6,1')->name('reset');
+    });
 });

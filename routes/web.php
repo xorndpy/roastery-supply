@@ -166,7 +166,7 @@ Route::prefix('customer')
 // =========================================================================
 Route::prefix('admin')
     ->as('admin.')
-    ->middleware(['auth', 'role:staff|admin|super_admin|gudang'])
+    ->middleware(['auth', 'role:staff|admin|super_admin|gudang', '2fa'])
     ->group(function () {
 
         // Resource dengan izin terpisah per aksi. create harus terdaftar sebelum {param}.
