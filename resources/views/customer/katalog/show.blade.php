@@ -4,7 +4,7 @@
 
 @section('content')
 @php
-    $imgs = $product->images->map(fn ($i) => asset('storage/' . $i->image))->values();
+    $imgs = $product->images->map(fn ($i) => media_url($i->image))->values();
     $soldOut = $product->stock <= 0;
     $wa = !empty($site['contact_whatsapp']) ? preg_replace('/\D/', '', $site['contact_whatsapp']) : null;
 @endphp
@@ -22,30 +22,23 @@
 
 <div class="container-x py-10">
     <div class="grid gap-12 lg:grid-cols-[1.05fr_1fr]"
-         x-data='{ view: @json($product->model_3d ? "3d" : "img"), img: @json($imgs->first()), qty: 1, msg: "", max: {{ max($product->stock, 1) }} }'>
+         x-data='{ view: "img", img: @json($imgs->first()), qty: 1, msg: "", max: {{ max($product->stock, 1) }} }'>
 
         {{-- Galeri --}}
         <div>
             <div class="aspect-square overflow-hidden rounded-xl border border-stone-200 bg-stone-100">
-                @if($product->model_3d)
-                    <model-viewer x-show="view === '3d'" src="{{ asset('storage/' . $product->model_3d) }}" alt="{{ $product->name }}"
-                                  auto-rotate camera-controls shadow-intensity="1" style="width:100%;height:100%"></model-viewer>
-                @endif
+
                 <template x-if="view === 'img' && img">
                     <img :src="img" alt="{{ $product->name }}" class="h-full w-full object-cover">
                 </template>
-                @if(!$product->model_3d && $imgs->isEmpty())
+                @if($imgs->isEmpty())
                     <div class="flex h-full items-center justify-center text-sm text-stone-400">Foto produk</div>
                 @endif
             </div>
 
-            @if($product->model_3d || $imgs->count() > 1)
+            @if($imgs->count() > 1)
                 <div class="mt-3 grid grid-cols-5 gap-2.5">
-                    @if($product->model_3d)
-                        <button type="button" @click="view = '3d'"
-                                class="flex aspect-square items-center justify-center rounded-lg border bg-stone-100 text-xs font-medium"
-                                :class="view === '3d' ? 'border-orange-500' : 'border-stone-200'">3D</button>
-                    @endif
+
                     @foreach($imgs as $src)
                         <button type="button" @click="view = 'img'; img = '{{ $src }}'"
                                 class="aspect-square overflow-hidden rounded-lg border bg-stone-100"
@@ -117,5 +110,4 @@
     @endif
 </div>
 
-<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 @endsection

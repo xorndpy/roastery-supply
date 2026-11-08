@@ -8,7 +8,8 @@
 <div class="group flex h-full flex-col overflow-hidden rounded-xl border border-stone-200 bg-white transition duration-200 hover:-translate-y-0.5 hover:border-orange-500 hover:shadow-lg hover:shadow-stone-900/5">
     <a href="{{ route('products.show', $product->slug) }}" class="relative block aspect-square overflow-hidden bg-stone-100">
         @if($image)
-            <img src="{{ asset('storage/' . $image->image) }}" alt="{{ $product->name }}" loading="lazy"
+            <img src="{{ thumb_url($image->image) }}" alt="{{ $product->name }}" loading="lazy" decoding="async" width="480" height="480"
+                 onerror="this.onerror=null;this.src='{{ media_url($image->image) }}'"
                  class="h-full w-full object-cover transition duration-300 group-hover:scale-105 {{ $soldOut ? 'opacity-60' : '' }}">
         @else
             <div class="flex h-full w-full items-center justify-center text-xs tracking-wide text-stone-400">Foto produk</div>

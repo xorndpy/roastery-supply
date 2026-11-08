@@ -8,7 +8,7 @@
 
 <div class="relative overflow-hidden border-b {{ $img ? 'border-transparent bg-[#24150e]' : 'border-stone-200 bg-stone-100' }}">
     @if($img)
-        <img src="{{ asset('storage/' . $img) }}" alt="" class="absolute inset-0 h-full w-full object-cover">
+        <img src="{{ media_url($img) }}" alt="" class="absolute inset-0 h-full w-full object-cover">
         <div class="absolute inset-0 bg-gradient-to-r from-[#24150e]/90 via-[#24150e]/65 to-[#24150e]/25"></div>
     @else
         <div class="pointer-events-none absolute -right-20 -top-28 h-80 w-80 rounded-full bg-orange-200/50 blur-3xl"></div>

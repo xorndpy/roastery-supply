@@ -18,7 +18,7 @@
                     <div class="flex gap-4 p-5">
                         <a href="{{ route('products.show', $item['slug']) }}" class="h-24 w-24 shrink-0 overflow-hidden rounded-lg border border-stone-200 bg-stone-100">
                             @if($item['image'])
-                                <img src="{{ asset('storage/' . $item['image']) }}" alt="{{ $item['name'] }}" class="h-full w-full object-cover">
+                                <img src="{{ media_url($item['image']) }}" alt="{{ $item['name'] }}" class="h-full w-full object-cover">
                             @endif
                         </a>
 

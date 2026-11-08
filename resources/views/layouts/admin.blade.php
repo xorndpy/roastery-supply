@@ -165,6 +165,28 @@
         }
     </script>
 
+    {{-- Format ribuan otomatis untuk <input data-rupiah>: tampil 10.000, terkirim 10000 --}}
+    <script>
+    (function () {
+        var fmt = function (v) { return String(v).replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.'); };
+        document.querySelectorAll('input[data-rupiah]').forEach(function (el) {
+            var raw = String(el.value).trim();
+            if (/^\d+\.\d+$/.test(raw)) raw = String(Math.round(parseFloat(raw))); // "10000.00" dari database
+            el.value = fmt(raw);
+            el.setAttribute('autocomplete', 'off');
+            el.addEventListener('input', function () {
+                var before = el.value.slice(0, el.selectionStart || 0).replace(/\D/g, '').length;
+                el.value = fmt(el.value);
+                var pos = 0, n = 0;
+                while (pos < el.value.length && n < before) { if (/\d/.test(el.value[pos])) n++; pos++; }
+                el.setSelectionRange(pos, pos);
+            });
+        });
+        document.addEventListener('submit', function (e) {
+            e.target.querySelectorAll('input[data-rupiah]').forEach(function (el) { el.value = el.value.replace(/\D/g, ''); });
+        }, true);
+    })();
+    </script>
     @stack('scripts')
 </body>
 </html>

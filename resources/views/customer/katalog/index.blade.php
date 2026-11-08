@@ -22,7 +22,7 @@
                             <a href="{{ route('products.index', ['category' => $c->slug]) }}" class="group w-[104px] shrink-0 snap-start text-center sm:w-[132px]">
                                 <div class="aspect-square overflow-hidden rounded-2xl bg-white/10 ring-1 ring-white/10 transition group-hover:ring-orange-300">
                                     @if(!empty($c->image))
-                                        <img src="{{ asset('storage/' . $c->image) }}" alt="" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                                        <img src="{{ media_url($c->image) }}" alt="" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
                                     @else
                                         <div class="heading flex h-full w-full items-center justify-center text-3xl text-orange-300">{{ \Illuminate\Support\Str::substr($c->name, 0, 1) }}</div>
                                     @endif
@@ -67,7 +67,7 @@
                          :aria-hidden="i !== {{ $loop->index }}">
                         <a href="{{ route('products.show', $spot->slug) }}" class="block aspect-[4/5] overflow-hidden rounded-2xl bg-stone-100 shadow-xl shadow-stone-900/15 md:-my-16 lg:-ml-10" :tabindex="i === {{ $loop->index }} ? 0 : -1">
                             @if($spotImg)
-                                <img src="{{ asset('storage/' . $spotImg->image) }}" alt="{{ $spot->name }}" loading="lazy" class="h-full w-full object-cover">
+                                <img src="{{ media_url($spotImg->image) }}" alt="{{ $spot->name }}" loading="lazy" class="h-full w-full object-cover">
                             @endif
                         </a>
                         <div>

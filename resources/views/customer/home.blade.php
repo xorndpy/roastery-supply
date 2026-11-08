@@ -21,7 +21,7 @@
 {{-- ============ HERO ============ --}}
 <section class="relative isolate flex min-h-[640px] flex-col overflow-hidden bg-[#1a0f0a] text-white lg:min-h-[calc(100vh-4rem)]">
     @if(!empty($site['hero_bg']))
-        <img src="{{ asset('storage/' . $site['hero_bg']) }}" alt="" class="absolute inset-0 -z-20 h-full w-full object-cover" fetchpriority="high">
+        <img src="{{ media_url($site['hero_bg']) }}" alt="" class="absolute inset-0 -z-20 h-full w-full object-cover" fetchpriority="high">
         <div class="absolute inset-0 -z-10 bg-[#1a0f0a]/80 lg:hidden"></div>
         <div class="absolute inset-0 -z-10 hidden bg-gradient-to-r from-[#1a0f0a]/90 via-[#1a0f0a]/75 via-[46%] to-[#1a0f0a]/0 lg:block"></div>
         <div class="absolute inset-x-0 bottom-0 -z-10 h-1/3 bg-gradient-to-t from-[#1a0f0a]/70 to-transparent"></div>
@@ -85,7 +85,7 @@
     <section class="container-x pt-24" aria-label="Sorotan">
         <div class="space-y-5">
             @foreach($banners as $b)
-                @php $img = '<img src="' . e(asset('storage/' . $b->image)) . '" alt="' . e($b->title) . '" loading="lazy" class="block h-auto w-full rounded-2xl">'; @endphp
+                @php $img = '<img src="' . e(media_url($b->image)) . '" alt="' . e($b->title) . '" loading="lazy" class="block h-auto w-full rounded-2xl">'; @endphp
                 <div data-reveal>
                     @if($b->link)
                         <a href="{{ $b->link }}" class="block rounded-2xl transition hover:opacity-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2">{!! $img !!}</a>
@@ -114,25 +114,33 @@
 
 {{-- ============ MEREK & REKANAN ============ --}}
 @if($partners->isNotEmpty())
-    <section class="container-x pt-24" aria-labelledby="brand-title" x-data="{ scroll(d) { $refs.track.scrollBy({ left: d * $refs.track.clientWidth * 0.8, behavior: 'smooth' }) } }">
+    <section class="container-x pt-24" aria-labelledby="brand-title" x-data="{ all: false, scroll(d) { $refs.track.scrollBy({ left: d * $refs.track.clientWidth * 0.8, behavior: 'smooth' }) } }">
         <div class="text-center" data-reveal>
             <p class="eyebrow">Merek & rekanan</p>
             <h2 id="brand-title" class="heading mt-3 text-3xl leading-[1.15] sm:text-[2.25rem]">Merek yang kami hadirkan.</h2>
         </div>
 
-        <div x-ref="track" class="mt-10 grid grid-flow-col grid-rows-2 justify-center gap-3.5 overflow-x-auto scroll-smooth pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden auto-cols-[calc(50%-7px)] sm:auto-cols-[calc(33.333%-9.5px)] lg:auto-cols-[calc(16.666%-11.7px)]" data-reveal style="--d: 100ms">
+        <div x-ref="track" class="mt-10 grid grid-cols-2 gap-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:grid-flow-col sm:grid-cols-none sm:grid-rows-2 sm:auto-cols-[calc(33.333%-9.5px)] sm:justify-center sm:gap-3.5 sm:overflow-x-auto sm:scroll-smooth sm:pb-1 lg:auto-cols-[calc(16.666%-11.7px)]" data-reveal style="--d: 100ms">
             @foreach($partners as $p)
-                @php $logo = '<img src="' . e(asset('storage/' . $p->logo)) . '" alt="' . e($p->name) . '" loading="lazy" class="max-h-16 max-w-[75%] object-contain opacity-70 grayscale transition group-hover:opacity-100 group-hover:grayscale-0">'; @endphp
+                @php
+                    $logo = '<img src="' . e(media_url($p->logo)) . '" alt="' . e($p->name) . '" loading="lazy" class="max-h-14 max-w-[75%] object-contain opacity-70 grayscale transition group-hover:opacity-100 group-hover:grayscale-0 sm:max-h-16">';
+                    $card = 'group h-28 items-center justify-center rounded-xl border border-stone-200 bg-white p-3 sm:h-32 sm:p-4';
+                    $extra = $loop->index >= 6; // di HP hanya 6 merek pertama sampai "Tampilkan semua" ditekan
+                @endphp
                 @if($p->link)
-                    <a href="{{ $p->link }}" target="_blank" rel="noopener noreferrer" class="group flex h-32 min-w-[180px] items-center justify-center rounded-xl border border-stone-200 bg-white p-4 transition hover:border-orange-500">{!! $logo !!}</a>
+                    <a href="{{ $p->link }}" target="_blank" rel="noopener noreferrer" @if($extra) :class="all ? 'flex' : 'hidden sm:flex'" @endif class="{{ $card }} {{ $extra ? '' : 'flex' }} transition hover:border-orange-500">{!! $logo !!}</a>
                 @else
-                    <div class="group flex h-32 min-w-[180px] items-center justify-center rounded-xl border border-stone-200 bg-white p-4">{!! $logo !!}</div>
+                    <div @if($extra) :class="all ? 'flex' : 'hidden sm:flex'" @endif class="{{ $card }} {{ $extra ? '' : 'flex' }}">{!! $logo !!}</div>
                 @endif
             @endforeach
         </div>
 
         @if($partners->count() > 6)
-            <div class="mt-6 flex justify-center gap-3">
+            <button type="button" x-show="!all" @click="all = true" class="mt-5 w-full rounded-full border border-stone-300 py-2.5 text-sm font-medium text-stone-700 hover:border-orange-500 sm:hidden">Tampilkan semua merek</button>
+        @endif
+
+        @if($partners->count() > 6)
+            <div class="mt-6 hidden justify-center gap-3 sm:flex">
                 <button type="button" @click="scroll(-1)" class="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-white hover:border-orange-500" aria-label="Sebelumnya">
                     <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
                 </button>

@@ -2,11 +2,14 @@
 @php
     $cartCount = count((array) session('cart', []));
     $wc = ['products' => fn ($q) => $q->where('is_active', true)];
-    $navCats = \App\Models\Category::where('is_active', true)->whereNull('parent_id')
-        ->withCount($wc)->with(['children' => fn ($q) => $q->where('is_active', true)->withCount($wc)])
-        ->orderBy('name')->get()
-        ->filter(fn ($c) => $c->products_count + $c->children->sum('products_count') > 0)
-        ->take(12)->values();
+    // Menu kategori jarang berubah: simpan 5 menit supaya tidak query berat di setiap halaman.
+    $navCats = \Illuminate\Support\Facades\Cache::remember('shop.nav.categories', 300, function () use ($wc) {
+        return \App\Models\Category::where('is_active', true)->whereNull('parent_id')
+            ->withCount($wc)->with(['children' => fn ($q) => $q->where('is_active', true)->withCount($wc)])
+            ->orderBy('name')->get()
+            ->filter(fn ($c) => $c->products_count + $c->children->sum('products_count') > 0)
+            ->take(12)->values();
+    });
     $navLink = 'rounded-full px-3.5 py-2 text-stone-600 transition hover:bg-stone-100 hover:text-stone-900';
 @endphp
 
@@ -14,11 +17,10 @@
     <div class="container-x flex h-16 items-center gap-4 lg:gap-8">
         <a href="{{ route('products.index') }}" class="shrink-0 leading-none">
             @if(!empty($site['site_logo']))
-                <img src="{{ asset('storage/' . $site['site_logo']) }}" alt="{{ $site['site_name'] }}" class="h-8 w-auto">
+                <img src="{{ media_url($site['site_logo']) }}" alt="{{ $site['site_name'] }}" class="h-8 w-auto">
             @else
                 <span class="heading block text-[22px] text-brand">{{ $site['site_name'] }}</span>
             @endif
-            <span class="mt-1 block text-[10px] font-semibold uppercase tracking-[0.2em] text-orange-600">Katalog</span>
         </a>
 
         {{-- Menu desktop --}}

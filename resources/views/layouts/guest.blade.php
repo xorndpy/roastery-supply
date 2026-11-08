@@ -12,7 +12,7 @@
             break;
         }
     }
-    $authPhoto ??= !empty($site['hero_bg']) ? asset('storage/' . $site['hero_bg']) : null;
+    $authPhoto ??= !empty($site['hero_bg']) ? media_url($site['hero_bg']) : null;
 
     // Judul panel brand bisa diganti per halaman lewat <x-slot:headline>.
     $headline = $headline ?? ($site['tagline'] ?? 'Mesin kopi profesional untuk kedai kopi serius.');

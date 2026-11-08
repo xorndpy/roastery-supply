@@ -22,7 +22,7 @@
         {{-- Brand + sosial --}}
         <div>
             @if(!empty($site['site_logo']))
-                <img src="{{ asset('storage/' . $site['site_logo']) }}" alt="{{ $site['site_name'] }}" class="h-10 w-auto">
+                <img src="{{ media_url($site['site_logo']) }}" alt="{{ $site['site_name'] }}" class="h-10 w-auto">
             @else
                 <div class="heading text-2xl text-brand">{{ $site['site_name'] }}</div>
             @endif
