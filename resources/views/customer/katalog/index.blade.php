@@ -5,36 +5,114 @@
 @section('content')
 
 @if($landing)
-    {{-- HERO --}}
-    <section class="relative overflow-hidden bg-[#26180f] text-white">
-        <div class="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-orange-500/25 blur-3xl"></div>
-        <div class="container-x relative pb-10 pt-12 sm:pb-14 sm:pt-16">
-            <p class="eyebrow !text-orange-300">Toko {{ $site['site_name'] }}</p>
-            <h1 class="heading mt-3 max-w-3xl text-[2rem] leading-[1.1] [text-wrap:balance] sm:text-5xl">
-                <span class="text-orange-300">Eksplor.</span> Lengkapi kedai kopi Anda dari satu toko.
-            </h1>
-            <p class="mt-4 max-w-xl text-[15px] text-stone-300">{{ $site['tagline'] }}</p>
+    {{-- HERO (besar, gaya beranda: pakai background dari Admin > Pengaturan > Tampilan) --}}
+    @php
+        // Slide otomatis: produk terbaru (cadangan: unggulan) yang punya foto
+        $heroSlides = ($latest->isNotEmpty() ? $latest : $featured)->filter(fn ($p) => $p->images->isNotEmpty())->take(6)->values();
+        // Kartu kategori hanya tampil kalau sudah punya foto
+        $heroCats = $categoryCards->filter(fn ($c) => ! empty($c->image))->values();
+    @endphp
+    <section class="relative isolate flex min-h-[560px] flex-col overflow-hidden bg-[#1a0f0a] text-white lg:min-h-[78vh]">
+        @if(!empty($site['hero_bg']))
+            <img src="{{ media_url($site['hero_bg']) }}" alt="" class="absolute inset-0 -z-20 h-full w-full object-cover" fetchpriority="high">
+            <div class="absolute inset-0 -z-10 bg-[#1a0f0a]/45 lg:hidden"></div>
+            <div class="absolute inset-0 -z-10 hidden bg-gradient-to-r from-[#1a0f0a]/55 via-[#1a0f0a]/30 via-[46%] to-[#1a0f0a]/0 lg:block"></div>
+            <div class="absolute inset-x-0 bottom-0 -z-10 h-1/3 bg-gradient-to-t from-[#1a0f0a]/70 to-transparent"></div>
+        @else
+            <div class="absolute inset-0 -z-20 bg-gradient-to-br from-[#24150e] via-[#35200f] to-brand"></div>
+            <div class="auth-beans absolute inset-0 -z-10"></div>
+            <div class="absolute -right-24 top-1/4 -z-10 h-[28rem] w-[28rem] rounded-full bg-orange-500/20 blur-3xl"></div>
+        @endif
 
-            @if($categoryCards->isNotEmpty())
-                <div class="mt-10">
-                    <x-rail>
-                        @foreach($categoryCards as $c)
-                            <a href="{{ route('products.index', ['category' => $c->slug]) }}" class="group w-[104px] shrink-0 snap-start text-center sm:w-[132px]">
-                                <div class="aspect-square overflow-hidden rounded-2xl bg-white/10 ring-1 ring-white/10 transition group-hover:ring-orange-300">
-                                    @if(!empty($c->image))
-                                        <img src="{{ media_url($c->image) }}" alt="" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
-                                    @else
-                                        <div class="heading flex h-full w-full items-center justify-center text-3xl text-orange-300">{{ \Illuminate\Support\Str::substr($c->name, 0, 1) }}</div>
-                                    @endif
-                                </div>
-                                <span class="mt-2.5 block text-[13px] font-medium text-stone-200 group-hover:text-white">{{ $c->name }}</span>
-                            </a>
-                        @endforeach
-                    </x-rail>
+        <div class="container-x flex w-full flex-1 items-center py-16 sm:py-20">
+            <div class="grid w-full items-center gap-10 {{ $heroSlides->isNotEmpty() ? 'lg:grid-cols-[minmax(0,1fr)_400px] lg:gap-14' : '' }}">
+
+                <div class="min-w-0">
+                    {{-- Judul disembunyikan dari tampilan (tetap dibaca mesin pencari & pembaca layar) --}}
+                    <h1 class="sr-only">Toko {{ $site['site_name'] }}: lengkapi kedai kopi Anda dari satu toko.</h1>
+
+                    @if($heroCats->isNotEmpty())
+                        <div class="auth-rise" style="--d:120ms">
+                            <x-rail>
+                                @foreach($heroCats as $c)
+                                    <a href="{{ route('products.index', ['category' => $c->slug]) }}" class="group w-[104px] shrink-0 snap-start text-center sm:w-[132px]">
+                                        <div class="aspect-square overflow-hidden rounded-2xl bg-white/10 ring-1 ring-white/10 transition group-hover:ring-orange-300">
+                                            <img src="{{ media_url($c->image) }}" alt="" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                                        </div>
+                                        <span class="mt-2.5 block text-[13px] font-medium text-stone-200 group-hover:text-white">{{ $c->name }}</span>
+                                    </a>
+                                @endforeach
+                            </x-rail>
+                        </div>
+                    @endif
                 </div>
-            @endif
+
+                @if($heroSlides->isNotEmpty())
+                    {{-- Slide produk otomatis (geser sendiri tiap 4,5 detik, berhenti saat disorot) --}}
+                    <div class="relative mx-auto w-full max-w-sm lg:max-w-none"
+                         x-data="{ i: 0, n: {{ $heroSlides->count() }}, timer: null,
+                                   next() { this.i = (this.i + 1) % this.n },
+                                   play() { if (this.n > 1 && !this.timer) this.timer = setInterval(() => this.next(), 4500) },
+                                   stop() { clearInterval(this.timer); this.timer = null } }"
+                         x-init="play()" @mouseenter="stop()" @mouseleave="play()">
+                        <div class="relative grid aspect-[4/5] grid-rows-1 overflow-hidden rounded-3xl bg-white/5 shadow-2xl shadow-black/30 ring-1 ring-white/10">
+                            @foreach($heroSlides as $p)
+                                @php $img = $p->images->first(); @endphp
+                                <a href="{{ route('products.show', $p->slug) }}"
+                                   class="col-start-1 row-start-1 flex h-full flex-col transition-opacity duration-700"
+                                   :class="i === {{ $loop->index }} ? 'opacity-100' : 'pointer-events-none opacity-0'"
+                                   :aria-hidden="i !== {{ $loop->index }}" :tabindex="i === {{ $loop->index }} ? 0 : -1">
+                                    <div class="flex min-h-0 flex-1 items-center justify-center bg-white p-6">
+                                        <img src="{{ media_url($img->image) }}" alt="{{ $p->name }}" @if(! $loop->first) loading="lazy" @endif class="max-h-full max-w-full object-contain">
+                                    </div>
+                                    <div class="bg-black/40 px-5 py-4">
+                                        <span class="eyebrow !text-orange-300">Terbaru</span>
+                                        <div class="heading mt-1 line-clamp-1 text-lg">{{ $p->name }}</div>
+                                        <div class="mt-0.5 text-[15px] font-semibold text-orange-300">Rp {{ number_format($p->price, 0, ',', '.') }}</div>
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+
+                        @if($heroSlides->count() > 1)
+                            <div class="mt-4 flex justify-center gap-2">
+                                @foreach($heroSlides as $p)
+                                    <button type="button" @click="i = {{ $loop->index }}" class="h-2 rounded-full transition-all"
+                                            :class="i === {{ $loop->index }} ? 'w-6 bg-orange-300' : 'w-2 bg-white/30 hover:bg-white/50'"
+                                            aria-label="Tampilkan produk {{ $loop->iteration }}"></button>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                @endif
+
+            </div>
         </div>
     </section>
+
+    {{-- MEREK (dari Admin > Merek), tepat di bawah hero --}}
+    @if($brandCards->isNotEmpty())
+        <section class="container-x pt-14" aria-labelledby="merek-title">
+            <div class="mb-6 flex items-end justify-between gap-4">
+                <h2 id="merek-title" class="heading text-2xl sm:text-3xl"><span class="text-orange-500">Merek.</span> Pilih yang Anda percaya.</h2>
+                <a href="{{ route('products.brands') }}" class="hidden text-sm font-medium text-orange-700 hover:underline sm:block">Lihat semua merek →</a>
+            </div>
+            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-6">
+                @foreach($brandCards as $b)
+                    <a href="{{ route('products.index', ['brand' => $b->slug]) }}"
+                       class="group flex aspect-[4/3] flex-col items-center justify-center gap-2 rounded-2xl border border-stone-200 bg-white p-4 transition hover:-translate-y-0.5 hover:border-orange-500 hover:shadow-lg hover:shadow-stone-900/5">
+                        @if($b->logo)
+                            <img src="{{ media_url($b->logo) }}" alt="{{ $b->name }}" loading="lazy" class="max-h-14 max-w-[80%] object-contain opacity-70 grayscale transition group-hover:opacity-100 group-hover:grayscale-0">
+                        @else
+                            <span class="heading text-center text-lg leading-tight text-stone-800">{{ $b->name }}</span>
+                        @endif
+                        <span class="text-[11px] text-stone-500">{{ $b->products_count }} produk</span>
+                    </a>
+                @endforeach
+            </div>
+            <p class="mt-4 text-center sm:hidden"><a href="{{ route('products.brands') }}" class="text-sm font-medium text-orange-700 hover:underline">Lihat semua merek →</a></p>
+        </section>
+    @endif
 
     {{-- TERBARU --}}
     @if($latest->isNotEmpty())
