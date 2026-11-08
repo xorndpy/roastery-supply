@@ -6,7 +6,7 @@ use App\Models\ProductImage;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 
-/** Buat thumbnail 480px untuk foto produk yang sudah ada. Aman diulang. */
+/** Buat thumbnail 480px (dengan trim ruang putih) untuk foto produk yang sudah ada. Foto asli tidak diubah. Aman diulang. */
 class GenerateImageThumbs extends Command
 {
     protected $signature = 'images:thumbs {--force : Buat ulang walau thumbnail sudah ada}';
@@ -43,6 +43,9 @@ class GenerateImageThumbs extends Command
                 $this->warn("Tidak bisa dibaca: {$path}");
                 continue;
             }
+
+            // Buang ruang putih di tepi foto, margin seragam (lihat App\Support\ImageTrim).
+            $src = \App\Support\ImageTrim::apply($src);
 
             $w = imagesx($src);
             $h = imagesy($src);

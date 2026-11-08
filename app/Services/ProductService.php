@@ -81,11 +81,11 @@ class ProductService
         return $path;
     }
 
-    /** Thumbnail 480px untuk kartu produk (jauh lebih ringan dari foto penuh). Gagal bikin thumbnail tidak menggagalkan upload. */
+    /** Thumbnail 480px untuk kartu produk (ruang putih di tepi dipotong otomatis). Gagal bikin thumbnail tidak menggagalkan upload. */
     protected function makeThumb(UploadedFile $file, string $path): void
     {
         try {
-            Storage::disk('public')->put(thumb_path($path), $this->resizeImage($file, 480));
+            Storage::disk('public')->put(thumb_path($path), $this->resizeImage($file, 480, true));
         } catch (\Throwable $e) {
             // kartu produk otomatis memakai foto penuh bila thumbnail tidak ada
         }
@@ -94,7 +94,7 @@ class ProductService
     /**
      * Resize gambar pakai GD native (tanpa package tambahan)
      */
-    protected function resizeImage(UploadedFile $file, int $maxWidth): string
+    protected function resizeImage(UploadedFile $file, int $maxWidth, bool $trim = false): string
     {
         $mime = $file->getMimeType();
         $sourcePath = $file->getRealPath();
@@ -109,6 +109,11 @@ class ProductService
 
         if (!$source) {
             throw new \Exception('Format gambar tidak didukung.');
+        }
+
+        // Khusus thumbnail kartu: buang ruang putih berlebih supaya produk mengisi kartu secara konsisten.
+        if ($trim) {
+            $source = \App\Support\ImageTrim::apply($source);
         }
 
         // Hitung dimensi baru

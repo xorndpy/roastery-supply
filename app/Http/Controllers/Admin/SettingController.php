@@ -29,6 +29,7 @@ class SettingController extends Controller
             $rules[$key] = match ($def['type']) {
                 'image'    => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
                 'number'   => "nullable|integer|min:0|max:{$max}",
+                'select'   => ['nullable', \Illuminate\Validation\Rule::in(array_keys($def['options'] ?? []))],
                 'url'      => "nullable|url:http,https|max:{$max}",
                 'email'    => "nullable|email|max:{$max}",
                 'textarea' => "nullable|string|max:{$max}",

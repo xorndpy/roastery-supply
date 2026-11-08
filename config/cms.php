@@ -3,7 +3,7 @@
 /**
  * Definisi pengaturan situs (PRD 6.5: tidak ada konten yang di-hardcode).
  * Nilai disimpan di tabel `settings` (key/value). Bagian 'default' dipakai bila belum diisi.
- * type: text | textarea | url | email | image
+ * type: text | textarea | url | email | number | image | select (select wajib punya 'options' => [nilai => label])
  */
 return [
     'settings' => [
@@ -47,6 +47,12 @@ return [
             'about_photo'    => ['label' => 'Foto Profil Usaha', 'type' => 'image', 'help' => 'Disarankan landscape 1200 x 900 px (JPG/WEBP, ideal di bawah 300 KB). Mis. showroom, gudang, atau tim. Kosongkan bila belum ada: bagian ini tetap tampil rapi tanpa foto.'],
         ],
         'Tampilan' => [
+            'card_ratio' => ['label' => 'Rasio Foto Kartu Produk', 'type' => 'select', 'default' => 'portrait',
+                'options' => ['portrait' => 'Potret 4:5 (disarankan, memanjang ke bawah)', 'square' => 'Persegi 1:1', 'landscape' => 'Lebar 4:3'],
+                'help' => 'Berlaku untuk semua kartu produk di beranda, katalog, dan rekomendasi. Mesin dan grinder umumnya paling pas di Potret.'],
+            'card_fit' => ['label' => 'Mode Foto Kartu Produk', 'type' => 'select', 'default' => 'contain',
+                'options' => ['contain' => 'Utuh: seluruh produk terlihat (disarankan)', 'cover' => 'Penuh: mengisi kotak, tepi foto bisa terpotong'],
+                'help' => 'Pilih Utuh kalau ukuran foto produk Anda beragam.'],
             'hero_text'        => ['label' => 'Teks Pengantar Hero', 'type' => 'textarea', 'rows' => 3, 'max' => 300, 'default' => 'Espresso machine, grinder, dan perlengkapan barista dengan garansi resmi serta layanan sparepart.', 'help' => 'Kalimat di bawah judul besar di beranda.'],
             'home_intro_title' => ['label' => 'Beranda: Judul Perkenalan', 'type' => 'text', 'max' => 140, 'default' => 'Mitra peralatan kopi untuk usaha yang mengutamakan kualitas.'],
             'home_intro_body'  => ['label' => 'Beranda: Teks Perkenalan', 'type' => 'textarea', 'rows' => 4, 'max' => 600, 'default' => 'Kami menyediakan espresso machine, grinder, dan perlengkapan barista dari distributor resmi, lengkap dengan konsultasi, instalasi, dan layanan purna jual bagi kedai kopi serta roastery di Indonesia.'],

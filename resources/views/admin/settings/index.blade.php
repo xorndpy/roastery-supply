@@ -80,6 +80,12 @@
                                 @if($def['type'] === 'textarea')
                                     <textarea id="f-{{ $key }}" name="{{ $key }}" rows="{{ $def['rows'] ?? 3 }}" maxlength="{{ $def['max'] ?? 500 }}"
                                               class="w-full border border-stone-300 rounded-lg px-3 py-2">{{ $val }}</textarea>
+                                @elseif($def['type'] === 'select')
+                                    <select id="f-{{ $key }}" name="{{ $key }}" class="w-full border border-stone-300 rounded-lg px-3 py-2 bg-white">
+                                        @foreach($def['options'] as $optValue => $optLabel)
+                                            <option value="{{ $optValue }}" @selected((string) $val === (string) $optValue)>{{ $optLabel }}</option>
+                                        @endforeach
+                                    </select>
                                 @elseif($def['type'] === 'image')
                                     <div x-data="{ src: null }">
                                         @if(!empty($values[$key]))

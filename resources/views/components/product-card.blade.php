@@ -3,14 +3,18 @@
     $image = $product->images->first();
     $soldOut = ($product->stock ?? 0) <= 0;
     $low = !$soldOut && $product->stock <= ($product->stock_threshold ?? 5);
+
+    // Tampilan foto diatur dari Admin > Pengaturan > Tampilan (berlaku global).
+    $ratio = ['portrait' => 'aspect-[4/5]', 'square' => 'aspect-square', 'landscape' => 'aspect-[4/3]'][$site['card_ratio'] ?? 'portrait'] ?? 'aspect-[4/5]';
+    $cover = ($site['card_fit'] ?? 'contain') === 'cover';
 @endphp
 
 <div class="group flex h-full flex-col overflow-hidden rounded-lg border border-stone-200 bg-white transition-colors duration-200 hover:border-stone-400">
-    <a href="{{ route('products.show', $product->slug) }}" class="relative block aspect-square overflow-hidden bg-white">
+    <a href="{{ route('products.show', $product->slug) }}" class="relative block {{ $ratio }} overflow-hidden bg-white">
         @if($image)
             <img src="{{ thumb_url($image->image) }}" alt="{{ $product->name }}" loading="lazy" decoding="async" width="480" height="480"
                  onerror="this.onerror=null;this.src='{{ media_url($image->image) }}'"
-                 class="h-full w-full object-contain p-5 {{ $soldOut ? 'opacity-50' : '' }}">
+                 class="h-full w-full {{ $cover ? 'object-cover' : 'object-contain p-2 sm:p-3' }} {{ $soldOut ? 'opacity-50' : '' }}">
         @else
             <div class="flex h-full w-full items-center justify-center bg-stone-100 text-xs text-stone-400">Foto produk</div>
         @endif

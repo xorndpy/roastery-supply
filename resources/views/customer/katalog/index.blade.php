@@ -184,20 +184,6 @@
                 </div>
             </div>
         </section>
-
-        {{-- Sub-kategori --}}
-        @if($pillCats->isNotEmpty())
-            <nav class="container-x pt-5" aria-label="Sub-kategori">
-                <div class="flex flex-wrap gap-2 rounded-2xl border border-stone-200 bg-white p-4">
-                    <a href="{{ route('products.index', array_merge(request()->except('page'), ['category' => $parentCat->slug])) }}"
-                       class="rounded-full border px-4 py-1.5 text-sm transition {{ $current->id === $parentCat->id ? 'border-brand bg-brand text-white' : 'border-stone-300 text-stone-700 hover:border-stone-500' }}">Semua {{ $parentCat->name }}</a>
-                    @foreach($pillCats as $child)
-                        <a href="{{ route('products.index', array_merge(request()->except('page'), ['category' => $child->slug])) }}"
-                           class="rounded-full border px-4 py-1.5 text-sm transition {{ $current->id === $child->id ? 'border-brand bg-brand text-white' : 'border-stone-300 text-stone-700 hover:border-stone-500' }}">{{ $child->name }}</a>
-                    @endforeach
-                </div>
-            </nav>
-        @endif
     @else
         <div class="border-b border-stone-200 bg-white">
             <div class="container-x py-6">
@@ -209,115 +195,138 @@
 @endif
 
 {{-- SEMUA PRODUK --}}
-<div id="semua" class="container-x {{ $landing ? 'pb-12 pt-16 sm:pt-20' : 'py-10 grid gap-10 lg:grid-cols-[240px_1fr]' }}" x-data="{ filters: false }">
+<div id="semua" class="container-x {{ $landing ? 'pb-12 pt-16 sm:pt-20' : 'pb-12 pt-5 sm:pt-6' }}">
 
     @unless($landing)
-    <aside class="lg:sticky lg:top-24 lg:self-start">
-        <button type="button" @click="filters = true" class="btn btn-outline btn-sm mb-4 w-full !rounded-full lg:hidden">Filter &amp; Urutkan</button>
+    @php
+        // Pill: sub-kategori dari kategori aktif; bila tidak ada, kategori utama.
+        $pills = $pillCats->isNotEmpty() ? $pillCats : $categories;
+        $allLabel = $pillCats->isNotEmpty() ? 'Semua ' . $parentCat->name : 'Semua';
+        $allSlug = $pillCats->isNotEmpty() ? $parentCat->slug : null;
+        $allUrl = route('products.index', array_merge(request()->except('page', 'category'), $allSlug ? ['category' => $allSlug] : []));
+        $allActive = $allSlug ? ($current && $current->id === $parentCat->id) : !request('category');
+        $filterKeys = ['brand', 'min_price', 'max_price', 'in_stock'];
+        $activeCount = (request('brand') ? 1 : 0) + ((request('min_price') || request('max_price')) ? 1 : 0) + (request()->boolean('in_stock') ? 1 : 0);
+        $resetUrl = route('products.index', request()->except(array_merge($filterKeys, ['page'])));
+    @endphp
 
-        <div x-show="filters" x-cloak x-transition.opacity @click="filters = false" class="fixed inset-0 z-50 bg-black/40 lg:hidden"></div>
+    <div x-data="filterDrawer" @keydown.escape.window="filters && close()">
 
-        <form id="filter-form" method="GET" action="{{ route('products.index') }}"
-              class="space-y-5 bg-white p-5 lg:static lg:block lg:rounded-xl lg:border lg:border-stone-200"
-              :class="filters ? 'fixed inset-x-0 bottom-0 z-[60] block max-h-[85vh] overflow-y-auto rounded-t-2xl shadow-2xl' : 'hidden'">
-            <div class="flex items-center justify-between">
-                <b class="text-sm">Filter</b>
-                <div class="flex items-center gap-4">
-                    <a href="{{ route('products.index') }}" class="text-[13px] text-orange-600 hover:underline">Reset</a>
-                    <button type="button" @click="filters = false" class="text-sm text-stone-500 lg:hidden" aria-label="Tutup">✕</button>
+        {{-- Toolbar: pill kategori, cari, urutkan, tombol Filter --}}
+        <form id="filter-form" method="GET" action="{{ route('products.index') }}" class="rounded-2xl border border-stone-200 bg-white">
+            @if(request('category'))<input type="hidden" name="category" value="{{ request('category') }}">@endif
+
+            <nav aria-label="Kategori" class="px-3 pt-3 sm:px-4 sm:pt-4">
+                <div class="-mx-3 flex gap-2 overflow-x-auto px-3 pb-3 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-4 [&::-webkit-scrollbar]:hidden">
+                    <a href="{{ $allUrl }}" @if($allActive) aria-current="page" @endif
+                       class="inline-flex h-10 shrink-0 items-center rounded-full border px-4 text-sm transition {{ $allActive ? 'border-brand bg-brand text-white' : 'border-stone-300 text-stone-700 hover:border-stone-500' }}">{{ $allLabel }}</a>
+                    @foreach($pills as $pill)
+                        @php $pillActive = request('category') === $pill->slug; @endphp
+                        <a href="{{ route('products.index', array_merge(request()->except('page'), ['category' => $pill->slug])) }}" @if($pillActive) aria-current="page" @endif
+                           class="inline-flex h-10 shrink-0 items-center rounded-full border px-4 text-sm transition {{ $pillActive ? 'border-brand bg-brand text-white' : 'border-stone-300 text-stone-700 hover:border-stone-500' }}">{{ $pill->name }}</a>
+                    @endforeach
+                </div>
+            </nav>
+
+            <div class="flex flex-wrap items-center gap-2 border-t border-stone-100 p-3 sm:gap-3 sm:p-4">
+                <div class="relative w-full sm:max-w-sm sm:flex-1">
+                    <label for="f-search" class="sr-only">Cari produk</label>
+                    <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg>
+                    <input id="f-search" type="search" name="search" value="{{ request('search') }}" placeholder="Cari nama, SKU, deskripsi…" enterkeyhint="search" class="field !pl-9">
+                </div>
+
+                <div class="flex w-full items-center gap-2 sm:ml-auto sm:w-auto">
+                    <label for="f-sort" class="sr-only">Urutkan</label>
+                    <select id="f-sort" name="sort" onchange="this.form.submit()" class="field min-w-0 flex-1 sm:w-auto sm:flex-none sm:pr-9">
+                        <option value="latest" @selected(request('sort', 'latest') == 'latest')>Terbaru</option>
+                        <option value="price_asc" @selected(request('sort') == 'price_asc')>Harga Terendah</option>
+                        <option value="price_desc" @selected(request('sort') == 'price_desc')>Harga Tertinggi</option>
+                        <option value="name_asc" @selected(request('sort') == 'name_asc')>Nama A–Z</option>
+                    </select>
+                    <button type="button" x-ref="trigger" @click="open()" aria-haspopup="dialog" :aria-expanded="filters.toString()" class="btn btn-outline shrink-0 gap-2">
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
+                        Filter
+                        @if($activeCount)
+                            <span class="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-brand px-1.5 text-[11px] font-semibold text-white" aria-hidden="true">{{ $activeCount }}</span>
+                            <span class="sr-only">({{ $activeCount }} filter aktif)</span>
+                        @endif
+                    </button>
                 </div>
             </div>
-
-            <div>
-                <label for="f-search" class="mb-1.5 block text-xs font-semibold uppercase tracking-[0.08em] text-stone-500">Cari</label>
-                <input id="f-search" type="text" name="search" value="{{ request('search') }}" placeholder="Nama, SKU, deskripsi…" class="field">
-            </div>
-
-            <div>
-                <label for="f-cat" class="mb-1.5 block text-xs font-semibold uppercase tracking-[0.08em] text-stone-500">Kategori</label>
-                <select id="f-cat" name="category" class="field">
-                    <option value="">Semua Kategori</option>
-                    @foreach($categories as $cat)
-                        <option value="{{ $cat->slug }}" @selected(request('category') == $cat->slug)>{{ $cat->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div>
-                <label for="f-brand" class="mb-1.5 block text-xs font-semibold uppercase tracking-[0.08em] text-stone-500">Merek</label>
-                <select id="f-brand" name="brand" class="field">
-                    <option value="">Semua Merek</option>
-                    @foreach($brands as $brand)
-                        <option value="{{ $brand->slug }}" @selected(request('brand') == $brand->slug)>{{ $brand->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div>
-                <label class="mb-1.5 block text-xs font-semibold uppercase tracking-[0.08em] text-stone-500">Harga (Rp)</label>
-                <div class="flex items-center gap-2">
-                    <input type="number" name="min_price" min="0" value="{{ request('min_price') }}" placeholder="Min" class="field" aria-label="Harga minimum">
-                    <span class="text-stone-400">–</span>
-                    <input type="number" name="max_price" min="0" value="{{ request('max_price') }}" placeholder="Maks" class="field" aria-label="Harga maksimum">
-                </div>
-            </div>
-
-            <label class="flex items-center gap-2 text-sm text-stone-700">
-                <input type="checkbox" name="in_stock" value="1" @checked(request()->boolean('in_stock')) class="rounded border-stone-300 text-orange-600 focus:ring-orange-500">
-                Hanya yang stoknya tersedia
-            </label>
-
-            <button type="submit" class="btn btn-primary w-full">Terapkan Filter</button>
         </form>
-    </aside>
+
+        {{-- Drawer filter: panel kanan di desktop, bottom-sheet di HP. Input memakai atribut form="filter-form". --}}
+        <div x-show="filters" x-cloak x-transition.opacity.duration.200ms @click="close()" class="fixed inset-0 z-[70] bg-black/40"></div>
+        <div x-show="filters" x-cloak x-ref="panel" @keydown.tab="trap($event)"
+             role="dialog" aria-modal="true" aria-labelledby="filter-title"
+             x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none"
+             x-transition:enter-start="translate-y-full sm:translate-y-0 sm:translate-x-full"
+             x-transition:enter-end="translate-y-0 sm:translate-x-0"
+             x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none"
+             x-transition:leave-start="translate-y-0 sm:translate-x-0"
+             x-transition:leave-end="translate-y-full sm:translate-y-0 sm:translate-x-full"
+             class="fixed inset-x-0 bottom-0 z-[71] flex max-h-[88vh] flex-col rounded-t-2xl bg-white shadow-2xl sm:inset-y-0 sm:left-auto sm:right-0 sm:max-h-none sm:w-[400px] sm:rounded-none sm:rounded-l-2xl">
+            <div class="flex items-center justify-between border-b border-stone-200 px-5 py-3">
+                <h2 id="filter-title" class="heading text-xl">Filter</h2>
+                <button type="button" @click="close()" class="flex h-11 w-11 items-center justify-center rounded-full text-stone-600 hover:bg-stone-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500" aria-label="Tutup filter">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+                </button>
+            </div>
+
+            <div class="flex-1 space-y-6 overflow-y-auto px-5 py-5">
+                <div>
+                    <label for="f-brand" class="mb-1.5 block text-xs font-semibold uppercase tracking-[0.08em] text-stone-600">Merek</label>
+                    <select id="f-brand" name="brand" form="filter-form" class="field">
+                        <option value="">Semua Merek</option>
+                        @foreach($brands as $brand)
+                            <option value="{{ $brand->slug }}" @selected(request('brand') == $brand->slug)>{{ $brand->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <fieldset>
+                    <legend class="mb-1.5 block text-xs font-semibold uppercase tracking-[0.08em] text-stone-600">Harga (Rp)</legend>
+                    <div class="flex items-center gap-2">
+                        <input type="number" name="min_price" form="filter-form" min="0" inputmode="numeric" value="{{ request('min_price') }}" placeholder="Min" class="field" aria-label="Harga minimum">
+                        <span class="text-stone-500" aria-hidden="true">–</span>
+                        <input type="number" name="max_price" form="filter-form" min="0" inputmode="numeric" value="{{ request('max_price') }}" placeholder="Maks" class="field" aria-label="Harga maksimum">
+                    </div>
+                </fieldset>
+
+                <label class="flex min-h-11 cursor-pointer items-center gap-3 text-[15px] text-stone-800">
+                    <input type="checkbox" name="in_stock" form="filter-form" value="1" @checked(request()->boolean('in_stock')) class="h-5 w-5 rounded border-stone-300 text-orange-600 focus:ring-orange-500">
+                    Hanya yang stoknya tersedia
+                </label>
+            </div>
+
+            <div class="flex gap-3 border-t border-stone-200 px-5 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+                <a href="{{ $resetUrl }}" class="btn btn-outline flex-1">Reset</a>
+                <button type="submit" form="filter-form" class="btn btn-primary flex-[2]">Terapkan</button>
+            </div>
+        </div>
+    </div>
     @endunless
 
-    <div class="min-w-0">
-        @unless($landing)
-        {{-- Chip kategori (HP) --}}
-        <div class="-mx-4 mb-4 flex gap-2 overflow-x-auto px-4 pb-1 text-sm [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:hidden">
-            <a href="{{ route('products.index', request()->except('page', 'category')) }}" class="shrink-0 rounded-full px-4 py-1.5 {{ !request('category') ? 'bg-brand text-white' : 'border border-stone-300 bg-white text-stone-600' }}">Semua</a>
-            @foreach($categories as $cat)
-                <a href="{{ route('products.index', array_merge(request()->except('page'), ['category' => $cat->slug])) }}" class="shrink-0 rounded-full px-4 py-1.5 {{ request('category') === $cat->slug ? 'bg-brand text-white' : 'border border-stone-300 bg-white text-stone-600' }}">{{ $cat->name }}</a>
-            @endforeach
-        </div>
-
-        @endunless
-
+    <div class="min-w-0 {{ $landing ? '' : 'mt-5' }}">
         @if($landing)
             <div class="mb-6 flex items-end justify-between gap-4">
                 <h2 class="heading text-2xl sm:text-3xl">Semua produk</h2>
                 <span class="text-sm text-stone-500">{{ $products->total() }} produk</span>
             </div>
         @else
-        <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
-            <span class="text-sm text-stone-500">{{ $products->total() }} produk</span>
-            <div class="flex items-center gap-2 text-sm">
-                <label for="f-sort" class="text-stone-500">Urutkan</label>
-                <select id="f-sort" name="sort" form="filter-form" onchange="this.form.submit()" class="field !h-10 !w-auto pr-8">
-                    <option value="latest" @selected(request('sort', 'latest') == 'latest')>Terbaru</option>
-                    <option value="price_asc" @selected(request('sort') == 'price_asc')>Harga Terendah</option>
-                    <option value="price_desc" @selected(request('sort') == 'price_desc')>Harga Tertinggi</option>
-                    <option value="name_asc" @selected(request('sort') == 'name_asc')>Nama A–Z</option>
-                </select>
-            </div>
-        </div>
-        @endif
-
-        @php
-            $chips = array_filter([
-                'category'  => $categories->firstWhere('slug', request('category'))->name ?? null,
-                'brand'     => $brands->firstWhere('slug', request('brand'))->name ?? null,
-                'search'    => request('search') ? '“' . request('search') . '”' : null,
-                'min_price' => request('min_price') ? 'Min Rp ' . number_format((int) request('min_price'), 0, ',', '.') : null,
-                'max_price' => request('max_price') ? 'Maks Rp ' . number_format((int) request('max_price'), 0, ',', '.') : null,
-                'in_stock'  => request()->boolean('in_stock') ? 'Stok tersedia' : null,
-            ]);
-        @endphp
-        @if($chips)
-            <div class="mb-5 flex flex-wrap gap-2">
+            @php
+                $chips = array_filter([
+                    'brand'     => $brands->firstWhere('slug', request('brand'))->name ?? null,
+                    'search'    => request('search') ? '“' . request('search') . '”' : null,
+                    'min_price' => request('min_price') ? 'Min Rp ' . number_format((int) request('min_price'), 0, ',', '.') : null,
+                    'max_price' => request('max_price') ? 'Maks Rp ' . number_format((int) request('max_price'), 0, ',', '.') : null,
+                    'in_stock'  => request()->boolean('in_stock') ? 'Stok tersedia' : null,
+                ]);
+            @endphp
+            <div class="mb-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+                <span class="text-sm text-stone-600" role="status">{{ $products->total() }} produk</span>
                 @foreach($chips as $key => $label)
-                    <a href="{{ route('products.index', request()->except($key, 'page')) }}" class="inline-flex items-center gap-1.5 rounded-full border border-stone-300 bg-white px-3 py-1 text-xs text-stone-700 transition hover:border-orange-500">
+                    <a href="{{ route('products.index', request()->except($key, 'page')) }}" class="inline-flex min-h-8 items-center gap-1.5 rounded-full border border-stone-300 bg-white px-3 py-1 text-xs text-stone-700 transition hover:border-orange-500" aria-label="Hapus filter {{ $label }}">
                         {{ $label }} <span aria-hidden="true">×</span>
                     </a>
                 @endforeach
@@ -325,7 +334,7 @@
         @endif
 
         @if($products->count())
-            <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:gap-5 {{ $landing ? 'sm:grid-cols-3 lg:grid-cols-4' : 'xl:grid-cols-3' }}">
+            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 lg:gap-5">
                 @foreach($products as $product)
                     <x-product-card :product="$product" />
                 @endforeach
