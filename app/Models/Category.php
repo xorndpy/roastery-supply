@@ -21,6 +21,7 @@ class Category extends Model
         'slug',
         'description',
         'image',
+        'banner',
         'is_active',
     ];
 

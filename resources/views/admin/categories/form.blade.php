@@ -92,6 +92,24 @@
                 @error('image') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
 
+            {{-- Banner --}}
+            <div class="bg-white p-6 rounded-lg border border-stone-200">
+                <h2 class="font-bold mb-1">Banner Kategori</h2>
+                <p class="text-xs text-stone-500 mb-4">Foto lebar di atas halaman kategori (nama kategori tampil di tengahnya). Kosong = memakai foto header umum atau latar polos.</p>
+
+                @if($mode === 'edit' && $category->banner)
+                    <img src="{{ media_url($category->banner) }}" alt="" class="w-full rounded border border-stone-200 mb-2">
+                    <label class="flex items-center gap-2 text-xs text-stone-500 mb-3">
+                        <input type="checkbox" name="remove_banner" value="1"> Hapus banner ini
+                    </label>
+                @endif
+
+                <input type="file" name="banner" accept="image/jpeg,image/png,image/webp"
+                       class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm">
+                <p class="text-xs text-stone-500 mt-1">Disarankan 1600 x 500 px, JPG/WEBP, maks 3 MB.</p>
+                @error('banner') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+            </div>
+
             {{-- Status --}}
             <div class="bg-white p-6 rounded-lg border border-stone-200">
                 <h2 class="font-bold mb-4">Status</h2>

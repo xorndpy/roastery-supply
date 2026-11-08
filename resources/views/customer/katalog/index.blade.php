@@ -156,12 +156,56 @@
         </x-rail>
     </section>
 @else
-    <div class="border-b border-stone-200 bg-white">
-        <div class="container-x py-6">
-            <h1 class="heading text-2xl sm:text-[1.9rem]">{{ request('search') ? 'Hasil untuk “' . request('search') . '”' : 'Katalog Produk' }}</h1>
-            <p class="mt-1 text-sm text-stone-600">{{ $site['tagline'] }}</p>
+    @php
+        $curSlug = request('category');
+        $current = $curSlug
+            ? ($categories->firstWhere('slug', $curSlug) ?? $categories->flatMap(fn ($c) => $c->children)->firstWhere('slug', $curSlug))
+            : null;
+        $parentCat = $current ? ($current->parent_id ? $categories->firstWhere('id', $current->parent_id) : $current) : null;
+        $pillCats = $parentCat ? $parentCat->children : collect();
+    @endphp
+
+    @if($current)
+        {{-- Banner kategori: foto kategori -> foto header umum -> latar polos --}}
+        @php $bannerPhoto = $current->banner ?: ($site['header_bg'] ?? null); @endphp
+        <section class="container-x pt-6" aria-label="Kategori {{ $current->name }}">
+            <div class="relative isolate flex h-[180px] items-center justify-center overflow-hidden rounded-2xl bg-[#26180f] text-center text-white sm:h-[240px] lg:h-[280px]">
+                @if($bannerPhoto)
+                    <img src="{{ media_url($bannerPhoto) }}" alt="" class="absolute inset-0 -z-10 h-full w-full object-cover">
+                    <div class="absolute inset-0 -z-10 bg-black/40"></div>
+                @else
+                    <div class="pointer-events-none absolute -right-16 -top-16 -z-10 h-72 w-72 rounded-full bg-orange-500/25 blur-3xl"></div>
+                @endif
+                <div class="px-6">
+                    <h1 class="heading text-3xl uppercase tracking-[0.08em] sm:text-5xl">{{ $current->name }}</h1>
+                    @if($current->description)
+                        <p class="mx-auto mt-3 hidden max-w-xl text-sm text-stone-200 sm:block">{{ \Illuminate\Support\Str::limit(strip_tags((string) $current->description), 120) }}</p>
+                    @endif
+                </div>
+            </div>
+        </section>
+
+        {{-- Sub-kategori --}}
+        @if($pillCats->isNotEmpty())
+            <nav class="container-x pt-5" aria-label="Sub-kategori">
+                <div class="flex flex-wrap gap-2 rounded-2xl border border-stone-200 bg-white p-4">
+                    <a href="{{ route('products.index', array_merge(request()->except('page'), ['category' => $parentCat->slug])) }}"
+                       class="rounded-full border px-4 py-1.5 text-sm transition {{ $current->id === $parentCat->id ? 'border-brand bg-brand text-white' : 'border-stone-300 text-stone-700 hover:border-stone-500' }}">Semua {{ $parentCat->name }}</a>
+                    @foreach($pillCats as $child)
+                        <a href="{{ route('products.index', array_merge(request()->except('page'), ['category' => $child->slug])) }}"
+                           class="rounded-full border px-4 py-1.5 text-sm transition {{ $current->id === $child->id ? 'border-brand bg-brand text-white' : 'border-stone-300 text-stone-700 hover:border-stone-500' }}">{{ $child->name }}</a>
+                    @endforeach
+                </div>
+            </nav>
+        @endif
+    @else
+        <div class="border-b border-stone-200 bg-white">
+            <div class="container-x py-6">
+                <h1 class="heading text-2xl sm:text-[1.9rem]">{{ request('search') ? 'Hasil untuk “' . request('search') . '”' : 'Katalog Produk' }}</h1>
+                <p class="mt-1 text-sm text-stone-600">{{ $site['tagline'] }}</p>
+            </div>
         </div>
-    </div>
+    @endif
 @endif
 
 {{-- SEMUA PRODUK --}}

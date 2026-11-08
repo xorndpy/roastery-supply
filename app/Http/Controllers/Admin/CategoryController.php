@@ -74,6 +74,11 @@ class CategoryController extends Controller
             $data['image'] = $request->file('image')->store('categories', 'public');
         }
 
+        $request->validate(['banner' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:3072']);
+        if ($request->hasFile('banner')) {
+            $data['banner'] = $request->file('banner')->store('categories/banners', 'public');
+        }
+
         $category = Category::create($data);
 
         return redirect()
@@ -122,6 +127,17 @@ class CategoryController extends Controller
             $data['image'] = $request->file('image')->store('categories', 'public');
         }
 
+        $request->validate(['banner' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:3072']);
+        if ($request->hasFile('banner')) {
+            if ($category->banner) {
+                Storage::disk('public')->delete($category->banner);
+            }
+            $data['banner'] = $request->file('banner')->store('categories/banners', 'public');
+        } elseif ($request->boolean('remove_banner') && $category->banner) {
+            Storage::disk('public')->delete($category->banner);
+            $data['banner'] = null;
+        }
+
         $category->update($data);
 
         return redirect()
@@ -146,6 +162,10 @@ class CategoryController extends Controller
         // Hapus image
         if ($category->image && Storage::disk('public')->exists($category->image)) {
             Storage::disk('public')->delete($category->image);
+        }
+
+        if ($category->banner) {
+            Storage::disk('public')->delete($category->banner);
         }
 
         $category->delete();
