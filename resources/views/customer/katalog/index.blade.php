@@ -18,67 +18,71 @@
         @else
             <div class="absolute inset-0 -z-20 bg-gradient-to-br from-[#24150e] via-[#35200f] to-brand"></div>
             <div class="auth-beans absolute inset-0 -z-10"></div>
-            <div class="absolute -right-24 top-1/4 -z-10 h-[28rem] w-[28rem] rounded-full bg-orange-500/20 blur-3xl"></div>
+            <div class="absolute -right-24 top-1/4 -z-10 h-[28rem] w-[28rem] rounded-full bg-white/5 blur-3xl"></div>
         @endif
         {{-- Judul disembunyikan dari tampilan (tetap dibaca mesin pencari & pembaca layar) --}}
         <h1 class="sr-only">Toko {{ $site['site_name'] }}: lengkapi kedai kopi Anda dari satu toko.</h1>
     </section>
 
-    {{-- KATEGORI: baris ikon ringkas (gaya Toffin) tepat di bawah hero --}}
+    {{-- KATEGORI: baris ikon ringkas tepat di bawah hero --}}
     @if($categoryCards->isNotEmpty())
-        <section class="container-x pt-10" aria-label="Kategori">
-            <div class="flex flex-wrap justify-center gap-x-4 gap-y-6 sm:gap-x-7">
+        <section class="container-x pt-14" aria-label="Kategori">
+            <div class="flex flex-wrap justify-center gap-x-5 gap-y-8 sm:gap-x-9">
                 @foreach($categoryCards as $c)
                     @php $cardImg = $c->card_image ?? $c->image ?? null; @endphp
-                    <a href="{{ route('products.index', ['category' => $c->slug]) }}" class="group w-[84px] text-center sm:w-[112px]">
-                        <div class="relative isolate mx-auto flex aspect-square items-center justify-center overflow-hidden rounded-2xl bg-white p-2.5 ring-1 ring-stone-200 transition group-hover:shadow-md group-hover:ring-orange-400">
+                    <a href="{{ route('products.index', ['category' => $c->slug]) }}" class="group w-[88px] text-center sm:w-[120px]">
+                        <div class="relative isolate mx-auto flex aspect-square items-center justify-center overflow-hidden rounded-xl border border-stone-200 bg-white p-3 transition-colors group-hover:border-stone-400">
                             @if($cardImg)
-                                <img src="{{ media_url($cardImg) }}" alt="" loading="lazy" class="h-full w-full object-contain transition duration-300 group-hover:scale-105">
+                                <img src="{{ media_url($cardImg) }}" alt="" loading="lazy" class="h-full w-full object-contain">
                             @else
                                 <div class="absolute inset-0 -z-10 bg-gradient-to-br from-[#35200f] to-[#1a0f0a]"></div>
                                 <div class="auth-beans absolute inset-0 -z-10"></div>
                             @endif
                         </div>
-                        <span class="mt-2 block text-[13px] font-medium leading-tight text-stone-800 transition group-hover:text-orange-600">{{ $c->name }}</span>
+                        <span class="mt-3 block text-sm font-medium leading-tight text-stone-800 transition group-hover:text-brand">{{ $c->name }}</span>
                     </a>
                 @endforeach
             </div>
         </section>
     @endif
 
-    {{-- SOROTAN (slider produk unggulan) --}}
+    {{-- UNGGULAN: satu panel, foto di kiri, teks di kanan; ganti sendiri tiap 6 detik --}}
     @if($featured->isNotEmpty())
-        <section class="container-x pb-16 pt-14 sm:pb-20" aria-label="Produk unggulan"
+        <section class="container-x pb-16 pt-20 sm:pb-20" aria-label="Produk unggulan"
                  x-data="{ i: 0, n: {{ $featured->count() }}, timer: null,
                            next() { this.i = (this.i + 1) % this.n },
-                           play() { if (this.n > 1) this.timer = setInterval(() => this.next(), 6000) },
-                           stop() { clearInterval(this.timer) } }"
-                 x-init="play()" @mouseenter="stop()" @mouseleave="play()">
-            <div class="relative grid rounded-3xl border border-stone-200 bg-white p-5 sm:p-6 md:py-10 md:pl-8 md:pr-14">
-                @foreach($featured as $spot)
-                    @php $spotImg = $spot->images->first(); @endphp
-                    <div class="col-start-1 row-start-1 grid items-center gap-6 transition-opacity duration-500 md:grid-cols-[minmax(0,300px)_1fr] md:gap-12"
-                         :class="i === {{ $loop->index }} ? 'opacity-100' : 'pointer-events-none opacity-0'"
-                         :aria-hidden="i !== {{ $loop->index }}">
-                        <a href="{{ route('products.show', $spot->slug) }}" class="block aspect-[4/5] overflow-hidden rounded-2xl bg-stone-100 shadow-xl shadow-stone-900/15 md:-my-16 lg:-ml-10" :tabindex="i === {{ $loop->index }} ? 0 : -1">
-                            @if($spotImg)
-                                <img src="{{ media_url($spotImg->image) }}" alt="{{ $spot->name }}" loading="lazy" class="h-full w-full object-cover">
-                            @endif
-                        </a>
-                        <div>
-                            <span class="eyebrow">Unggulan</span>
-                            <h2 class="heading mt-2 text-2xl leading-tight sm:text-3xl">{{ $spot->name }}</h2>
-                            <p class="mt-3 max-w-md text-[15px] leading-relaxed text-stone-600">{{ \Illuminate\Support\Str::limit(strip_tags((string) $spot->description), 170) }}</p>
-                            <div class="mt-4 text-xl font-semibold text-orange-500">Rp {{ number_format($spot->price, 0, ',', '.') }}</div>
-                            <a href="{{ route('products.show', $spot->slug) }}" class="btn btn-primary mt-5 !h-12 !rounded-full px-7" :tabindex="i === {{ $loop->index }} ? 0 : -1">Jelajahi sekarang</a>
+                           play() { if (this.n > 1 && !this.timer && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.timer = setInterval(() => this.next(), 6000) },
+                           stop() { clearInterval(this.timer); this.timer = null } }"
+                 x-init="play()" @mouseenter="stop()" @mouseleave="play()" @focusin="stop()" @focusout="play()">
+            <div class="overflow-hidden rounded-2xl border border-stone-200 bg-white">
+                <div class="grid">
+                    @foreach($featured as $spot)
+                        @php $spotImg = $spot->images->first(); @endphp
+                        <div class="col-start-1 row-start-1 grid transition-opacity duration-500 md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]"
+                             :class="i === {{ $loop->index }} ? 'opacity-100' : 'pointer-events-none opacity-0'"
+                             :aria-hidden="i !== {{ $loop->index }}">
+                            <a href="{{ route('products.show', $spot->slug) }}" class="flex items-center justify-center border-stone-200 bg-white p-8 sm:p-12 md:min-h-[380px] md:border-r" :tabindex="i === {{ $loop->index }} ? 0 : -1" aria-label="{{ $spot->name }}">
+                                @if($spotImg)
+                                    <img src="{{ media_url($spotImg->image) }}" alt="" loading="lazy" class="max-h-72 w-full object-contain">
+                                @endif
+                            </a>
+                            <div class="flex flex-col justify-center border-t border-stone-200 p-7 sm:p-10 md:border-t-0 lg:p-14">
+                                @if($spot->brand)
+                                    <p class="text-sm text-stone-500">{{ $spot->brand->name }}</p>
+                                @endif
+                                <h2 class="heading mt-2 text-2xl leading-tight sm:text-3xl">{{ $spot->name }}</h2>
+                                <p class="mt-4 max-w-md text-[15px] leading-relaxed text-stone-600">{{ \Illuminate\Support\Str::limit(strip_tags((string) $spot->description), 160) }}</p>
+                                <div class="mt-6 text-xl font-semibold text-stone-900">Rp {{ number_format($spot->price, 0, ',', '.') }}</div>
+                                <a href="{{ route('products.show', $spot->slug) }}" class="btn btn-primary mt-7 w-fit px-7" :tabindex="i === {{ $loop->index }} ? 0 : -1">Lihat produk</a>
+                            </div>
                         </div>
-                    </div>
-                @endforeach
+                    @endforeach
+                </div>
 
                 @if($featured->count() > 1)
-                    <div class="absolute bottom-3 left-1/2 flex -translate-x-1/2 flex-row gap-2 md:bottom-auto md:left-auto md:right-5 md:top-1/2 md:-translate-y-1/2 md:translate-x-0 md:flex-col">
+                    <div class="flex justify-center gap-2 border-t border-stone-200 py-4">
                         @foreach($featured as $spot)
-                            <button type="button" @click="i = {{ $loop->index }}" class="h-2 w-2 rounded-full transition" :class="i === {{ $loop->index }} ? 'bg-orange-400' : 'bg-stone-300 hover:bg-stone-400'" aria-label="Tampilkan unggulan {{ $loop->iteration }}"></button>
+                            <button type="button" @click="i = {{ $loop->index }}" class="h-2 rounded-full transition-all" :class="i === {{ $loop->index }} ? 'w-6 bg-brand' : 'w-2 bg-stone-300 hover:bg-stone-400'" aria-label="Tampilkan unggulan {{ $loop->iteration }}"></button>
                         @endforeach
                     </div>
                 @endif
@@ -87,8 +91,8 @@
     @endif
 
     {{-- KELEBIHAN (edit teks di array $perks sesuai kebutuhan) --}}
-    <section class="container-x {{ $featured->isEmpty() ? 'pt-14' : '' }} pb-4" aria-labelledby="plus-title">
-        <h2 id="plus-title" class="heading mb-6 text-2xl sm:text-3xl">Kelebihan berbelanja di <span class="text-orange-500">{{ $site['site_name'] }}</span></h2>
+    <section class="container-x {{ $featured->isEmpty() ? 'pt-20' : '' }} pb-16 sm:pb-20" aria-labelledby="plus-title">
+        <h2 id="plus-title" class="heading mb-8 text-2xl sm:text-3xl">Kelebihan berbelanja di {{ $site['site_name'] }}</h2>
         @php
             $perks = [
                 ['Rangkaian produk lengkap untuk kedai dan roastery Anda.', 'M3 9l1.5-5h15L21 9M4 9v11h16V9M9 20v-6h6v6'],
@@ -102,9 +106,9 @@
         @endphp
         <x-rail>
             @foreach($perks as [$text, $icon])
-                <div class="w-[240px] shrink-0 snap-start rounded-2xl bg-gradient-to-br from-orange-400 to-orange-600 p-5 text-white sm:w-[calc(25%-12px)]">
-                    <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ $icon }}"/></svg>
-                    <p class="mt-4 text-[15px] font-medium leading-snug">{{ $text }}</p>
+                <div class="w-[250px] shrink-0 snap-start rounded-xl border border-stone-200 bg-white p-6 sm:w-[calc(25%-12px)]">
+                    <svg class="h-6 w-6 text-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ $icon }}"/></svg>
+                    <p class="mt-5 text-[15px] leading-snug text-stone-700">{{ $text }}</p>
                 </div>
             @endforeach
         </x-rail>
@@ -114,9 +118,9 @@
         {{-- BANNER KATEGORI (gaya Toffin): nama kategori di atas foto --}}
         <section class="container-x pt-6 sm:pt-8">
             <nav class="mb-3 text-[13px] text-stone-500" aria-label="Breadcrumb">
-                <a href="{{ route('products.index') }}" class="hover:text-orange-600">Toko</a>
+                <a href="{{ route('products.index') }}" class="hover:text-brand">Toko</a>
                 @if($currentCategory->parent)
-                    <span class="mx-1.5">/</span><a href="{{ route('products.index', ['category' => $currentCategory->parent->slug]) }}" class="hover:text-orange-600">{{ $currentCategory->parent->name }}</a>
+                    <span class="mx-1.5">/</span><a href="{{ route('products.index', ['category' => $currentCategory->parent->slug]) }}" class="hover:text-brand">{{ $currentCategory->parent->name }}</a>
                 @endif
                 <span class="mx-1.5">/</span><span class="text-stone-800">{{ $currentCategory->name }}</span>
             </nav>
@@ -128,7 +132,7 @@
                     <div class="absolute inset-0 -z-20 bg-gradient-to-br from-[#24150e] via-[#35200f] to-brand"></div>
                     <div class="auth-beans absolute inset-0 -z-10"></div>
                 @endif
-                <h1 class="heading px-4 text-center text-3xl uppercase tracking-[0.14em] text-white sm:text-5xl">{{ $currentCategory->name }}</h1>
+                <h1 class="heading px-4 text-center text-4xl text-white sm:text-6xl">{{ $currentCategory->name }}</h1>
             </div>
         </section>
     @else
@@ -143,12 +147,12 @@
 @endif
 
 {{-- DAFTAR PRODUK --}}
-<div id="semua" class="container-x {{ $landing ? 'py-10' : 'pb-12 pt-6' }}"
+<div id="semua" class="container-x {{ $landing ? 'pb-24 pt-2' : 'pb-16 pt-8' }}"
      x-data="{ filters: {{ request()->hasAny(['brand', 'min_price', 'max_price']) || request()->boolean('in_stock') ? 'true' : 'false' }} }">
 
     @unless($landing)
         {{-- Kartu filter: chip sub-kategori + cari + tombol Filter --}}
-        <form id="filter-form" method="GET" action="{{ route('products.index') }}" class="mb-8 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm sm:p-5">
+        <form id="filter-form" method="GET" action="{{ route('products.index') }}" class="mb-10 rounded-2xl border border-stone-200 bg-white p-4 sm:p-5">
             @if(request('category'))
                 <input type="hidden" name="category" value="{{ request('category') }}">
             @endif
@@ -157,10 +161,10 @@
                 @php $root = $currentCategory->parent ?? $currentCategory; @endphp
                 <div class="flex flex-wrap gap-2 border-b border-stone-200 pb-4 text-[13px]">
                     <a href="{{ route('products.index', ['category' => $root->slug]) }}"
-                       class="rounded-full border px-4 py-1.5 transition {{ $currentCategory->id === $root->id ? 'border-brand bg-brand text-white' : 'border-stone-300 bg-white text-stone-700 hover:border-orange-500' }}">Semua</a>
+                       class="rounded-full border px-4 py-1.5 transition {{ $currentCategory->id === $root->id ? 'border-brand bg-brand text-white' : 'border-stone-300 bg-white text-stone-700 hover:border-stone-400' }}">Semua</a>
                     @foreach($subCategories as $sc)
                         <a href="{{ route('products.index', ['category' => $sc->slug]) }}"
-                           class="rounded-full border px-4 py-1.5 transition {{ $currentCategory->id === $sc->id ? 'border-brand bg-brand text-white' : 'border-stone-300 bg-white text-stone-700 hover:border-orange-500' }}">{{ $sc->name }}</a>
+                           class="rounded-full border px-4 py-1.5 transition {{ $currentCategory->id === $sc->id ? 'border-brand bg-brand text-white' : 'border-stone-300 bg-white text-stone-700 hover:border-stone-400' }}">{{ $sc->name }}</a>
                     @endforeach
                 </div>
             @endif
@@ -179,7 +183,7 @@
 
             <div x-show="filters" x-cloak x-transition class="mt-4 grid gap-4 border-t border-stone-200 pt-4 sm:grid-cols-2 lg:grid-cols-4">
                 <div>
-                    <label for="f-brand" class="mb-1.5 block text-xs font-semibold uppercase tracking-[0.08em] text-stone-500">Merek</label>
+                    <label for="f-brand" class="mb-1.5 block text-sm font-medium text-stone-700">Merek</label>
                     <select id="f-brand" name="brand" class="field">
                         <option value="">Semua Merek</option>
                         @foreach($brands as $brand)
@@ -188,7 +192,7 @@
                     </select>
                 </div>
                 <div class="sm:col-span-2 lg:col-span-1">
-                    <label class="mb-1.5 block text-xs font-semibold uppercase tracking-[0.08em] text-stone-500">Harga (Rp)</label>
+                    <label class="mb-1.5 block text-sm font-medium text-stone-700">Harga (Rp)</label>
                     <div class="flex items-center gap-2">
                         <input type="number" name="min_price" min="0" value="{{ request('min_price') }}" placeholder="Min" class="field" aria-label="Harga minimum">
                         <span class="text-stone-400">–</span>
@@ -196,19 +200,19 @@
                     </div>
                 </div>
                 <label class="flex items-center gap-2 self-end pb-2 text-sm text-stone-700">
-                    <input type="checkbox" name="in_stock" value="1" @checked(request()->boolean('in_stock')) class="rounded border-stone-300 text-orange-600 focus:ring-orange-500">
+                    <input type="checkbox" name="in_stock" value="1" @checked(request()->boolean('in_stock')) class="rounded border-stone-300 text-brand focus:ring-brand">
                     Hanya yang stoknya tersedia
                 </label>
                 <div class="flex items-end gap-3">
                     <button type="submit" class="btn btn-primary w-full">Terapkan</button>
-                    <a href="{{ request('category') ? route('products.index', ['category' => request('category')]) : route('products.index') }}" class="text-[13px] text-orange-600 hover:underline">Reset</a>
+                    <a href="{{ request('category') ? route('products.index', ['category' => request('category')]) : route('products.index') }}" class="text-[13px] text-brand underline-offset-2 hover:underline">Reset</a>
                 </div>
             </div>
         </form>
     @endunless
 
     @if($landing)
-        <div class="mb-6 flex items-end justify-between gap-4">
+        <div class="mb-8 flex items-end justify-between gap-4">
             <h2 class="heading text-2xl sm:text-3xl">Semua produk</h2>
             <span class="text-sm text-stone-500">{{ $products->total() }} produk</span>
         </div>
@@ -225,7 +229,7 @@
                 ]);
             @endphp
             @foreach($chips as $key => $label)
-                <a href="{{ route('products.index', request()->except($key, 'page')) }}" class="inline-flex items-center gap-1.5 rounded-full border border-stone-300 bg-white px-3 py-1 text-xs text-stone-700 transition hover:border-orange-500">
+                <a href="{{ route('products.index', request()->except($key, 'page')) }}" class="inline-flex items-center gap-1.5 rounded-full border border-stone-300 bg-white px-3 py-1 text-xs text-stone-700 transition hover:border-stone-400">
                     {{ $label }} <span aria-hidden="true">×</span>
                 </a>
             @endforeach
@@ -233,7 +237,7 @@
     @endif
 
     @if($products->count())
-        <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 lg:gap-5">
+        <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4 lg:gap-6">
             @foreach($products as $product)
                 <x-product-card :product="$product" />
             @endforeach
@@ -242,7 +246,7 @@
     @else
         <div class="rounded-xl border border-stone-200 bg-white py-16 text-center">
             <p class="text-stone-500">Produk tidak ditemukan.</p>
-            <a href="{{ request('category') ? route('products.index', ['category' => request('category')]) : route('products.index') }}" class="mt-3 inline-block text-sm text-orange-600 hover:underline">Reset filter</a>
+            <a href="{{ request('category') ? route('products.index', ['category' => request('category')]) : route('products.index') }}" class="mt-3 inline-block text-sm text-brand underline-offset-2 hover:underline">Reset filter</a>
         </div>
     @endif
 </div>
