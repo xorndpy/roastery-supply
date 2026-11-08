@@ -42,6 +42,7 @@ class RolePermissionSeeder extends Seeder
         $staffRole = Role::where('name', 'staff')->first();
         if ($staffRole) {
             $staffPermissions = [
+            'view_finance',
                 'view_products',
                 'view_categories',
                 'view_brands',

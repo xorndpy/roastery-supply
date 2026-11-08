@@ -47,6 +47,7 @@ class PermissionSeeder extends Seeder
                 'approve_returns',
                 'reject_returns',
                 'download_invoices',
+                'view_finance',
             ],
             'pelanggan' => [
                 'view_customers',

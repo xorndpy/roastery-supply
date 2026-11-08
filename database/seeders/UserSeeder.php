@@ -9,71 +9,54 @@ use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // 1. Super Admin
-        $superAdmin = User::updateOrCreate(
-            ['email' => 'super@roastery.com'],
-            [
-                'name' => 'Super Administrator',
-                'phone' => '08110000001',
-                'password' => Hash::make('password'),
-                'email_verified_at' => now(),
-            ]
-        );
-        $superAdmin->syncRoles(['super_admin']);
+        // PRODUKSI: hanya satu Super Admin, kredensial dari .env (tanpa akun demo / password default).
+        if (app()->environment('production')) {
+            $email = env('ADMIN_EMAIL');
+            $password = env('ADMIN_PASSWORD');
 
-        // 2. Admin
-        $admin = User::updateOrCreate(
-            ['email' => 'admin@roastery.com'],
-            [
-                'name' => 'Store Administrator',
-                'phone' => '08110000002',
-                'password' => Hash::make('password'),
-                'email_verified_at' => now(),
-            ]
-        );
-        $admin->syncRoles(['admin']);
+            if (! $email || ! $password) {
+                $this->command?->warn('Isi ADMIN_EMAIL dan ADMIN_PASSWORD di .env, lalu jalankan ulang: php artisan db:seed --class=UserSeeder --force');
 
-        // 3. Staff
-        $staff = User::updateOrCreate(
-            ['email' => 'staff@roastery.com'],
-            [
-                'name' => 'Operations Staff',
-                'phone' => '08110000003',
-                'password' => Hash::make('password'),
-                'email_verified_at' => now(),
-            ]
-        );
-        $staff->syncRoles(['staff']);
+                return;
+            }
 
-        // 4. Customer
-        $customerUser = User::updateOrCreate(
-            ['email' => 'customer@roastery.com'],
-            [
-                'name' => 'Budi Santoso',
-                'phone' => '081234567890',
-                'password' => Hash::make('password'),
+            $user = User::updateOrCreate(['email' => $email], [
+                'name' => env('ADMIN_NAME', 'Super Administrator'),
+                'password' => Hash::make($password),
                 'email_verified_at' => now(),
-            ]
-        );
-        $customerUser->syncRoles(['customer']);
+            ]);
+            $user->syncRoles(['super_admin']);
 
-        // Customer Profile
-        Customer::updateOrCreate(
-            ['user_id' => $customerUser->id],
-            [
-                'name' => $customerUser->name,
-                'email' => $customerUser->email,
-                'phone' => $customerUser->phone,
-                'address' => 'Jl. Kopi Specialty No. 10, Kebayoran',
-                'city' => 'Jakarta Selatan',
-                'province' => 'DKI Jakarta',
-                'postal_code' => '12190',
-            ]
-        );
+            return;
+        }
+
+        $this->demoAccounts();
+    }
+
+    /** Akun demo, hanya untuk lokal / testing. */
+    private function demoAccounts(): void
+    {
+        $make = fn (string $email, string $name, string $phone, string $role) => tap(User::updateOrCreate(
+            ['email' => $email],
+            ['name' => $name, 'phone' => $phone, 'password' => Hash::make('password'), 'email_verified_at' => now()]
+        ), fn ($u) => $u->syncRoles([$role]));
+
+        $make('super@roastery.com', 'Super Administrator', '08110000001', 'super_admin');
+        $make('admin@roastery.com', 'Store Administrator', '08110000002', 'admin');
+        $make('staff@roastery.com', 'Operations Staff', '08110000003', 'staff');
+        $make('gudang@roastery.com', 'Admin Gudang', '08110000004', 'gudang');
+        $customerUser = $make('customer@roastery.com', 'Budi Santoso', '081234567890', 'customer');
+
+        Customer::updateOrCreate(['user_id' => $customerUser->id], [
+            'name' => $customerUser->name,
+            'email' => $customerUser->email,
+            'phone' => $customerUser->phone,
+            'address' => 'Jl. Kopi Specialty No. 10, Kebayoran',
+            'city' => 'Jakarta Selatan',
+            'province' => 'DKI Jakarta',
+            'postal_code' => '12190',
+        ]);
     }
 }
