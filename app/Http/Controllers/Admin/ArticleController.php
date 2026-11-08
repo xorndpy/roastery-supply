@@ -99,7 +99,7 @@ class ArticleController extends Controller
     {
         $request->validate(['image' => 'required|image|mimes:jpg,jpeg,png,webp|max:3072']);
 
-        return response()->json(['url' => asset('storage/' . $request->file('image')->store('articles/isi', 'public'))]);
+        return response()->json(['url' => media_url($request->file('image')->store('articles/isi', 'public'))]);
     }
 
     private function validated(Request $request, ?Article $article = null): array

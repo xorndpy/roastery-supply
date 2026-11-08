@@ -68,6 +68,7 @@ class ProductService
             try {
                 $resized = $this->resizeImage($file, 1000);
                 Storage::disk('public')->put($path, $resized);
+                $this->makeThumb($file, $path);
                 return $path;
             } catch (\Exception $e) {
                 // Fallback: upload apa adanya kalau resize gagal
@@ -78,6 +79,16 @@ class ProductService
         Storage::disk('public')->put($path, file_get_contents($file->getRealPath()));
 
         return $path;
+    }
+
+    /** Thumbnail 480px untuk kartu produk (jauh lebih ringan dari foto penuh). Gagal bikin thumbnail tidak menggagalkan upload. */
+    protected function makeThumb(UploadedFile $file, string $path): void
+    {
+        try {
+            Storage::disk('public')->put(thumb_path($path), $this->resizeImage($file, 480));
+        } catch (\Throwable $e) {
+            // kartu produk otomatis memakai foto penuh bila thumbnail tidak ada
+        }
     }
 
     /**
@@ -168,6 +179,9 @@ class ProductService
     {
         if ($path && Storage::disk('public')->exists($path)) {
             Storage::disk('public')->delete($path);
+            if (Storage::disk('public')->exists(thumb_path($path))) {
+                Storage::disk('public')->delete(thumb_path($path));
+            }
         }
     }
 

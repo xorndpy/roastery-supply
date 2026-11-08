@@ -46,7 +46,7 @@ class Article extends Model
 
     public function getCoverUrlAttribute(): ?string
     {
-        return $this->cover_image ? asset('storage/' . $this->cover_image) : null;
+        return $this->cover_image ? media_url($this->cover_image) : null;
     }
 
     /** Isi (Markdown) menjadi HTML. Tag HTML mentah dibuang dan tautan berbahaya ditolak. */
