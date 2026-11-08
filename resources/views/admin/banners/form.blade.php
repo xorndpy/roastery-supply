@@ -35,7 +35,7 @@
                 <option value="{{ $val }}" @selected(old('placement', $banner->placement ?? 'beranda') === $val)>{{ $label }}</option>
             @endforeach
         </select>
-        <p class="text-xs text-stone-500 mt-1">Beranda: banner lebar di bawah hero (maks. 2). Katalog: slider promo di atas halaman toko (maks. 6).</p>
+        <p class="text-xs text-stone-500 mt-1">Beranda: banner lebar di bawah hero (maks. 2). Katalog: foto besar di paling atas halaman toko, otomatis jadi slider bila lebih dari satu (maks. 6; ideal 1920×800).</p>
     </div>
 
     <div>

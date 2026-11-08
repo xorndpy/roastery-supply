@@ -5,76 +5,72 @@
 @section('content')
 
 @if($landing)
-    {{-- HEADER (polos: tanpa foto, foto promosi ada di bagian bawahnya) --}}
-    <section class="relative overflow-hidden bg-[#26180f] text-white">
-        <div class="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-orange-500/25 blur-3xl"></div>
-        <div class="container-x relative pb-12 pt-12 sm:pb-14 sm:pt-16">
-            <p class="eyebrow !text-orange-300">Toko {{ $site['site_name'] }}</p>
-            <h1 class="heading mt-3 max-w-3xl text-[2rem] leading-[1.1] [text-wrap:balance] sm:text-5xl">
-                <span class="text-orange-300">Eksplor.</span> Lengkapi kedai kopi Anda dari satu toko.
-            </h1>
-            <p class="mt-4 max-w-xl text-[15px] text-stone-300">{{ $site['tagline'] }}</p>
-        </div>
-    </section>
+    @php $multiPromo = $promos->count() > 1; @endphp
 
-    {{-- PROMO (Admin > Banner > "Tampil di" Katalog). Muncul hanya bila ada banner. --}}
+    {{-- HERO: polos & besar. Bila ada banner "Katalog" (Admin > Banner), hero ini menjadi slider foto promo/terbaru. --}}
     @if($promos->isNotEmpty())
-        @php $multiPromo = $promos->count() > 1; @endphp
-        <section class="container-x pt-10 sm:pt-12" aria-label="Promo"
+        <section class="relative isolate overflow-hidden bg-[#26180f]" aria-label="Promo"
                  @if($multiPromo)
                      x-data="{ i: 0, n: {{ $promos->count() }}, timer: null,
                                play() { if (!matchMedia('(prefers-reduced-motion: reduce)').matches) this.timer = setInterval(() => { this.i = (this.i + 1) % this.n }, 6000) },
                                stop() { clearInterval(this.timer) } }"
                      x-init="play()" @mouseenter="stop()" @mouseleave="stop(); play()"
                  @endif>
-            <div class="relative overflow-hidden rounded-3xl bg-stone-200">
-                <div class="relative aspect-[16/9] sm:aspect-[12/5]">
+            <h1 class="sr-only">Katalog produk {{ $site['site_name'] }}</h1>
+            <div class="relative aspect-[16/9] max-h-[560px] sm:aspect-[2/1] lg:aspect-[21/8]">
+                @foreach($promos as $k => $promo)
+                    @php
+                        $promoImg = '<img src="' . e(media_url($promo->image)) . '" alt="' . e($promo->title) . '" class="h-full w-full object-cover"' . ($k === 0 ? ' fetchpriority="high"' : ' loading="lazy"') . '>';
+                    @endphp
+                    <div class="absolute inset-0 transition-opacity duration-700 {{ $k === 0 ? '' : 'pointer-events-none opacity-0' }}"
+                         @if($multiPromo)
+                             @if($k === 0) :class="{ 'pointer-events-none opacity-0': i !== 0 }" @else :class="{ 'pointer-events-auto opacity-100': i === {{ $k }} }" @endif
+                             :aria-hidden="i !== {{ $k }}"
+                         @endif>
+                        @if($promo->link)
+                            <a href="{{ $promo->link }}" class="block h-full w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-500" @if($multiPromo) :tabindex="i === {{ $k }} ? 0 : -1" @endif>{!! $promoImg !!}</a>
+                        @else
+                            {!! $promoImg !!}
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+
+            @if($multiPromo)
+                <div class="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full bg-black/30 px-3 py-2 backdrop-blur-sm" role="group" aria-label="Pilih promo">
                     @foreach($promos as $k => $promo)
-                        @php
-                            $promoImg = '<img src="' . e(media_url($promo->image)) . '" alt="' . e($promo->title) . '" class="h-full w-full object-cover"' . ($k === 0 ? ' fetchpriority="high"' : ' loading="lazy"') . '>';
-                        @endphp
-                        <div class="absolute inset-0 transition-opacity duration-700 {{ $k === 0 ? '' : 'pointer-events-none opacity-0' }}"
-                             @if($multiPromo)
-                                 @if($k === 0) :class="{ 'pointer-events-none opacity-0': i !== 0 }" @else :class="{ 'pointer-events-auto opacity-100': i === {{ $k }} }" @endif
-                                 :aria-hidden="i !== {{ $k }}"
-                             @endif>
-                            @if($promo->link)
-                                <a href="{{ $promo->link }}" class="block h-full w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-inset" @if($multiPromo) :tabindex="i === {{ $k }} ? 0 : -1" @endif>{!! $promoImg !!}</a>
-                            @else
-                                {!! $promoImg !!}
-                            @endif
-                        </div>
+                        <button type="button" @click="i = {{ $k }}" class="h-1.5 rounded-full transition-all duration-300"
+                                :class="i === {{ $k }} ? 'w-6 bg-white' : 'w-1.5 bg-white/60 hover:bg-white'"
+                                :aria-current="i === {{ $k }} ? 'true' : 'false'" aria-label="Promo {{ $loop->iteration }} dari {{ $promos->count() }}"></button>
                     @endforeach
                 </div>
-
-                @if($multiPromo)
-                    <div class="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full bg-black/30 px-3 py-2 backdrop-blur-sm" role="group" aria-label="Pilih promo">
-                        @foreach($promos as $k => $promo)
-                            <button type="button" @click="i = {{ $k }}" class="h-1.5 rounded-full transition-all duration-300"
-                                    :class="i === {{ $k }} ? 'w-6 bg-white' : 'w-1.5 bg-white/60 hover:bg-white'"
-                                    :aria-current="i === {{ $k }} ? 'true' : 'false'" aria-label="Promo {{ $loop->iteration }} dari {{ $promos->count() }}"></button>
-                        @endforeach
-                    </div>
-                @endif
+            @endif
+        </section>
+    @else
+        <section class="relative overflow-hidden bg-[#26180f] text-white">
+            <div class="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-orange-500/25 blur-3xl"></div>
+            <div class="container-x relative flex min-h-[300px] flex-col justify-center py-14 sm:min-h-[380px] lg:min-h-[440px]">
+                <p class="eyebrow !text-orange-300">Toko {{ $site['site_name'] }}</p>
+                <h1 class="heading mt-3 max-w-3xl text-[2.25rem] leading-[1.08] [text-wrap:balance] sm:text-6xl">
+                    <span class="text-orange-300">Eksplor.</span> Lengkapi kedai kopi Anda dari satu toko.
+                </h1>
+                <p class="mt-5 max-w-xl text-base text-stone-300">{{ $site['tagline'] }}</p>
             </div>
         </section>
     @endif
 
-    {{-- KATEGORI --}}
+    {{-- KATEGORI (strip bersih: foto tanpa kotak, nama di bawahnya) --}}
     @if($categoryCards->isNotEmpty())
-        <section class="container-x pt-12 sm:pt-16" aria-labelledby="kategori-title">
-            <h2 id="kategori-title" class="heading mb-6 text-2xl sm:text-3xl">Belanja per kategori</h2>
+        <section class="container-x pt-10 sm:pt-12" aria-label="Kategori produk">
             <x-rail>
                 @foreach($categoryCards as $c)
-                    <a href="{{ route('products.index', ['category' => $c->slug]) }}" class="group w-[124px] shrink-0 snap-start text-center sm:w-[156px]">
-                        <div class="aspect-square overflow-hidden rounded-2xl bg-stone-100 ring-1 ring-stone-200 transition group-hover:ring-orange-400">
-                            @if(!empty($c->image))
-                                <img src="{{ media_url($c->image) }}" alt="" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
-                            @else
-                                <div class="heading flex h-full w-full items-center justify-center text-3xl text-orange-500">{{ \Illuminate\Support\Str::substr($c->name, 0, 1) }}</div>
-                            @endif
-                        </div>
-                        <span class="mt-3 block text-[13px] font-medium text-stone-800 group-hover:text-orange-700">{{ $c->name }}</span>
+                    <a href="{{ route('products.index', ['category' => $c->slug]) }}" class="group flex w-[104px] shrink-0 snap-start flex-col items-center text-center first:ml-auto last:mr-auto sm:w-[132px]">
+                        @if(!empty($c->image))
+                            <img src="{{ media_url($c->image) }}" alt="" loading="lazy" class="h-16 w-16 object-contain transition duration-300 group-hover:scale-110 sm:h-20 sm:w-20">
+                        @else
+                            <span class="heading flex h-16 w-16 items-center justify-center rounded-full bg-orange-50 text-2xl text-orange-600 sm:h-20 sm:w-20">{{ \Illuminate\Support\Str::substr($c->name, 0, 1) }}</span>
+                        @endif
+                        <span class="mt-3 text-[13px] font-semibold text-orange-600 group-hover:text-orange-700">{{ $c->name }}</span>
                     </a>
                 @endforeach
             </x-rail>
@@ -98,35 +94,35 @@
 
     {{-- SOROTAN (slider produk unggulan) --}}
     @if($featured->isNotEmpty())
-        <section class="container-x pt-16 sm:pt-20" aria-label="Produk unggulan"
+        <section class="container-x py-16 sm:py-20" aria-label="Produk unggulan"
                  x-data="{ i: 0, n: {{ $featured->count() }}, timer: null,
                            next() { this.i = (this.i + 1) % this.n },
                            play() { if (this.n > 1) this.timer = setInterval(() => this.next(), 6000) },
                            stop() { clearInterval(this.timer) } }"
                  x-init="play()" @mouseenter="stop()" @mouseleave="play()">
-            <div class="relative grid rounded-3xl border border-stone-200 bg-white p-6 sm:p-8 md:pr-16">
+            <div class="relative grid rounded-3xl border border-stone-200 bg-white p-5 sm:p-6 md:py-10 md:pl-8 md:pr-14">
                 @foreach($featured as $spot)
                     @php $spotImg = $spot->images->first(); @endphp
-                    <div class="col-start-1 row-start-1 grid items-center gap-8 transition-opacity duration-500 md:grid-cols-[minmax(0,320px)_1fr] md:gap-12"
+                    <div class="col-start-1 row-start-1 grid items-center gap-6 transition-opacity duration-500 md:grid-cols-[minmax(0,300px)_1fr] md:gap-12"
                          :class="i === {{ $loop->index }} ? 'opacity-100' : 'pointer-events-none opacity-0'"
                          :aria-hidden="i !== {{ $loop->index }}">
-                        <a href="{{ route('products.show', $spot->slug) }}" class="block aspect-[4/3] overflow-hidden rounded-2xl bg-stone-50 ring-1 ring-stone-100" :tabindex="i === {{ $loop->index }} ? 0 : -1">
+                        <a href="{{ route('products.show', $spot->slug) }}" class="block aspect-[4/5] overflow-hidden rounded-2xl bg-stone-100 shadow-xl shadow-stone-900/15 md:-my-16 lg:-ml-10" :tabindex="i === {{ $loop->index }} ? 0 : -1">
                             @if($spotImg)
-                                <img src="{{ media_url($spotImg->image) }}" alt="{{ $spot->name }}" loading="lazy" class="h-full w-full object-contain p-5">
+                                <img src="{{ media_url($spotImg->image) }}" alt="{{ $spot->name }}" loading="lazy" class="h-full w-full object-cover">
                             @endif
                         </a>
                         <div>
                             <span class="eyebrow">Unggulan</span>
                             <h2 class="heading mt-2 text-2xl leading-tight sm:text-3xl">{{ $spot->name }}</h2>
-                            <p class="mt-4 max-w-md text-[15px] leading-relaxed text-stone-600">{{ \Illuminate\Support\Str::limit(strip_tags((string) $spot->description), 170) }}</p>
-                            <div class="mt-5 text-xl font-semibold text-orange-500">Rp {{ number_format($spot->price, 0, ',', '.') }}</div>
-                            <a href="{{ route('products.show', $spot->slug) }}" class="btn btn-primary mt-6 !h-12 !rounded-full px-7" :tabindex="i === {{ $loop->index }} ? 0 : -1">Jelajahi sekarang</a>
+                            <p class="mt-3 max-w-md text-[15px] leading-relaxed text-stone-600">{{ \Illuminate\Support\Str::limit(strip_tags((string) $spot->description), 170) }}</p>
+                            <div class="mt-4 text-xl font-semibold text-orange-500">Rp {{ number_format($spot->price, 0, ',', '.') }}</div>
+                            <a href="{{ route('products.show', $spot->slug) }}" class="btn btn-primary mt-5 !h-12 !rounded-full px-7" :tabindex="i === {{ $loop->index }} ? 0 : -1">Jelajahi sekarang</a>
                         </div>
                     </div>
                 @endforeach
 
                 @if($featured->count() > 1)
-                    <div class="absolute bottom-4 left-1/2 flex -translate-x-1/2 flex-row gap-2 md:bottom-auto md:left-auto md:right-6 md:top-1/2 md:-translate-y-1/2 md:translate-x-0 md:flex-col">
+                    <div class="absolute bottom-3 left-1/2 flex -translate-x-1/2 flex-row gap-2 md:bottom-auto md:left-auto md:right-5 md:top-1/2 md:-translate-y-1/2 md:translate-x-0 md:flex-col">
                         @foreach($featured as $spot)
                             <button type="button" @click="i = {{ $loop->index }}" class="h-2 w-2 rounded-full transition" :class="i === {{ $loop->index }} ? 'bg-orange-400' : 'bg-stone-300 hover:bg-stone-400'" aria-label="Tampilkan unggulan {{ $loop->iteration }}"></button>
                         @endforeach
@@ -137,31 +133,27 @@
     @endif
 
     {{-- KELEBIHAN (edit teks di array $perks sesuai kebutuhan) --}}
-    <section class="container-x pt-16 sm:pt-20" aria-labelledby="plus-title">
-        <div class="border-t border-stone-200 pt-14 sm:pt-16">
-            <h2 id="plus-title" class="heading max-w-2xl text-2xl sm:text-3xl">Kelebihan berbelanja di <span class="text-orange-500">{{ $site['site_name'] }}</span></h2>
-            @php
-                $perks = [
-                    ['Produk lengkap', 'Rangkaian produk untuk kedai dan roastery Anda.', 'M3 9l1.5-5h15L21 9M4 9v11h16V9M9 20v-6h6v6'],
-                    ['Lacak pengiriman', 'Pantau status pesanan langsung dari akun Anda.', 'M3 7h11v9H3zM14 10h4l3 3v3h-7M7 19a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM17 19a1.5 1.5 0 100-3 1.5 1.5 0 000 3z'],
-                    ['Ongkir otomatis', 'Ongkos kirim dihitung sesuai alamat tujuan.', 'M3 7h18v12H3zM3 7l2-3h14l2 3M16 13h2'],
-                    ['Retur mudah', 'Ajukan retur langsung dari akun, tanpa ribet.', 'M4 12a8 8 0 018-8 8 8 0 016 2.6M20 4v4h-4M20 12a8 8 0 01-8 8 8 8 0 01-6-2.6M4 20v-4h4'],
-                    ['Garansi & suku cadang', 'Jaminan perawatan dan perbaikan suku cadang.', 'M12 15a6 6 0 100-12 6 6 0 000 12zM8.5 14l-1.5 7 5-3 5 3-1.5-7'],
-                    ['Konsultasi gratis', 'Kami bantu pilih produk yang tepat untuk bisnis Anda.', 'M4 14v-2a8 8 0 0116 0v2M4 14h3v5H5a1 1 0 01-1-1zM20 14h-3v5h2a1 1 0 001-1zM17 19c0 1.5-2 2-5 2'],
-                ];
-            @endphp
-            <dl class="mt-10 grid gap-x-12 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-                @foreach($perks as [$title, $text, $icon])
-                    <div class="flex gap-4">
-                        <svg class="mt-0.5 h-6 w-6 shrink-0 text-orange-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ $icon }}"/></svg>
-                        <div>
-                            <dt class="font-semibold text-stone-900">{{ $title }}</dt>
-                            <dd class="mt-1.5 text-[15px] leading-relaxed text-stone-600">{{ $text }}</dd>
-                        </div>
-                    </div>
-                @endforeach
-            </dl>
-        </div>
+    <section class="container-x {{ $featured->isEmpty() ? 'pt-14' : '' }} pb-4" aria-labelledby="plus-title">
+        <h2 id="plus-title" class="heading mb-6 text-2xl sm:text-3xl">Kelebihan berbelanja di <span class="text-orange-500">{{ $site['site_name'] }}</span></h2>
+        @php
+            $perks = [
+                ['Rangkaian produk lengkap untuk kedai dan roastery Anda.', 'M3 9l1.5-5h15L21 9M4 9v11h16V9M9 20v-6h6v6'],
+                ['Lacak pengiriman pesanan langsung dari akun Anda.', 'M3 7h11v9H3zM14 10h4l3 3v3h-7M7 19a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM17 19a1.5 1.5 0 100-3 1.5 1.5 0 000 3z'],
+                ['Ongkir dihitung otomatis sesuai alamat tujuan.', 'M3 7h18v12H3zM3 7l2-3h14l2 3M16 13h2'],
+                ['Ajukan retur langsung dari akun, tanpa ribet.', 'M4 12a8 8 0 018-8 8 8 0 016 2.6M20 4v4h-4M20 12a8 8 0 01-8 8 8 8 0 01-6-2.6M4 20v-4h4'],
+                ['Jaminan garansi perawatan dan perbaikan suku cadang.', 'M12 15a6 6 0 100-12 6 6 0 000 12zM8.5 14l-1.5 7 5-3 5 3-1.5-7'],
+                ['Tersedia paket bundle yang lebih hemat dan memudahkan Anda berbelanja.', 'M21 8l-9-5-9 5v8l9 5 9-5zM3 8l9 5 9-5M12 13v8'],
+                ['Konsultasi gratis untuk mendapatkan produk yang tepat untuk bisnis Anda.', 'M4 14v-2a8 8 0 0116 0v2M4 14h3v5H5a1 1 0 01-1-1zM20 14h-3v5h2a1 1 0 001-1zM17 19c0 1.5-2 2-5 2'],
+            ];
+        @endphp
+        <x-rail>
+            @foreach($perks as [$text, $icon])
+                <div class="w-[240px] shrink-0 snap-start rounded-2xl border border-stone-200 bg-white p-5 text-stone-800 sm:w-[calc(25%-12px)]">
+                    <svg class="h-8 w-8 text-orange-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ $icon }}"/></svg>
+                    <p class="mt-4 text-[15px] font-medium leading-snug">{{ $text }}</p>
+                </div>
+            @endforeach
+        </x-rail>
     </section>
 @else
     <div class="border-b border-stone-200 bg-white">
