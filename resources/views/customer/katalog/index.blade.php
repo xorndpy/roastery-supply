@@ -24,51 +24,31 @@
         <h1 class="sr-only">Toko {{ $site['site_name'] }}: lengkapi kedai kopi Anda dari satu toko.</h1>
     </section>
 
-    {{-- KATEGORI: kartu kategori tepat di bawah hero (klik -> halaman kategori) --}}
+    {{-- KATEGORI: baris ikon ringkas (gaya Toffin) tepat di bawah hero --}}
     @if($categoryCards->isNotEmpty())
-        <section class="container-x pt-14" aria-labelledby="kategori-title">
-            <div class="mb-6">
-                <h2 id="kategori-title" class="heading text-2xl sm:text-3xl"><span class="text-orange-500">Kategori.</span> Temukan kebutuhan kedai Anda.</h2>
-            </div>
-            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+        <section class="container-x pt-10" aria-label="Kategori">
+            <div class="flex flex-wrap justify-center gap-x-4 gap-y-6 sm:gap-x-7">
                 @foreach($categoryCards as $c)
-                    <a href="{{ route('products.index', ['category' => $c->slug]) }}"
-                       class="group relative isolate flex aspect-[4/3] items-end overflow-hidden rounded-2xl bg-[#26180f] p-4 text-white ring-1 ring-stone-200 transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-stone-900/10 sm:p-5">
-                        @if(!empty($c->image))
-                            <img src="{{ media_url($c->image) }}" alt="" loading="lazy" class="absolute inset-0 -z-20 h-full w-full object-cover transition duration-500 group-hover:scale-105">
-                            <div class="absolute inset-0 -z-10 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
-                        @else
-                            <div class="absolute inset-0 -z-20 bg-gradient-to-br from-[#35200f] to-[#1a0f0a]"></div>
-                            <div class="auth-beans absolute inset-0 -z-10"></div>
-                        @endif
-                        <div>
-                            <div class="heading text-lg leading-tight sm:text-xl">{{ $c->name }}</div>
-                            <div class="mt-0.5 text-xs text-stone-200">{{ $c->products_count }} produk</div>
+                    @php $cardImg = $c->card_image ?? $c->image ?? null; @endphp
+                    <a href="{{ route('products.index', ['category' => $c->slug]) }}" class="group w-[84px] text-center sm:w-[112px]">
+                        <div class="relative isolate mx-auto flex aspect-square items-center justify-center overflow-hidden rounded-2xl bg-white p-2.5 ring-1 ring-stone-200 transition group-hover:shadow-md group-hover:ring-orange-400">
+                            @if($cardImg)
+                                <img src="{{ media_url($cardImg) }}" alt="" loading="lazy" class="h-full w-full object-contain transition duration-300 group-hover:scale-105">
+                            @else
+                                <div class="absolute inset-0 -z-10 bg-gradient-to-br from-[#35200f] to-[#1a0f0a]"></div>
+                                <div class="auth-beans absolute inset-0 -z-10"></div>
+                            @endif
                         </div>
+                        <span class="mt-2 block text-[13px] font-medium leading-tight text-stone-800 transition group-hover:text-orange-600">{{ $c->name }}</span>
                     </a>
                 @endforeach
             </div>
         </section>
     @endif
 
-    {{-- TERBARU --}}
-    @if($latest->isNotEmpty())
-        <section class="container-x pt-14" aria-labelledby="terbaru-title">
-            <div class="mb-6 flex items-end justify-between gap-4">
-                <h2 id="terbaru-title" class="heading text-2xl sm:text-3xl"><span class="text-orange-500">Terbaru.</span> Temukan sekarang.</h2>
-                <a href="#semua" class="hidden text-sm font-medium text-orange-700 hover:underline sm:block">Lihat semua →</a>
-            </div>
-            <x-rail>
-                @foreach($latest as $product)
-                    <div class="w-[176px] shrink-0 snap-start sm:w-[230px] lg:w-[250px]"><x-product-card :product="$product" /></div>
-                @endforeach
-            </x-rail>
-        </section>
-    @endif
-
     {{-- SOROTAN (slider produk unggulan) --}}
     @if($featured->isNotEmpty())
-        <section class="container-x py-16 sm:py-20" aria-label="Produk unggulan"
+        <section class="container-x pb-16 pt-14 sm:pb-20" aria-label="Produk unggulan"
                  x-data="{ i: 0, n: {{ $featured->count() }}, timer: null,
                            next() { this.i = (this.i + 1) % this.n },
                            play() { if (this.n > 1) this.timer = setInterval(() => this.next(), 6000) },

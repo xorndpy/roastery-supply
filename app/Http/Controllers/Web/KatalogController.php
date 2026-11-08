@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Models\Category;
 use App\Models\Brand;
 use Illuminate\Http\Request;
@@ -94,6 +95,16 @@ class KatalogController extends Controller
                 ->each(fn ($c) => $c->products_count += $c->children->sum('products_count'))
                 ->filter(fn ($c) => $c->products_count > 0)
                 ->sortByDesc('products_count')->values()->take(12);
+            // Kategori tanpa foto sendiri memakai foto produk pertamanya (termasuk sub-kategori).
+            $categoryCards->each(function ($cat) {
+                if (! empty($cat->image)) {
+                    $cat->card_image = $cat->image;
+                    return;
+                }
+                $ids = $cat->children->pluck('id')->push($cat->id);
+                $cat->card_image = ProductImage::whereIn('product_id', Product::where('is_active', true)->whereIn('category_id', $ids)->select('id'))
+                    ->orderByDesc('is_primary')->orderBy('sort_order')->value('image');
+            });
             $featured = Product::where('is_active', true)->where('is_featured', true)
                 ->with(['category', 'brand', 'images'])->latest()->take(6)->get();
             $latest = Product::where('is_active', true)
