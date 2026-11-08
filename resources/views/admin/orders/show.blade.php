@@ -189,23 +189,7 @@
             {{-- Ship --}}
             @can('manage_shipments')
             @if(in_array($order->status, ['dikonfirmasi', 'diproses']))
-                <form method="POST" action="{{ route('admin.orders.ship', $order->id) }}" class="mb-3 space-y-3">
-                    @csrf
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Kurir *</label>
-                        <input type="text" name="courier" placeholder="JNE, J&T, SiCepat..." required
-                               class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">No. Resi *</label>
-                        <input type="text" name="tracking_number" required
-                               class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm">
-                    </div>
-                    <button type="submit"
-                            class="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-3 rounded-lg font-medium transition">
-                        Kirim Pesanan
-                    </button>
-                </form>
+                @include('admin.orders._ship-form', ['order' => $order])
             @endif
             @endcan
 

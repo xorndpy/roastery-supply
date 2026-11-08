@@ -57,6 +57,15 @@ class ShipmentController extends Controller
             'tracking_number' => 'required|string|max:100',
         ]);
 
+        $resi = \App\Support\Couriers::normalizeResi($validated['tracking_number']);
+        if (! \App\Support\Couriers::validResi($resi)) {
+            return back()->withErrors(['tracking_number' => 'Nomor resi tidak valid. Gunakan huruf/angka saja (4-40 karakter).'])->withInput();
+        }
+        if ($used = \App\Support\Couriers::usedByOtherOrder($validated['courier'], $resi, $shipment->order_id)) {
+            return back()->withErrors(['tracking_number' => "Resi ini sudah dipakai di pesanan {$used}."])->withInput();
+        }
+        $validated['tracking_number'] = $resi;
+
         $shipment->update($validated);
 
         return back()->with('success', 'Data pengiriman diperbarui.');

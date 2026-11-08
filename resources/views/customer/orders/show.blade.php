@@ -242,8 +242,18 @@
         <div class="bg-white rounded-lg border border-stone-200 p-6 mb-6">
             <h2 class="font-bold mb-4">Info Pengiriman</h2>
             <div class="text-sm space-y-2">
-                <div><span class="text-stone-500">Kurir:</span> {{ $order->shipment->courier ?? '-' }}</div>
-                <div><span class="text-stone-500">No. Resi:</span> <strong>{{ $order->shipment->tracking_number }}</strong></div>
+                <div><span class="text-stone-500">Kurir:</span> {{ $order->shipment->courier ?? '-' }}{{ $order->shipment->service ? ' (' . $order->shipment->service . ')' : '' }}</div>
+                <div class="flex flex-wrap items-center gap-2" x-data="{ copied: false }">
+                    <span class="text-stone-500">No. Resi:</span> <strong class="font-mono">{{ $order->shipment->tracking_number }}</strong>
+                    <button type="button" class="rounded border border-stone-300 px-2 py-0.5 text-xs hover:bg-stone-50"
+                            @click="navigator.clipboard?.writeText(@js($order->shipment->tracking_number)); copied = true; setTimeout(() => copied = false, 1800)"
+                            x-text="copied ? 'Tersalin ✓' : 'Salin resi'">Salin resi</button>
+                </div>
+                @if($order->shipment->shipped_at)
+                    <div><span class="text-stone-500">Dikirim:</span> {{ $order->shipment->shipped_at->copy()->timezone('Asia/Jakarta')->locale('id')->translatedFormat('j F Y') }}</div>
+                @endif
+                <a href="{{ config('couriers.tracker_url') }}" target="_blank" rel="noopener noreferrer"
+                   class="inline-block text-sm text-orange-700 underline">Lacak paket di situs cek resi →</a>
             </div>
         </div>
     @endif

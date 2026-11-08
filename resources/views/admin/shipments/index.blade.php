@@ -37,8 +37,8 @@
                 <th class="px-4 py-3">Pesanan</th>
                 <th class="px-4 py-3">Tujuan</th>
                 <th class="px-4 py-3">Barang</th>
-                <th class="px-4 py-3">Status</th>
-                <th class="px-4 py-3"></th>
+                <th class="px-4 py-3">Pilihan pelanggan</th>
+                <th class="px-4 py-3">Kurir &amp; resi</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-stone-100">
@@ -53,9 +53,13 @@
                     <div class="text-xs text-stone-500 max-w-xs">{{ $o->full_shipping_address ?: ($o->customer->address ?? '-') }}</div>
                 </td>
                 <td class="px-4 py-3">{{ $o->items->sum('quantity') }} unit</td>
-                <td class="px-4 py-3 capitalize">{{ $o->status }}</td>
-                <td class="px-4 py-3 text-right">
-                    <a href="{{ route('admin.orders.show', $o->id) }}" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-1.5 rounded-lg text-xs">Input Resi</a>
+                <td class="px-4 py-3 text-xs">
+                    <div class="font-medium text-stone-800">{{ $o->shipping_method ?: '-' }}</div>
+                    @if($o->shipping_etd)<div class="text-stone-500">estimasi {{ $o->shipping_etd }}</div>@endif
+                    <a href="{{ route('admin.orders.show', $o->id) }}" class="text-orange-600 hover:underline">Detail</a>
+                </td>
+                <td class="px-4 py-3">
+                    @include('admin.orders._ship-form', ['order' => $o, 'compact' => true])
                 </td>
             </tr>
         @empty

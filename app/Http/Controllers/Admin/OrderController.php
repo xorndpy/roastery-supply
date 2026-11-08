@@ -94,15 +94,44 @@ class OrderController extends Controller
     {
         $validated = $request->validate([
             'courier' => 'required|string|max:100',
+            'courier_other' => 'nullable|string|max:100|required_if:courier,__other',
             'service' => 'nullable|string|max:100',
             'tracking_number' => 'required|string|max:100',
             'cost' => 'nullable|numeric|min:0',
+        ], [
+            'courier.required' => 'Pilih kurir.',
+            'courier_other.required_if' => 'Isi nama kurir.',
+            'tracking_number.required' => 'Nomor resi wajib diisi.',
         ]);
+
+        // "Lainnya" -> pakai nama yang diketik; resi dirapikan (huruf besar, tanpa spasi) lalu dicek.
+        $validated['courier'] = $validated['courier'] === '__other' ? trim($validated['courier_other']) : $validated['courier'];
+        unset($validated['courier_other']);
+        $validated['tracking_number'] = $this->cleanResi($validated['courier'], $validated['tracking_number'], $order->id);
 
         return $this->run(
             fn () => $this->orders->ship($order, $validated),
             'Resi berhasil diinput. Pesanan sedang dikirim.'
         );
+    }
+
+    /** Rapikan & periksa nomor resi: format wajar dan belum dipakai pesanan lain. */
+    private function cleanResi(string $courier, string $resi, ?int $orderId): string
+    {
+        $resi = \App\Support\Couriers::normalizeResi($resi);
+
+        if (! \App\Support\Couriers::validResi($resi)) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'tracking_number' => 'Nomor resi tidak valid. Gunakan huruf/angka saja (4-40 karakter), tanpa spasi.',
+            ]);
+        }
+        if ($used = \App\Support\Couriers::usedByOtherOrder($courier, $resi, $orderId)) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'tracking_number' => "Resi ini sudah dipakai di pesanan {$used}. Periksa lagi agar tidak tertukar.",
+            ]);
+        }
+
+        return $resi;
     }
 
     public function complete(Order $order)
