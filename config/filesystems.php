@@ -30,7 +30,22 @@ return [
 
     'disks' => [
 
-        'local' => [
+        // Variabel R2_* juga cocok untuk penyimpanan lain yang kompatibel S3 (mis. Supabase Storage); isi R2_REGION sesuai penyedia.
+        // Bila R2_PRIVATE_BUCKET / R2_BUCKET diisi, file upload disimpan di Cloudflare R2 (awet,
+        // tidak hilang saat redeploy). Kalau kosong, otomatis kembali ke disk lokal seperti biasa.
+
+        // PRIVAT: bukti bayar & foto retur. Bucket ini JANGAN dibuka publik.
+        'local' => env('R2_PRIVATE_BUCKET') ? [
+            'driver' => 's3',
+            'key' => env('R2_ACCESS_KEY_ID'),
+            'secret' => env('R2_SECRET_ACCESS_KEY'),
+            'region' => env('R2_REGION', 'auto'),
+            'bucket' => env('R2_PRIVATE_BUCKET'),
+            'endpoint' => env('R2_ENDPOINT'),
+            'use_path_style_endpoint' => true,
+            'throw' => true,
+            'report' => false,
+        ] : [
             'driver' => 'local',
             'root' => storage_path('app/private'),
             'serve' => true,
@@ -38,7 +53,19 @@ return [
             'report' => false,
         ],
 
-        'public' => [
+        // PUBLIK: foto produk, logo, banner, artikel. R2 tidak mendukung ACL, jadi 'visibility' sengaja tidak diisi.
+        'public' => env('R2_BUCKET') ? [
+            'driver' => 's3',
+            'key' => env('R2_ACCESS_KEY_ID'),
+            'secret' => env('R2_SECRET_ACCESS_KEY'),
+            'region' => env('R2_REGION', 'auto'),
+            'bucket' => env('R2_BUCKET'),
+            'endpoint' => env('R2_ENDPOINT'),
+            'url' => rtrim((string) env('R2_PUBLIC_URL'), '/'),
+            'use_path_style_endpoint' => true,
+            'throw' => true,
+            'report' => false,
+        ] : [
             'driver' => 'local',
             'root' => storage_path('app/public'),
             'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
