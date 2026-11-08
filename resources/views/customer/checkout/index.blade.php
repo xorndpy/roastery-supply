@@ -16,7 +16,7 @@
     @endif
 
     <form method="POST" action="{{ route('customer.checkout.store') }}"
-          x-data="checkoutForm(@js(['shippingUrl' => route('customer.checkout.shipping'), 'cityId' => old('city_id', $customer->city_id ?? null), 'methodId' => old('shipping_method_id'), 'base' => (int) $afterDiscount, 'configured' => $shippingConfigured]))"
+          x-data="checkoutForm(@js(['shippingUrl' => route('customer.checkout.shipping'), 'cityId' => old('city_id', $customer->city_id ?? null), 'methodId' => old('shipping_method_id'), 'base' => (int) $afterDiscount, 'configured' => $shippingConfigured, 'postal' => old('postal_code', $customer->postal_code ?? '')]))"
           @city-changed="onCity($event.detail)">
         @csrf
         <input type="hidden" name="idempotency_key" value="{{ $idempotencyKey }}">
@@ -59,7 +59,7 @@
 
                     <div class="mt-4 md:w-1/2">
                         <label class="block text-sm font-medium mb-2">Kode Pos *</label>
-                        <input type="text" name="postal_code" inputmode="numeric" maxlength="5" pattern="[0-9]{5}"
+                        <input type="text" name="postal_code" @input="onPostal($event.target.value)" inputmode="numeric" maxlength="5" pattern="[0-9]{5}"
                                value="{{ old('postal_code', $customer->postal_code ?? '') }}" required
                                class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-orange-500 focus:border-orange-500">
                         @error('postal_code') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
@@ -209,6 +209,7 @@
         return {
             cityId: cfg.cityId || '',
             methodId: cfg.methodId || '',
+            postal: cfg.postal || '',
             methods: [],
             loading: false,
             message: '',
@@ -224,13 +225,14 @@
             get selected() { return this.methods.find(m => String(m.id) === String(this.methodId)) || null; },
             get total() { return this.base + (this.selected ? this.selected.cost : 0); },
             rp(n) { return 'Rp ' + Number(n).toLocaleString('id-ID'); },
+            onPostal(v) { this.postal = v; if (v.length === 5) this.loadOptions(); },
             onCity(id) { this.cityId = id || ''; this.loadOptions(); },
             async loadOptions() {
                 if (!this.configured) return;
                 if (!this.cityId) { this.methods = []; this.methodId = ''; this.message = ''; return; }
                 this.loading = true; this.message = '';
                 try {
-                    const res = await fetch(cfg.shippingUrl + '?city_id=' + encodeURIComponent(this.cityId), { headers: { 'Accept': 'application/json' } });
+                    const res = await fetch(cfg.shippingUrl + '?city_id=' + encodeURIComponent(this.cityId) + '&postal_code=' + encodeURIComponent(this.postal), { headers: { 'Accept': 'application/json' } });
                     const data = await res.json();
                     this.methods = data.options || [];
                     this.message = this.methods.length ? '' : (data.message || 'Layanan pengiriman belum tersedia.');

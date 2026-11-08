@@ -90,7 +90,7 @@ class CheckoutController extends Controller
             }
         }
 
-        $options = $this->shipping->options($city, $this->shipping->totalWeight($cart), $total - $discount);
+        $options = $this->shipping->options($city, $this->shipping->totalWeight($cart), $total - $discount, $request->query('postal_code'));
 
         return response()->json([
             'options' => $options,
@@ -136,7 +136,7 @@ class CheckoutController extends Controller
             'province_id' => 'required|integer|exists:provinces,id',
             'city_id' => ['required', 'integer', Rule::exists('cities', 'id')->where('province_id', $request->input('province_id'))],
             'postal_code' => 'required|digits:5',
-            'shipping_method_id' => [Rule::requiredIf(fn () => $this->shipping->configured()), 'nullable', 'integer'],
+            'shipping_method_id' => [Rule::requiredIf(fn () => $this->shipping->configured()), 'nullable', 'string', 'max:60'],
             'note' => 'nullable|string',
         ], [
             'city_id.exists' => 'Kota tidak sesuai dengan provinsi yang dipilih.',
@@ -234,7 +234,7 @@ class CheckoutController extends Controller
         $weight = $this->shipping->totalWeight($cart);
         $quote = null;
         if ($this->shipping->configured()) {
-            $quote = $this->shipping->quote((int) $data['shipping_method_id'], $city, $weight, $subtotal - $discount);
+            $quote = $this->shipping->quote($data['shipping_method_id'], $city, $weight, $subtotal - $discount, $data['postal_code']);
             if (!$quote) {
                 throw new ShippingUnavailable('Layanan pengiriman yang dipilih tidak tersedia untuk tujuan ini. Silakan pilih ulang.');
             }
