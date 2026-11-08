@@ -63,12 +63,28 @@ class KatalogController extends Controller
             ->values();
         $brands = Brand::where('is_active', true)->get();
 
+        // Halaman kategori: banner + chip sub-kategori (anak dari kategori ini, atau saudara kalau ini sudah sub-kategori).
+        $currentCategory = null;
+        $subCategories = collect();
+        if ($request->filled('category')) {
+            $currentCategory = Category::where('is_active', true)->where('slug', $request->category)
+                ->with(['parent', 'children' => fn ($q) => $q->where('is_active', true)->withCount($wc)->orderBy('name')])
+                ->first();
+            if ($currentCategory) {
+                $subCategories = $currentCategory->children->isNotEmpty()
+                    ? $currentCategory->children
+                    : ($currentCategory->parent_id
+                        ? Category::where('is_active', true)->where('parent_id', $currentCategory->parent_id)->withCount($wc)->orderBy('name')->get()
+                        : collect());
+                $subCategories = $subCategories->filter(fn ($sc) => $sc->products_count > 0)->values();
+            }
+        }
+
         // Beranda toko (tanpa filter, halaman 1): hero kategori + terbaru + sorotan.
         $landing = !array_filter($request->except('page', 'sort')) && (int) $request->query('page', 1) <= 1;
         $categoryCards = collect();
         $featured = collect();
         $latest = collect();
-        $brandCards = collect();
         if ($landing) {
             $withCount = ['products' => fn ($q) => $q->where('is_active', true)];
             $categoryCards = Category::where('is_active', true)->whereNull('parent_id')
@@ -82,13 +98,9 @@ class KatalogController extends Controller
                 ->with(['category', 'brand', 'images'])->latest()->take(6)->get();
             $latest = Product::where('is_active', true)
                 ->with(['category', 'brand', 'images'])->latest()->take(10)->get();
-            // Merek di bawah hero: yang punya logo duluan, lalu urut nama.
-            $brandCards = Brand::where('is_active', true)
-                ->withCount(['products' => fn ($q) => $q->where('is_active', true)])
-                ->orderByRaw('logo is null')->orderBy('name')->take(12)->get();
         }
 
-        return view('customer.katalog.index', compact('products', 'categories', 'brands', 'landing', 'categoryCards', 'featured', 'latest', 'brandCards'));
+        return view('customer.katalog.index', compact('products', 'categories', 'brands', 'landing', 'categoryCards', 'featured', 'latest', 'currentCategory', 'subCategories'));
     }
 
     public function brands()
