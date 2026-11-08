@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
-use App\Models\ProductImage;
 use App\Models\Category;
+use App\Models\Banner;
 use App\Models\Brand;
 use Illuminate\Http\Request;
 
@@ -64,29 +64,15 @@ class KatalogController extends Controller
             ->values();
         $brands = Brand::where('is_active', true)->get();
 
-        // Halaman kategori: banner + chip sub-kategori (anak dari kategori ini, atau saudara kalau ini sudah sub-kategori).
-        $currentCategory = null;
-        $subCategories = collect();
-        if ($request->filled('category')) {
-            $currentCategory = Category::where('is_active', true)->where('slug', $request->category)
-                ->with(['parent', 'children' => fn ($q) => $q->where('is_active', true)->withCount($wc)->orderBy('name')])
-                ->first();
-            if ($currentCategory) {
-                $subCategories = $currentCategory->children->isNotEmpty()
-                    ? $currentCategory->children
-                    : ($currentCategory->parent_id
-                        ? Category::where('is_active', true)->where('parent_id', $currentCategory->parent_id)->withCount($wc)->orderBy('name')->get()
-                        : collect());
-                $subCategories = $subCategories->filter(fn ($sc) => $sc->products_count > 0)->values();
-            }
-        }
-
         // Beranda toko (tanpa filter, halaman 1): hero kategori + terbaru + sorotan.
         $landing = !array_filter($request->except('page', 'sort')) && (int) $request->query('page', 1) <= 1;
         $categoryCards = collect();
         $featured = collect();
         $latest = collect();
+        $promos = collect();
         if ($landing) {
+            // Foto promosi/penjualan: Admin > Banner > Tampil di "Katalog"
+            $promos = Banner::active()->forPlacement('katalog')->orderBy('sort_order')->orderBy('id')->take(6)->get();
             $withCount = ['products' => fn ($q) => $q->where('is_active', true)];
             $categoryCards = Category::where('is_active', true)->whereNull('parent_id')
                 ->withCount($withCount)
@@ -95,23 +81,13 @@ class KatalogController extends Controller
                 ->each(fn ($c) => $c->products_count += $c->children->sum('products_count'))
                 ->filter(fn ($c) => $c->products_count > 0)
                 ->sortByDesc('products_count')->values()->take(12);
-            // Kategori tanpa foto sendiri memakai foto produk pertamanya (termasuk sub-kategori).
-            $categoryCards->each(function ($cat) {
-                if (! empty($cat->image)) {
-                    $cat->card_image = $cat->image;
-                    return;
-                }
-                $ids = $cat->children->pluck('id')->push($cat->id);
-                $cat->card_image = ProductImage::whereIn('product_id', Product::where('is_active', true)->whereIn('category_id', $ids)->select('id'))
-                    ->orderByDesc('is_primary')->orderBy('sort_order')->value('image');
-            });
             $featured = Product::where('is_active', true)->where('is_featured', true)
                 ->with(['category', 'brand', 'images'])->latest()->take(6)->get();
             $latest = Product::where('is_active', true)
                 ->with(['category', 'brand', 'images'])->latest()->take(10)->get();
         }
 
-        return view('customer.katalog.index', compact('products', 'categories', 'brands', 'landing', 'categoryCards', 'featured', 'latest', 'currentCategory', 'subCategories'));
+        return view('customer.katalog.index', compact('products', 'categories', 'brands', 'landing', 'categoryCards', 'featured', 'latest', 'promos'));
     }
 
     public function brands()

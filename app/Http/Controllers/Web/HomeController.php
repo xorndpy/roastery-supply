@@ -25,7 +25,7 @@ class HomeController extends Controller
         $testimonials = $this->homeTestimonials();
 
         // scopeActive: aktif DAN dalam jadwal tayang (PRD 6.4 "Banner tampil sesuai jadwal")
-        $banners = Banner::active()->orderBy('sort_order')->orderBy('id')->take(2)->get();
+        $banners = Banner::active()->forPlacement('beranda')->orderBy('sort_order')->orderBy('id')->take(2)->get();
 
         try {
             $heroSlides = HeroSlide::active()->get();

@@ -29,6 +29,16 @@
     </div>
 
     <div>
+        <label class="block text-sm font-medium mb-1.5">Tampil di</label>
+        <select name="placement" class="w-full border border-stone-300 rounded-lg px-3 py-2">
+            @foreach(\App\Models\Banner::PLACEMENTS as $val => $label)
+                <option value="{{ $val }}" @selected(old('placement', $banner->placement ?? 'beranda') === $val)>{{ $label }}</option>
+            @endforeach
+        </select>
+        <p class="text-xs text-stone-500 mt-1">Beranda: banner lebar di bawah hero (maks. 2). Katalog: slider promo di atas halaman toko (maks. 6).</p>
+    </div>
+
+    <div>
         <label class="block text-sm font-medium mb-1.5">Link tujuan</label>
         <input type="text" name="link" value="{{ old('link', $banner->link) }}" placeholder="/katalog atau https://..." class="w-full border border-stone-300 rounded-lg px-3 py-2">
     </div>

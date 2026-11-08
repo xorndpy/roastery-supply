@@ -80,13 +80,17 @@ class BannerController extends Controller
             'image'      => ($creating ? 'required' : 'nullable') . '|image|mimes:jpg,jpeg,png,webp|max:4096',
             // hanya URL http(s) atau path internal: mencegah javascript: pada href
             'link'       => ['nullable', 'string', 'max:255', 'regex:/^(https?:\/\/|\/)/'],
+            'placement'  => 'nullable|in:beranda,katalog,semua',
             'sort_order' => 'nullable|integer|min:0|max:9999',
             'start_at'   => 'nullable|date',
             'end_at'     => 'nullable|date|after_or_equal:start_at',
         ], ['link.regex' => 'Link harus diawali http://, https:// atau /.']);
 
         $data['is_active'] = $request->boolean('is_active');
-        unset($data['image'] );
+        unset($data['image']);
+        if (empty($data['placement'])) {
+            unset($data['placement']); // buat baru: default beranda; edit: tidak berubah
+        }
 
         return $data;
     }

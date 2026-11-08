@@ -50,7 +50,7 @@ return [
             'hero_text'        => ['label' => 'Teks Pengantar Hero', 'type' => 'textarea', 'rows' => 3, 'max' => 300, 'default' => 'Espresso machine, grinder, dan perlengkapan barista dengan garansi resmi serta layanan sparepart.', 'help' => 'Kalimat di bawah judul besar di beranda.'],
             'home_intro_title' => ['label' => 'Beranda: Judul Perkenalan', 'type' => 'text', 'max' => 140, 'default' => 'Mitra peralatan kopi untuk usaha yang mengutamakan kualitas.'],
             'home_intro_body'  => ['label' => 'Beranda: Teks Perkenalan', 'type' => 'textarea', 'rows' => 4, 'max' => 600, 'default' => 'Kami menyediakan espresso machine, grinder, dan perlengkapan barista dari distributor resmi, lengkap dengan konsultasi, instalasi, dan layanan purna jual bagi kedai kopi serta roastery di Indonesia.'],
-            'header_bg'       => ['label' => 'Background Header Halaman', 'type' => 'image', 'help' => 'Satu foto untuk header Katalog, Kontak, FAQ, dan Cabang. Disarankan 1920 x 500 px (JPG/WEBP, ideal di bawah 300 KB, maks 2 MB). Kosongkan untuk memakai latar polos. Foto latar beranda diatur di menu Hero Beranda.'],
+            'header_bg'       => ['label' => 'Background Header Halaman', 'type' => 'image', 'help' => 'Satu foto untuk header Kontak, FAQ, dan Cabang. Disarankan 1920 x 500 px (JPG/WEBP, ideal di bawah 300 KB, maks 2 MB). Kosongkan untuk memakai latar polos. Foto latar beranda diatur di menu Hero Beranda.'],
             'about_header_bg' => ['label' => 'Foto Utama Halaman Tentang', 'type' => 'image', 'help' => 'Tampil di sisi kanan bagian atas halaman Tentang. Disarankan 1600 x 1000 px (JPG/WEBP, ideal di bawah 350 KB). Kosongkan untuk memakai pola biji kopi.'],
         ],
         'SEO' => [

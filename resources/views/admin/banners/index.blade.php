@@ -6,7 +6,7 @@
 
 <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
     <div>
-        <h1 class="text-2xl font-bold text-stone-900">Banner Beranda</h1>
+        <h1 class="text-2xl font-bold text-stone-900">Banner &amp; Promo</h1>
         <p class="text-sm text-stone-500 mt-1">Seret baris untuk mengatur urutan. Banner tayang sesuai jadwal.</p>
     </div>
     @can('create_banners')
@@ -26,7 +26,7 @@
         <span class="text-stone-400 select-none" aria-hidden="true">⋮⋮</span>
         <img src="{{ media_url($b->image) }}" alt="" class="w-40 h-20 object-cover rounded border border-stone-200">
         <div class="flex-1 min-w-0">
-            <div class="font-medium truncate">{{ $b->title }}</div>
+            <div class="font-medium truncate">{{ $b->title }} <span class="ml-1 rounded bg-stone-100 px-1.5 py-0.5 text-[11px] font-normal text-stone-600">{{ \App\Models\Banner::PLACEMENTS[$b->placement] ?? 'Beranda' }}</span></div>
             <div class="text-xs text-stone-500 mt-1">
                 @if($b->start_at || $b->end_at)
                     {{ $b->start_at?->format('d M Y H:i') ?? 'sekarang' }} → {{ $b->end_at?->format('d M Y H:i') ?? 'tanpa batas' }}

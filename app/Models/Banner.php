@@ -15,6 +15,7 @@ class Banner extends Model
         'title',
         'image',
         'link',
+        'placement',
         'sort_order',
         'start_at',
         'end_at',
@@ -29,6 +30,18 @@ class Banner extends Model
             'end_at' => 'datetime',
             'is_active' => 'boolean',
         ];
+    }
+
+    public const PLACEMENTS = [
+        'beranda' => 'Beranda',
+        'katalog' => 'Katalog',
+        'semua' => 'Beranda & Katalog',
+    ];
+
+    /** Banner untuk satu halaman ('semua' tayang di keduanya). */
+    public function scopeForPlacement(Builder $query, string $page): Builder
+    {
+        return $query->whereIn('placement', [$page, 'semua']);
     }
 
     /**
