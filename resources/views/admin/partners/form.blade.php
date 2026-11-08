@@ -19,7 +19,7 @@
     </div>
     <div>
         <label class="block text-sm font-medium mb-1.5">Logo {{ $isEdit ? '' : '*' }}</label>
-        @if($isEdit)<img src="{{ asset('storage/' . $partner->logo) }}" alt="" class="h-12 mb-2">@endif
+        @if($isEdit)<img src="{{ media_url($partner->logo) }}" alt="" class="h-12 mb-2">@endif
         <input type="file" name="logo" accept="image/jpeg,image/png,image/webp" {{ $isEdit ? '' : 'required' }} class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm">
     </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">

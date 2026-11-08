@@ -50,7 +50,7 @@
                     <h2 class="font-bold">Setujui</h2>
                     <div>
                         <label class="block text-sm mb-1.5">Nominal refund (Rp)</label>
-                        <input type="number" name="refund_amount" min="0" max="{{ (int) $order->total }}" value="{{ old('refund_amount', (int) $order->total) }}" class="w-full border border-stone-300 rounded-lg px-3 py-2">
+                        <input type="text" inputmode="numeric" data-rupiah name="refund_amount" min="0" max="{{ (int) $order->total }}" value="{{ old('refund_amount', (int) $order->total) }}" class="w-full border border-stone-300 rounded-lg px-3 py-2">
                         <p class="text-xs text-stone-500 mt-1">Maksimal total pesanan Rp {{ number_format($order->total, 0, ',', '.') }}.</p>
                     </div>
                     <label class="flex items-start gap-2 text-sm"><input type="checkbox" name="restock" value="1" class="mt-0.5"> <span>Barang layak jual, kembalikan ke stok</span></label>
@@ -89,7 +89,9 @@
     <div class="space-y-6">
         <div class="bg-white p-6 rounded-lg border border-stone-200 text-sm space-y-2">
             <h2 class="font-bold mb-2">Pesanan</h2>
+@can('view_finance')
             <div class="flex justify-between"><span class="text-stone-500">Total</span><span class="font-bold">Rp {{ number_format($order->total, 0, ',', '.') }}</span></div>
+@endcan
             <div class="flex justify-between"><span class="text-stone-500">Selesai</span><span>{{ $order->completed_at?->format('d M Y') ?? '-' }}</span></div>
             <div class="flex justify-between"><span class="text-stone-500">Diajukan</span><span>{{ $return->created_at->format('d M Y') }}</span></div>
             <div class="pt-2 border-t border-stone-100">{{ $order->shipping_name ?: ($order->customer->name ?? '-') }}</div>
@@ -99,12 +101,14 @@
             @can('view_orders')<a href="{{ route('admin.orders.show', $order->id) }}" class="inline-block pt-2 text-orange-600 hover:underline">Buka pesanan →</a>@endcan
         </div>
 
+        @can('view_finance')
         <div class="bg-white p-6 rounded-lg border border-stone-200 text-sm space-y-1">
             <h2 class="font-bold mb-2">Rekening refund</h2>
             <div>{{ $return->refund_bank }}</div>
             <div class="font-mono">{{ $return->refund_account_number }}</div>
             <div class="text-stone-600">a/n {{ $return->refund_account_name }}</div>
         </div>
+        @endcan
 
         @if($return->approved_at)
             <div class="bg-white p-6 rounded-lg border border-stone-200 text-sm space-y-1">
@@ -112,7 +116,9 @@
                 <div>{{ $return->status === 'approved' ? 'Disetujui' : 'Ditolak' }} oleh {{ $return->approvedBy->name ?? '-' }}</div>
                 <div class="text-stone-500">{{ $return->approved_at->format('d M Y H:i') }}</div>
                 @if($return->status === 'approved')
+@can('view_finance')
                     <div>Refund Rp {{ number_format($return->refund_amount, 0, ',', '.') }}</div>
+@endcan
                     <div>{{ $return->restocked ? 'Stok dikembalikan' : 'Stok tidak ditambah' }}</div>
                     @if($return->refunded_at)<div class="text-green-700">Refund selesai {{ $return->refunded_at->format('d M Y') }}</div>@endif
                 @endif

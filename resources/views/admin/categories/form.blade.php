@@ -80,7 +80,7 @@
 
                 @if($mode === 'edit' && $category->image)
                     <div class="mb-3">
-                        <img src="{{ asset('storage/' . $category->image) }}"
+                        <img src="{{ media_url($category->image) }}"
                              alt="{{ $category->name }}"
                              class="w-full rounded border border-stone-200">
                     </div>

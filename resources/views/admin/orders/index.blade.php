@@ -58,7 +58,9 @@
                 <th class="px-4 py-3 text-left font-medium text-stone-600">No. Pesanan</th>
                 <th class="px-4 py-3 text-left font-medium text-stone-600">Pelanggan</th>
                 <th class="px-4 py-3 text-left font-medium text-stone-600">Tanggal</th>
+@can('view_finance')
                 <th class="px-4 py-3 text-right font-medium text-stone-600">Total</th>
+@endcan
                 <th class="px-4 py-3 text-center font-medium text-stone-600">Status</th>
                 <th class="px-4 py-3 text-right font-medium text-stone-600">Aksi</th>
             </tr>
@@ -72,7 +74,9 @@
                         <div class="text-xs text-stone-500">{{ $order->customer->phone ?? '-' }}</div>
                     </td>
                     <td class="px-4 py-3 text-stone-600">{{ $order->created_at->format('d M Y, H:i') }}</td>
+@can('view_finance')
                     <td class="px-4 py-3 text-right font-medium">Rp {{ number_format($order->total, 0, ',', '.') }}</td>
+@endcan
                     <td class="px-4 py-3 text-center">
                         @php
                             $badges = [

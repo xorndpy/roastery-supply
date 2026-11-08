@@ -109,7 +109,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium mb-1.5">Harga (Rp) *</label>
-                        <input type="number" name="price" value="{{ old('price', $product->price) }}"
+                        <input type="text" inputmode="numeric" data-rupiah name="price" value="{{ old('price', $product->price) }}"
                                required min="0" step="1000"
                                class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-orange-500 focus:border-orange-500">
                         @error('price') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
@@ -147,24 +147,7 @@
                         <p class="text-xs text-stone-500 mt-1">Notifikasi muncul jika stok ≤ nilai ini.</p>
                     </div>
                 </div>
-            </div>
-
-            {{-- 3D Model --}}
-            <div class="bg-white p-6 rounded-lg border border-stone-200">
-                <h2 class="font-bold mb-4">Model 3D (Opsional)</h2>
-
-                @if($product->model_3d)
-                    <div class="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm">
-                        <div class="text-blue-800 font-medium">Model 3D sudah diunggah</div>
-                        <div class="text-blue-600 text-xs mt-1">{{ basename($product->model_3d) }}</div>
-                    </div>
-                @endif
-
-                <input type="file" name="model_3d" accept=".glb,.gltf"
-                       class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm">
-                <p class="text-xs text-stone-500 mt-1">Format: .glb atau .gltf. Max 10MB.</p>
-                @error('model_3d') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-            </div>
+            </div>
         </div>
 
         {{-- RIGHT: Sidebar --}}
@@ -183,7 +166,7 @@
                                 <label class="relative group cursor-pointer">
                                     <input type="checkbox" name="keep_images[]" value="{{ $image->id }}"
                                            class="absolute top-1 left-1 z-10 w-4 h-4" checked>
-                                    <img src="{{ asset('storage/' . $image->image) }}"
+                                    <img src="{{ media_url($image->image) }}"
                                          alt="Image"
                                          class="w-full h-24 object-cover rounded border border-stone-200">
                                     @if($image->is_primary)
@@ -231,8 +214,8 @@
                                {{ old('is_featured', $product->is_featured ?? false) ? 'checked' : '' }}
                                class="w-4 h-4 text-orange-500 rounded">
                         <div>
-                            <div class="font-medium text-sm">Featured</div>
-                            <div class="text-xs text-stone-500">Tampil di home page</div>
+                            <div class="font-medium text-sm">Unggulan</div>
+                            <div class="text-xs text-stone-500">Tampil di sorotan beranda katalog</div>
                         </div>
                     </label>
                 </div>

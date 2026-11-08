@@ -10,10 +10,12 @@
         <h1 class="text-2xl font-bold text-stone-900">Katalog Produk</h1>
         <p class="text-sm text-stone-500 mt-1">Kelola produk, stok, dan status tayang.</p>
     </div>
-    <a href="{{ route('admin.products.create') }}"
+    @can('create_products')
+<a href="{{ route('admin.products.create') }}"
        class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-lg font-medium transition flex items-center gap-2">
         <span>+</span> Tambah Produk
     </a>
+@endcan
 </div>
 
 {{-- Stats --}}
@@ -145,7 +147,8 @@
                             @endif
                         </td>
                         <td class="px-4 py-3 text-center">
-                            <form method="POST" action="{{ route('admin.products.toggle-active', $product->id) }}" class="inline">
+                            @can('edit_products')
+<form method="POST" action="{{ route('admin.products.toggle-active', $product->id) }}" class="inline">
                                 @csrf
                                 @method('PATCH')
                                 <button type="submit"
@@ -154,14 +157,20 @@
                                     {{ $product->is_active ? 'Aktif' : 'Nonaktif' }}
                                 </button>
                             </form>
+@else
+<span class="text-xs px-2 py-1 rounded-full font-medium {{ $product->is_active ? 'bg-green-100 text-green-800' : 'bg-stone-100 text-stone-600' }}">{{ $product->is_active ? 'Aktif' : 'Nonaktif' }}</span>
+@endcan
                         </td>
                         <td class="px-4 py-3 text-right">
                             <div class="flex items-center justify-end gap-2">
-                                <a href="{{ route('admin.products.edit', $product->id) }}"
+                                @can('edit_products')
+<a href="{{ route('admin.products.edit', $product->id) }}"
                                    class="text-xs text-blue-600 hover:text-blue-800 font-medium">
                                     Edit
                                 </a>
-                                <form method="POST" action="{{ route('admin.products.destroy', $product->id) }}"
+@endcan
+                                @can('delete_products')
+<form method="POST" action="{{ route('admin.products.destroy', $product->id) }}"
                                       onsubmit="return confirm('Yakin hapus produk {{ $product->name }}?')">
                                     @csrf
                                     @method('DELETE')
@@ -169,6 +178,7 @@
                                         Hapus
                                     </button>
                                 </form>
+@endcan
                             </div>
                         </td>
                     </tr>
@@ -176,10 +186,12 @@
                     <tr>
                         <td colspan="7" class="px-4 py-16 text-center text-stone-500">
                             <p class="mb-3">Belum ada produk.</p>
-                            <a href="{{ route('admin.products.create') }}"
+                            @can('create_products')
+<a href="{{ route('admin.products.create') }}"
                                class="inline-block bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-lg text-sm font-medium">
                                 + Tambah Produk Pertama
                             </a>
+@endcan
                         </td>
                     </tr>
                 @endforelse

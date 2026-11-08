@@ -9,10 +9,12 @@
         <h1 class="text-2xl font-bold text-stone-900">Merek Produk</h1>
         <p class="text-sm text-stone-500 mt-1">Kelola merek mesin kopi.</p>
     </div>
-    <a href="{{ route('admin.brands.create') }}"
+    @can('create_brands')
+<a href="{{ route('admin.brands.create') }}"
        class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-lg font-medium transition">
         + Tambah Merek
     </a>
+@endcan
 </div>
 
 {{-- Stats --}}
@@ -99,7 +101,8 @@
                             </span>
                         </td>
                         <td class="px-4 py-3 text-center">
-                            <form method="POST" action="{{ route('admin.brands.toggle-active', $brand->id) }}" class="inline">
+                            @can('edit_brands')
+<form method="POST" action="{{ route('admin.brands.toggle-active', $brand->id) }}" class="inline">
                                 @csrf
                                 @method('PATCH')
                                 <button type="submit"
@@ -108,12 +111,18 @@
                                     {{ $brand->is_active ? 'Aktif' : 'Nonaktif' }}
                                 </button>
                             </form>
+@else
+<span class="text-xs px-2 py-1 rounded-full font-medium {{ $brand->is_active ? 'bg-green-100 text-green-800' : 'bg-stone-100 text-stone-600' }}">{{ $brand->is_active ? 'Aktif' : 'Nonaktif' }}</span>
+@endcan
                         </td>
                         <td class="px-4 py-3 text-right">
                             <div class="flex items-center justify-end gap-2">
-                                <a href="{{ route('admin.brands.edit', $brand->id) }}"
+                                @can('edit_brands')
+<a href="{{ route('admin.brands.edit', $brand->id) }}"
                                    class="text-xs text-blue-600 hover:text-blue-800 font-medium">Edit</a>
-                                <form method="POST" action="{{ route('admin.brands.destroy', $brand->id) }}"
+@endcan
+                                @can('delete_brands')
+<form method="POST" action="{{ route('admin.brands.destroy', $brand->id) }}"
                                       onsubmit="return confirm('Yakin hapus merek {{ $brand->name }}?')">
                                     @csrf
                                     @method('DELETE')
@@ -121,6 +130,7 @@
                                         Hapus
                                     </button>
                                 </form>
+@endcan
                             </div>
                         </td>
                     </tr>
@@ -128,10 +138,12 @@
                     <tr>
                         <td colspan="6" class="px-4 py-16 text-center text-stone-500">
                             <p class="mb-3">Belum ada merek.</p>
-                            <a href="{{ route('admin.brands.create') }}"
+                            @can('create_brands')
+<a href="{{ route('admin.brands.create') }}"
                                class="inline-block bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-lg text-sm font-medium">
                                 + Tambah Merek
                             </a>
+@endcan
                         </td>
                     </tr>
                 @endforelse

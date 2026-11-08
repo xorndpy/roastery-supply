@@ -9,10 +9,12 @@
         <h1 class="text-2xl font-bold text-stone-900">Kategori Produk</h1>
         <p class="text-sm text-stone-500 mt-1">Kelola kategori utama dan sub-kategori.</p>
     </div>
-    <a href="{{ route('admin.categories.create') }}"
+    @can('create_categories')
+<a href="{{ route('admin.categories.create') }}"
        class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-lg font-medium transition">
         + Tambah Kategori
     </a>
+@endcan
 </div>
 
 {{-- Stats --}}
@@ -101,7 +103,8 @@
                             </span>
                         </td>
                         <td class="px-4 py-3 text-center">
-                            <form method="POST" action="{{ route('admin.categories.toggle-active', $category->id) }}" class="inline">
+                            @can('edit_categories')
+<form method="POST" action="{{ route('admin.categories.toggle-active', $category->id) }}" class="inline">
                                 @csrf
                                 @method('PATCH')
                                 <button type="submit"
@@ -110,12 +113,18 @@
                                     {{ $category->is_active ? 'Aktif' : 'Nonaktif' }}
                                 </button>
                             </form>
+@else
+<span class="text-xs px-2 py-1 rounded-full font-medium {{ $category->is_active ? 'bg-green-100 text-green-800' : 'bg-stone-100 text-stone-600' }}">{{ $category->is_active ? 'Aktif' : 'Nonaktif' }}</span>
+@endcan
                         </td>
                         <td class="px-4 py-3 text-right">
                             <div class="flex items-center justify-end gap-2">
-                                <a href="{{ route('admin.categories.edit', $category->id) }}"
+                                @can('edit_categories')
+<a href="{{ route('admin.categories.edit', $category->id) }}"
                                    class="text-xs text-blue-600 hover:text-blue-800 font-medium">Edit</a>
-                                <form method="POST" action="{{ route('admin.categories.destroy', $category->id) }}"
+@endcan
+                                @can('delete_categories')
+<form method="POST" action="{{ route('admin.categories.destroy', $category->id) }}"
                                       onsubmit="return confirm('Yakin hapus kategori {{ $category->name }}?')">
                                     @csrf
                                     @method('DELETE')
@@ -123,6 +132,7 @@
                                         Hapus
                                     </button>
                                 </form>
+@endcan
                             </div>
                         </td>
                     </tr>
@@ -130,10 +140,12 @@
                     <tr>
                         <td colspan="6" class="px-4 py-16 text-center text-stone-500">
                             <p class="mb-3">Belum ada kategori.</p>
-                            <a href="{{ route('admin.categories.create') }}"
+                            @can('create_categories')
+<a href="{{ route('admin.categories.create') }}"
                                class="inline-block bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-lg text-sm font-medium">
                                 + Tambah Kategori
                             </a>
+@endcan
                         </td>
                     </tr>
                 @endforelse

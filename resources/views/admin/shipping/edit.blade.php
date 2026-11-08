@@ -73,8 +73,8 @@
             <p class="text-xs text-stone-500">Kosongkan kota untuk berlaku di seluruh provinsi. Memilih kota membuat pengecualian untuk kota itu. Jika tarif untuk wilayah ini sudah ada, nilainya diperbarui.</p>
             <x-region-select :required="false" />
             <div class="grid grid-cols-2 gap-3">
-                <div><label class="block text-xs mb-1">Tarif per kg (Rp) *</label><input type="number" name="rate_per_kg" min="0" step="500" required class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm"></div>
-                <div><label class="block text-xs mb-1">Minimum (Rp)</label><input type="number" name="min_charge" min="0" step="1000" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm"></div>
+                <div><label class="block text-xs mb-1">Tarif per kg (Rp) *</label><input type="text" inputmode="numeric" data-rupiah name="rate_per_kg" min="0" step="500" required class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm"></div>
+                <div><label class="block text-xs mb-1">Minimum (Rp)</label><input type="text" inputmode="numeric" data-rupiah name="min_charge" min="0" step="1000" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm"></div>
                 <div><label class="block text-xs mb-1">Estimasi min (hari)</label><input type="number" name="etd_min" min="1" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm"></div>
                 <div><label class="block text-xs mb-1">Estimasi maks (hari)</label><input type="number" name="etd_max" min="1" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm"></div>
             </div>
@@ -87,8 +87,8 @@
             <h2 class="font-bold">Isi semua provinsi</h2>
             <p class="text-xs text-stone-500">Cara cepat memulai: satu tarif untuk 38 provinsi, lalu ubah provinsi/kota tertentu di atas.</p>
             <div class="grid grid-cols-2 gap-3">
-                <div><label class="block text-xs mb-1">Tarif per kg (Rp) *</label><input type="number" name="rate_per_kg" min="0" step="500" required class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm"></div>
-                <div><label class="block text-xs mb-1">Minimum (Rp)</label><input type="number" name="min_charge" min="0" step="1000" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm"></div>
+                <div><label class="block text-xs mb-1">Tarif per kg (Rp) *</label><input type="text" inputmode="numeric" data-rupiah name="rate_per_kg" min="0" step="500" required class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm"></div>
+                <div><label class="block text-xs mb-1">Minimum (Rp)</label><input type="text" inputmode="numeric" data-rupiah name="min_charge" min="0" step="1000" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm"></div>
                 <div><label class="block text-xs mb-1">Estimasi min (hari)</label><input type="number" name="etd_min" min="1" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm"></div>
                 <div><label class="block text-xs mb-1">Estimasi maks (hari)</label><input type="number" name="etd_max" min="1" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm"></div>
             </div>

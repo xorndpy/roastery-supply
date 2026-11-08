@@ -77,14 +77,17 @@
                         <div>
                             <div class="font-medium">{{ $item->product_name }}</div>
                             <div class="text-sm text-stone-500">
-                                Rp {{ number_format($item->price, 0, ',', '.') }} × {{ $item->quantity }}
+                                @can('view_finance')Rp {{ number_format($item->price, 0, ',', '.') }} × @endcan{{ $item->quantity }}@cannot('view_finance') pcs@endcannot
                             </div>
                         </div>
+@can('view_finance')
                         <div class="font-medium">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</div>
+@endcan
                     </div>
                 @endforeach
             </div>
 
+            @can('view_finance')
             <div class="border-t border-stone-200 mt-4 pt-4 space-y-2">
                 <div class="flex justify-between text-sm">
                     <span class="text-stone-600">Subtotal</span>
@@ -105,10 +108,11 @@
                     <span class="text-orange-500">Rp {{ number_format($order->total, 0, ',', '.') }}</span>
                 </div>
             </div>
+            @endcan
         </div>
 
         {{-- Payment Proof --}}
-        @if($order->payment)
+        @if($order->payment && auth()->user()->can('view_finance'))
             <div class="bg-white p-6 rounded-lg border border-stone-200">
                 <h3 class="font-bold mb-4">Bukti Pembayaran</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

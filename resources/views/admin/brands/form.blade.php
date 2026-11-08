@@ -65,7 +65,7 @@
 
                 @if($mode === 'edit' && $brand->logo)
                     <div class="mb-3">
-                        <img src="{{ asset('storage/' . $brand->logo) }}"
+                        <img src="{{ media_url($brand->logo) }}"
                              alt="{{ $brand->name }}"
                              class="w-full h-32 object-contain rounded border border-stone-200 bg-stone-50 p-2">
                     </div>

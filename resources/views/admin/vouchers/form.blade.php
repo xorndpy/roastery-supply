@@ -56,20 +56,20 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div x-show="type === 'percentage'">
             <label class="block text-sm font-medium mb-1.5">Diskon maksimum (Rp)</label>
-            <input type="number" name="max_discount" min="0" value="{{ old('max_discount', $voucher->max_discount ? (int) $voucher->max_discount : '') }}" class="w-full border border-stone-300 rounded-lg px-3 py-2">
+            <input type="text" inputmode="numeric" data-rupiah name="max_discount" min="0" value="{{ old('max_discount', $voucher->max_discount ? (int) $voucher->max_discount : '') }}" class="w-full border border-stone-300 rounded-lg px-3 py-2">
             <p class="text-xs text-stone-500 mt-1">Batas atas potongan. Kosongkan jika tanpa batas.</p>
         </div>
         <div>
             <label class="block text-sm font-medium mb-1.5">Minimum belanja (Rp)</label>
-            <input type="number" name="min_purchase" min="0" value="{{ old('min_purchase', (int) $voucher->min_purchase) }}" class="w-full border border-stone-300 rounded-lg px-3 py-2">
+            <input type="text" inputmode="numeric" data-rupiah name="min_purchase" min="0" value="{{ old('min_purchase', (int) $voucher->min_purchase) }}" class="w-full border border-stone-300 rounded-lg px-3 py-2">
         </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
             <label class="block text-sm font-medium mb-1.5">Kuota total</label>
-            <input type="number" name="quota" min="0" value="{{ old('quota', $voucher->quota ?? 0) }}" class="w-full border border-stone-300 rounded-lg px-3 py-2">
-            <p class="text-xs text-stone-500 mt-1">0 = tanpa batas.</p>
+            <input type="number" name="quota" min="0" value="{{ old('quota', $voucher->exists ? $voucher->quota : 100) }}" class="w-full border border-stone-300 rounded-lg px-3 py-2">
+            <p class="text-xs text-stone-500 mt-1">0 = tanpa batas (hati-hati: voucher bisa dipakai tanpa habis).</p>
         </div>
         <div>
             <label class="block text-sm font-medium mb-1.5">Batas pakai per user</label>

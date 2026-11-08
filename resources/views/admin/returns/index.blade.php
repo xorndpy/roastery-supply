@@ -30,7 +30,7 @@
 
 <div class="bg-white rounded-lg border border-stone-200 overflow-x-auto">
     <table class="w-full text-sm">
-        <thead class="bg-stone-50 text-left text-stone-500"><tr><th class="px-4 py-3">Pesanan</th><th class="px-4 py-3">Customer</th><th class="px-4 py-3">Alasan</th><th class="px-4 py-3 text-right">Nominal</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Diajukan</th></tr></thead>
+        <thead class="bg-stone-50 text-left text-stone-500"><tr><th class="px-4 py-3">Pesanan</th><th class="px-4 py-3">Customer</th><th class="px-4 py-3">Alasan</th>@can('view_finance')<th class="px-4 py-3 text-right">Nominal</th>@endcan<th class="px-4 py-3">Status</th><th class="px-4 py-3">Diajukan</th></tr></thead>
         <tbody class="divide-y divide-stone-100">
         @forelse($returns as $r)
             @php
@@ -42,7 +42,9 @@
                 <td class="px-4 py-3"><a href="{{ route('admin.returns.show', $r->id) }}" class="font-mono font-medium text-orange-600 hover:underline">{{ $r->order->order_number }}</a></td>
                 <td class="px-4 py-3">{{ $r->order->shipping_name ?: ($r->order->customer->name ?? '-') }}</td>
                 <td class="px-4 py-3 text-stone-600">{{ $r->reason_label }}</td>
+@can('view_finance')
                 <td class="px-4 py-3 text-right">Rp {{ number_format($r->refund_amount, 0, ',', '.') }}</td>
+@endcan
                 <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-xs {{ $color }}">{{ $label }}</span></td>
                 <td class="px-4 py-3 text-stone-500">{{ $r->created_at->format('d M Y') }}</td>
             </tr>

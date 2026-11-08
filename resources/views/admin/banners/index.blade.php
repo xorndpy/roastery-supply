@@ -24,7 +24,7 @@
     @endphp
     <li draggable="true" data-id="{{ $b->id }}" class="bg-white p-4 rounded-lg border border-stone-200 flex items-center gap-4 cursor-move">
         <span class="text-stone-400 select-none" aria-hidden="true">⋮⋮</span>
-        <img src="{{ asset('storage/' . $b->image) }}" alt="" class="w-40 h-20 object-cover rounded border border-stone-200">
+        <img src="{{ media_url($b->image) }}" alt="" class="w-40 h-20 object-cover rounded border border-stone-200">
         <div class="flex-1 min-w-0">
             <div class="font-medium truncate">{{ $b->title }}</div>
             <div class="text-xs text-stone-500 mt-1">

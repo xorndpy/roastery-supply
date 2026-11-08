@@ -23,7 +23,7 @@
 
     <div>
         <label class="block text-sm font-medium mb-1.5">Gambar {{ $isEdit ? '' : '*' }}</label>
-        @if($isEdit)<img src="{{ asset('storage/' . $banner->image) }}" alt="" class="h-24 mb-2 rounded border border-stone-200">@endif
+        @if($isEdit)<img src="{{ media_url($banner->image) }}" alt="" class="h-24 mb-2 rounded border border-stone-200">@endif
         <input type="file" name="image" accept="image/jpeg,image/png,image/webp" {{ $isEdit ? '' : 'required' }} class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm">
         <p class="text-xs text-stone-500 mt-1">JPG/PNG/WEBP, maks 4 MB. Disarankan rasio lebar (mis. 1920×800).</p>
     </div>

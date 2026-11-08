@@ -32,7 +32,7 @@
     </div>
     <div>
         <label class="block text-sm font-medium mb-1.5">Foto (opsional)</label>
-        @if($testimonial->customer_photo)<img src="{{ asset('storage/' . $testimonial->customer_photo) }}" alt="" class="h-16 w-16 object-cover rounded-full mb-2">@endif
+        @if($testimonial->customer_photo)<img src="{{ media_url($testimonial->customer_photo) }}" alt="" class="h-16 w-16 object-cover rounded-full mb-2">@endif
         <input type="file" name="customer_photo" accept="image/jpeg,image/png,image/webp" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm">
     </div>
     <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="is_approved" value="1" @checked(old('is_approved', $testimonial->is_approved))> Tampilkan di website</label>

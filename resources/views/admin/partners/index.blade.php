@@ -18,7 +18,7 @@
         <tbody class="divide-y divide-stone-100">
         @forelse($partners as $p)
             <tr>
-                <td class="px-4 py-3"><img src="{{ asset('storage/' . $p->logo) }}" alt="{{ $p->name }}" class="h-10 max-w-[120px] object-contain"></td>
+                <td class="px-4 py-3"><img src="{{ media_url($p->logo) }}" alt="{{ $p->name }}" class="h-10 max-w-[120px] object-contain"></td>
                 <td class="px-4 py-3 font-medium">{{ $p->name }}</td>
                 <td class="px-4 py-3 text-stone-500 truncate max-w-[220px]">{{ $p->link ?: '-' }}</td>
                 <td class="px-4 py-3">{{ $p->sort_order }}</td>

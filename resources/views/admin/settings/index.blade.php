@@ -32,7 +32,7 @@
                                       class="w-full border border-stone-300 rounded-lg px-3 py-2">{{ $val }}</textarea>
                         @elseif($def['type'] === 'image')
                             @if(!empty($values[$key]))
-                                <img src="{{ asset('storage/' . $values[$key]) }}" alt="" class="h-16 mb-2 rounded border border-stone-200">
+                                <img src="{{ media_url($values[$key]) }}" alt="" class="h-16 mb-2 rounded border border-stone-200">
                                 <label class="flex items-center gap-2 text-xs text-stone-500 mb-2">
                                     <input type="checkbox" name="remove_{{ $key }}" value="1"> Hapus gambar ini
                                 </label>
