@@ -16,7 +16,7 @@ return [
             'view_stock', 'manage_stock',
         ],
         'Penjualan' => [
-            'view_orders', 'edit_orders', 'cancel_orders', 'download_invoices',
+            'view_orders', 'edit_orders', 'process_orders', 'complete_orders', 'cancel_orders', 'download_invoices', 'view_finance',
             'verify_payments', 'reject_payments', 'manage_shipments', 'view_shipping_rates', 'manage_shipping_rates',
             'view_returns', 'approve_returns', 'reject_returns',
         ],
@@ -28,6 +28,8 @@ return [
         ],
         'Konten (CMS)' => [
             'view_faqs', 'create_faqs', 'edit_faqs', 'delete_faqs',
+            'view_articles', 'create_articles', 'edit_articles', 'delete_articles',
+            'view_milestones', 'create_milestones', 'edit_milestones', 'delete_milestones',
             'view_partners', 'create_partners', 'edit_partners', 'delete_partners',
             'view_branches', 'create_branches', 'edit_branches', 'delete_branches',
             'view_settings', 'edit_settings',
@@ -49,5 +51,6 @@ return [
         'manage' => 'Kelola', 'verify' => 'Verifikasi', 'reject' => 'Tolak', 'approve' => 'Setujui',
         'cancel' => 'Batalkan', 'download' => 'Unduh', 'export' => 'Ekspor', 'reply' => 'Balas',
         'request' => 'Ajukan', 'import_export' => 'Impor/Ekspor',
+        'process' => 'Proses', 'complete' => 'Selesaikan',
     ],
 ];

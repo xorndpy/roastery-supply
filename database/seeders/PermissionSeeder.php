@@ -37,6 +37,8 @@ class PermissionSeeder extends Seeder
             'penjualan' => [
                 'view_orders',
                 'edit_orders',
+                'process_orders',
+                'complete_orders',
                 'cancel_orders',
                 'verify_payments',
                 'reject_payments',

@@ -50,6 +50,8 @@ class RolePermissionSeeder extends Seeder
                 'manage_stock',
                 'view_orders',
                 'edit_orders',
+                'process_orders',
+                'complete_orders',
                 'verify_payments',
                 'reject_payments',
                 'manage_shipments',
@@ -68,7 +70,7 @@ class RolePermissionSeeder extends Seeder
             $gudangRole->syncPermissions([
                 'view_products', 'view_categories', 'view_brands',
                 'view_stock', 'manage_stock',
-                'view_orders', 'edit_orders', 'manage_shipments',
+                'view_orders', 'process_orders', 'manage_shipments',
                 'view_returns',
             ]);
         }

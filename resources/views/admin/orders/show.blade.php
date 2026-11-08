@@ -77,7 +77,7 @@
                         <div>
                             <div class="font-medium">{{ $item->product_name }}</div>
                             <div class="text-sm text-stone-500">
-                                @can('view_finance')Rp {{ number_format($item->price, 0, ',', '.') }} × @endcan{{ $item->quantity }}@cannot('view_finance') pcs@endcannot
+                                @can('view_finance')Rp {{ number_format($item->price, 0, ',', '.') }} × @endcan{{ $item->quantity }}@cannot('view_finance') pcs @endcannot
                             </div>
                         </div>
 @can('view_finance')
@@ -161,6 +161,7 @@
             <h3 class="font-bold mb-4">Aksi</h3>
 
             {{-- Konfirmasi Pembayaran --}}
+            @can('verify_payments')
             @if($order->status === 'menunggu_bayar' && $order->payment && $order->payment->status === 'pending')
                 <form method="POST" action="{{ route('admin.orders.confirm-payment', $order->id) }}" class="mb-3">
                     @csrf
@@ -170,8 +171,10 @@
                     </button>
                 </form>
             @endif
+            @endcan
 
             {{-- Proses --}}
+            @can('process_orders')
             @if($order->status === 'dikonfirmasi')
                 <form method="POST" action="{{ route('admin.orders.process', $order->id) }}" class="mb-3">
                     @csrf
@@ -181,8 +184,10 @@
                     </button>
                 </form>
             @endif
+            @endcan
 
             {{-- Ship --}}
+            @can('manage_shipments')
             @if(in_array($order->status, ['dikonfirmasi', 'diproses']))
                 <form method="POST" action="{{ route('admin.orders.ship', $order->id) }}" class="mb-3 space-y-3">
                     @csrf
@@ -202,8 +207,10 @@
                     </button>
                 </form>
             @endif
+            @endcan
 
             {{-- Complete --}}
+            @can('complete_orders')
             @if($order->status === 'dikirim')
                 <form method="POST" action="{{ route('admin.orders.complete', $order->id) }}" class="mb-3">
                     @csrf
@@ -213,6 +220,7 @@
                     </button>
                 </form>
             @endif
+            @endcan
 
             {{-- Cancel --}}
             @if(in_array($order->status, ['menunggu_bayar', 'dikonfirmasi', 'diproses']))

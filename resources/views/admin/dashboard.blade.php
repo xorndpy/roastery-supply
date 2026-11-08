@@ -5,6 +5,8 @@
 @section('content')
 @php
     $user = auth()->user();
+    // Semua nominal uang (omzet, refund, grafik, total) hanya untuk yang punya view_finance.
+    $canFinance = $user->can('view_finance');
     $statusColors = ['menunggu_bayar' => '#d9a97a', 'dikonfirmasi' => '#a8643a', 'diproses' => '#734027', 'dikirim' => '#4a2f21', 'selesai' => '#5b7f4b', 'batal' => '#b3402f'];
     $rp = fn ($n) => 'Rp ' . number_format($n, 0, ',', '.');
 
@@ -76,6 +78,7 @@
 
         <section class="dash-hero dash-rise" style="--d:100ms" aria-labelledby="hero-title">
             <div class="dash-hero-top">
+                @if($canFinance)
                 <div>
                     <h2 id="hero-title" class="dash-hero-label">Pendapatan {{ $range }} hari terakhir</h2>
                     <p class="dash-hero-figure"><span data-count="{{ (int) $revenue }}" data-fmt="rp" data-delay="250" data-dur="1100">{{ $rp($revenue) }}</span></p>
@@ -91,6 +94,13 @@
                         @endif
                     </p>
                 </div>
+                @else
+                <div>
+                    <h2 id="hero-title" class="dash-hero-label">Pesanan {{ $range }} hari terakhir</h2>
+                    <p class="dash-hero-figure"><span>{{ number_format($orders) }}</span></p>
+                    <p class="dash-hero-delta"><span class="dash-hero-note">{{ $pendingOrders > 0 ? $pendingOrders . ' belum dibayar pelanggan' : 'Semua sudah dibayar' }}</span></p>
+                </div>
+                @endif
 
                 <dl class="dash-stats">
                     <div>
@@ -98,11 +108,13 @@
                         <dd><span data-count="{{ (int) $orders }}" data-delay="400" data-dur="800">{{ number_format($orders) }}</span></dd>
                         <dd class="sub">{{ $pendingOrders > 0 ? $pendingOrders . ' belum dibayar pelanggan' : 'Semua sudah dibayar' }}</dd>
                     </div>
+                    @if($canFinance)
                     <div>
                         <dt>Total keseluruhan</dt>
                         <dd class="is-money"><span>{{ $rp($totalRevenue) }}</span></dd>
                         <dd class="sub">{{ $totalRefund > 0 ? 'Sejak toko dibuka, setelah refund ' . $rp($totalRefund) : 'Sejak toko dibuka' }}</dd>
                     </div>
+                    @endif
                     <div>
                         <dt>Produk aktif</dt>
                         <dd><span data-count="{{ (int) $totalProducts }}" data-delay="480" data-dur="800">{{ number_format($totalProducts) }}</span></dd>
@@ -116,6 +128,7 @@
                 </dl>
             </div>
 
+            @if($canFinance)
             <div id="dashChart" class="dash-chart" tabindex="0" role="group"
                  aria-label="Grafik pendapatan harian {{ $range }} hari terakhir. Gunakan panah kiri dan kanan untuk menelusuri tiap hari."
                  data-dates='@json($chartDates)' data-values='@json($chartData)'></div>
@@ -125,6 +138,7 @@
                 <thead><tr><th>Tanggal</th><th>Pendapatan</th></tr></thead>
                 <tbody>@foreach($chartDates as $i => $d)<tr><td>{{ $d }}</td><td>{{ $rp($chartData[$i]) }}</td></tr>@endforeach</tbody>
             </table>
+            @endif
         </section>
 
         <section class="dash-card dash-queue dash-rise" style="--d:160ms" aria-labelledby="queue-title">
@@ -167,19 +181,19 @@
             <div class="dash-tablewrap overflow-x-auto">
                 <table class="dash-table">
                     <thead>
-                        <tr><th>No. pesanan</th><th>Pelanggan</th><th class="text-right">Total</th><th>Status</th><th class="text-right">Waktu</th></tr>
+                        <tr><th>No. pesanan</th><th>Pelanggan</th>@if($canFinance)<th class="text-right">Total</th>@endif<th>Status</th><th class="text-right">Waktu</th></tr>
                     </thead>
                     <tbody>
                         @forelse($recentOrders as $order)
                             <tr data-href="{{ route('admin.orders.show', $order->id) }}">
                                 <td><a href="{{ route('admin.orders.show', $order->id) }}" class="dash-order-no">{{ $order->order_number }}</a></td>
                                 <td class="is-name" title="{{ $order->customer->name ?? 'Guest' }}">{{ $order->customer->name ?? 'Guest' }}</td>
-                                <td class="text-right font-medium tabular-nums">{{ $rp($order->total) }}</td>
+                                @if($canFinance)<td class="text-right font-medium tabular-nums">{{ $rp($order->total) }}</td>@endif
                                 <td><span class="dash-badge" style="--c: {{ $statusColors[$order->status] ?? '#a8998b' }}"><i></i>{{ $order->status_label }}</span></td>
                                 <td class="text-right text-xs text-stone-500" title="{{ $order->created_at->copy()->timezone('Asia/Jakarta')->locale('id')->translatedFormat('j F Y, H:i') }} WIB">{{ $order->created_at->locale('id')->diffForHumans() }}</td>
                             </tr>
                         @empty
-                            <tr><td colspan="5" class="py-12 text-center text-stone-500">Belum ada pesanan.</td></tr>
+                            <tr><td colspan="{{ $canFinance ? 5 : 4 }}" class="py-12 text-center text-stone-500">Belum ada pesanan.</td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -244,7 +258,7 @@
                             <p class="text-xs text-stone-500">{{ $gp->methodLabel() }} · {{ $gp->updated_at->locale('id')->diffForHumans() }}</p>
                         </div>
                         <div class="shrink-0 text-right">
-                            <p class="text-sm font-medium tabular-nums">{{ $rp($gp->amount) }}</p>
+                            @if($canFinance)<p class="text-sm font-medium tabular-nums">{{ $rp($gp->amount) }}</p>@endif
                             <span class="dash-badge" style="--c: {{ ['verified' => '#5b7f4b', 'review' => '#b3402f', 'duplicate' => '#b3402f', 'expired' => '#a8998b'][$gp->status] ?? '#a8998b' }}"><i></i>{{ $gp->status === 'verified' ? 'Otomatis' : $gp->statusLabel() }}</span>
                         </div>
                     </li>
@@ -264,7 +278,7 @@
                         <div class="min-w-0 flex-1">
                             <div class="flex items-baseline justify-between gap-3"><span class="truncate text-sm font-medium">{{ $p->name }}</span><span class="shrink-0 text-xs text-stone-600 tabular-nums">{{ (int) $p->qty }} terjual</span></div>
                             <div class="dash-track"><div class="dash-fill dash-bar-fill" style="width: {{ $p->qty / $maxQty * 100 }}%; --d: {{ 460 + $i * 70 }}ms"></div></div>
-                            <p class="mt-1 text-xs text-stone-500 tabular-nums">{{ $rp($p->revenue) }}</p>
+                            @if($canFinance)<p class="mt-1 text-xs text-stone-500 tabular-nums">{{ $rp($p->revenue) }}</p>@endif
                         </div>
                     </li>
                     @if($loop->last)</ol>@endif
@@ -320,7 +334,7 @@
     document.querySelectorAll('.dash-table tr[data-href]').forEach(tr => tr.addEventListener('click', e => { if (!e.target.closest('a')) window.location.href = tr.dataset.href; }));
 
     /* ---------- grafik pendapatan (SVG buatan sendiri) ---------- */
-    const host = document.getElementById('dashChart'); if (!host) return;
+    const host = document.getElementById('dashChart'); if (!host) { try { sessionStorage.setItem('dashIntro', '1'); } catch (e) {} return; }
     const live = document.getElementById('dashChartLive');
     const dates = JSON.parse(host.dataset.dates), vals = JSON.parse(host.dataset.values).map(Number);
     const N = vals.length, total = vals.reduce((a, b) => a + b, 0), max = Math.max(0, ...vals), best = vals.indexOf(max), avg = total / Math.max(1, N);

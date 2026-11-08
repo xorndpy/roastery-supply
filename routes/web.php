@@ -207,9 +207,9 @@ Route::prefix('admin')
             Route::get('/', [AdminOrderController::class, 'index'])->name('index')->middleware('can:view_orders');
             Route::get('/{order}', [AdminOrderController::class, 'show'])->name('show')->middleware('can:view_orders');
             Route::post('/{order}/confirm-payment', [AdminOrderController::class, 'confirmPayment'])->name('confirm-payment')->middleware('can:verify_payments');
-            Route::post('/{order}/process', [AdminOrderController::class, 'process'])->name('process')->middleware('can:edit_orders');
+            Route::post('/{order}/process', [AdminOrderController::class, 'process'])->name('process')->middleware('can:process_orders');
             Route::post('/{order}/ship', [AdminOrderController::class, 'ship'])->name('ship')->middleware('can:manage_shipments');
-            Route::post('/{order}/complete', [AdminOrderController::class, 'complete'])->name('complete')->middleware('can:edit_orders');
+            Route::post('/{order}/complete', [AdminOrderController::class, 'complete'])->name('complete')->middleware('can:complete_orders');
             Route::post('/{order}/cancel', [AdminOrderController::class, 'cancel'])->name('cancel')->middleware('can:cancel_orders');
             Route::get('/{order}/invoice', [AdminOrderController::class, 'invoice'])->name('invoice')->middleware('can:download_invoices');
         });
