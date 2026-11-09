@@ -1,66 +1,45 @@
 @php
     $menus = [
-        [
-            'group' => 'Utama',
-            'items' => [
-                ['label' => 'Dashboard', 'route' => 'admin.dashboard', 'icon' => 'dashboard'],
-            ],
-        ],
-        [
-            'group' => 'Katalog',
-            'items' => [
-                ['label' => 'Produk', 'route' => 'admin.products.index', 'icon' => 'box'],
-                ['label' => 'Kategori', 'route' => 'admin.categories.index', 'icon' => 'tag'],
-                ['label' => 'Merek', 'route' => 'admin.brands.index', 'icon' => 'bookmark'],
-                ['label' => 'Stok', 'route' => 'admin.stock.index', 'icon' => 'archive'],
-            ],
-        ],
-        [
-            'group' => 'Penjualan',
-            'items' => [
-                ['label' => 'Pesanan', 'route' => 'admin.orders.index', 'icon' => 'bag'],
-                ['label' => 'Pembayaran', 'route' => 'admin.payments.index', 'icon' => 'card'],
-                ['label' => 'Pengiriman', 'route' => 'admin.shipments.index', 'icon' => 'truck'],
-                ['label' => 'Tarif Kirim', 'route' => 'admin.shipping.index', 'icon' => 'coins'],
-                ['label' => 'Retur', 'route' => 'admin.returns.index', 'icon' => 'undo'],
-                ['label' => 'Pelanggan', 'route' => 'admin.customers.index', 'icon' => 'users'],
-            ],
-        ],
-        [
-            'group' => 'Pemasaran',
-            'items' => [
-                ['label' => 'Voucher', 'route' => 'admin.vouchers.index', 'icon' => 'ticket'],
-                ['label' => 'Banner', 'route' => 'admin.banners.index', 'icon' => 'image'],
-                ['label' => 'Testimoni', 'route' => 'admin.testimonials.index', 'icon' => 'star'],
-            ],
-        ],
-        [
-            'group' => 'CMS',
-            'items' => [
-                ['label' => 'FAQ', 'route' => 'admin.faqs.index', 'icon' => 'help'],
+        ['group' => 'Ringkasan', 'items' => [
+            ['label' => 'Dashboard', 'route' => 'admin.dashboard', 'icon' => 'dashboard'],
+            ['label' => 'Laporan', 'route' => 'admin.reports.index', 'icon' => 'chart'],
+        ]],
+        ['group' => 'Penjualan', 'items' => [
+            ['label' => 'Pesanan', 'route' => 'admin.orders.index', 'icon' => 'bag'],
+            ['label' => 'Pembayaran', 'route' => 'admin.payments.index', 'icon' => 'card'],
+            ['label' => 'Pengiriman', 'route' => 'admin.shipments.index', 'icon' => 'truck'],
+            ['label' => 'Retur', 'route' => 'admin.returns.index', 'icon' => 'undo'],
+        ]],
+        ['group' => 'Katalog', 'items' => [
+            ['label' => 'Produk', 'route' => 'admin.products.index', 'icon' => 'box'],
+            ['label' => 'Kategori', 'route' => 'admin.categories.index', 'icon' => 'tag'],
+            ['label' => 'Merek', 'route' => 'admin.brands.index', 'icon' => 'bookmark'],
+            ['label' => 'Stok', 'route' => 'admin.stock.index', 'icon' => 'archive'],
+        ]],
+        ['group' => 'Pelanggan', 'items' => [
+            ['label' => 'Pelanggan', 'route' => 'admin.customers.index', 'icon' => 'users'],
+            ['label' => 'Pesan Masuk', 'route' => 'admin.messages.index', 'icon' => 'mail'],
+            ['label' => 'Testimoni', 'route' => 'admin.testimonials.index', 'icon' => 'star'],
+        ]],
+        ['group' => 'Pemasaran', 'items' => [
+            ['label' => 'Voucher', 'route' => 'admin.vouchers.index', 'icon' => 'ticket'],
+            ['label' => 'Banner Katalog', 'route' => 'admin.banners.index', 'icon' => 'image'],
+            ['label' => 'Hero Beranda', 'route' => 'admin.hero.index', 'icon' => 'monitor'],
+        ]],
+        ['group' => 'Konten', 'items' => [
             ['label' => 'Artikel', 'route' => 'admin.articles.index', 'icon' => 'doc'],
+            ['label' => 'FAQ', 'route' => 'admin.faqs.index', 'icon' => 'help'],
             ['label' => 'Milestone', 'route' => 'admin.milestones.index', 'icon' => 'flag'],
-                ['label' => 'Partner', 'route' => 'admin.partners.index', 'icon' => 'briefcase'],
-                ['label' => 'Cabang', 'route' => 'admin.branches.index', 'icon' => 'pin'],
-                ['label' => 'Pesan Masuk', 'route' => 'admin.messages.index', 'icon' => 'mail'],
-                ['label' => 'Hero Beranda', 'route' => 'admin.hero.index', 'icon' => 'image'],
-                ['label' => 'Pengaturan', 'route' => 'admin.settings.index', 'icon' => 'sliders'],
-            ],
-        ],
-        [
-            'group' => 'Laporan',
-            'items' => [
-                ['label' => 'Laporan', 'route' => 'admin.reports.index', 'icon' => 'chart'],
-            ],
-        ],
-        [
-            'group' => 'Administrasi',
-            'items' => [
-                ['label' => 'Users', 'route' => 'admin.users.index', 'icon' => 'user'],
-                ['label' => 'Roles', 'route' => 'admin.roles.index', 'icon' => 'shield'],
-                ['label' => 'Activity Log', 'route' => 'admin.logs.index', 'icon' => 'list'],
-            ],
-        ],
+            ['label' => 'Partner', 'route' => 'admin.partners.index', 'icon' => 'briefcase'],
+            ['label' => 'Cabang', 'route' => 'admin.branches.index', 'icon' => 'pin'],
+        ]],
+        ['group' => 'Sistem', 'items' => [
+            ['label' => 'Pengaturan', 'route' => 'admin.settings.index', 'icon' => 'sliders'],
+            ['label' => 'Tarif Kirim', 'route' => 'admin.shipping.index', 'icon' => 'coins'],
+            ['label' => 'Users', 'route' => 'admin.users.index', 'icon' => 'user'],
+            ['label' => 'Roles', 'route' => 'admin.roles.index', 'icon' => 'shield'],
+            ['label' => 'Activity Log', 'route' => 'admin.logs.index', 'icon' => 'list'],
+        ]],
     ];
 
     // Hanya tampilkan menu yang boleh diakses user ini (permission sama dengan yang menjaga route-nya).
@@ -106,6 +85,7 @@
         'shield' => '<path d="M12 3.5l7.5 3v5.4c0 4.4-3.1 7.6-7.5 8.6-4.4-1-7.5-4.2-7.5-8.6V6.5l7.5-3z"/>',
         'list' => '<rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M9 8.5h6M9 12h6M9 15.5h4"/>',
         'doc' => '<path d="M14 3.5H7.5A1.5 1.5 0 0 0 6 5v14a1.5 1.5 0 0 0 1.5 1.5h9A1.5 1.5 0 0 0 18 19V7.5L14 3.5z"/><path d="M14 3.5V7.5h4M9 12h6M9 15.5h4"/>',
+        'monitor' => '<rect x="3.5" y="4.5" width="17" height="11.5" rx="2"/><path d="M8.5 20h7M12 16v4"/>',
         'flag' => '<path d="M5.5 20.5V4M5.5 5h11l-2 3.5 2 3.5h-11"/>',
     ];
 
@@ -126,49 +106,72 @@
         ->values()->all();
 @endphp
 
+@php
+    $siteLogo = $site['site_logo'] ?? null;
+    $siteLabel = $site['site_name'] ?? 'Roastery';
+    $initial = mb_strtoupper(mb_substr($siteLabel, 0, 1));
+@endphp
 <div class="flex h-full flex-col">
-    {{-- Logo --}}
-    <div class="flex h-16 shrink-0 items-center border-b border-white/10 px-5">
-        <a href="{{ route('admin.dashboard') }}" class="group flex items-center gap-2.5 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-300">
-            <span class="flex h-8 w-8 items-center justify-center rounded-md bg-orange-400/15 text-orange-200 ring-1 ring-inset ring-orange-200/20" aria-hidden="true">
-                <svg class="h-[18px] w-[18px]" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 14h18v6.5a7 7 0 0 1-7 7h-4a7 7 0 0 1-7-7V14z"/><path d="M26 16h1.5a3 3 0 0 1 0 6H25.5"/><path d="M13 9c-1.6-1.4 1.6-2.6 0-4.2M18 9c-1.6-1.4 1.6-2.6 0-4.2M23 9c-1.6-1.4 1.6-2.6 0-4.2"/></svg>
-            </span>
-            <span class="leading-none">
-                <span class="heading block text-[17px] text-white">{{ $site['site_name'] ?? 'Roastery' }}</span>
-                <span class="mt-1 block text-[10px] font-medium uppercase tracking-[0.16em] text-stone-400">Admin</span>
+    {{-- Brand: memakai logo dari Pengaturan > Umum > Logo --}}
+    <div class="flex h-16 shrink-0 items-center border-b border-stone-200 px-4">
+        <a href="{{ route('admin.dashboard') }}" class="group flex min-w-0 items-center gap-3 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500">
+            @if($siteLogo)
+                <img src="{{ media_url($siteLogo) }}" alt="" class="h-9 w-9 shrink-0 rounded-lg bg-white object-contain p-0.5 ring-1 ring-stone-200">
+            @else
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand text-[15px] font-semibold text-white" aria-hidden="true">{{ $initial }}</span>
+            @endif
+            <span class="min-w-0 leading-tight">
+                <span class="block truncate text-[15px] font-semibold text-stone-900">{{ $siteLabel }}</span>
+                <span class="block text-[11px] text-stone-500">Admin panel</span>
             </span>
         </a>
     </div>
 
     {{-- Nav --}}
-    <nav class="dash-scroll flex-1 space-y-4 overflow-y-auto px-3 py-4" aria-label="Menu admin">
+    <nav class="dash-scroll flex-1 space-y-1 overflow-y-auto px-3 py-3" aria-label="Menu admin">
         @foreach($menus as $menu)
-            <div>
-                <div class="mb-1 px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-stone-500">{{ $menu['group'] }}</div>
-                @foreach($menu['items'] as $item)
-                    @php
-                        $isActive = request()->routeIs(str_replace('.index', '.*', $item['route'])) || request()->routeIs($item['route'])
-                            || ($item['route'] === 'admin.dashboard' && request()->routeIs('admin.dashboard.alt'));
-                        $badge = (int) ($navBadges[$item['route']] ?? 0);
-                    @endphp
-                    <a href="{{ route($item['route']) }}" data-nav data-nav-group="{{ $menu['group'] }}" data-nav-label="{{ $item['label'] }}"
-                       @if($isActive) aria-current="page" @endif
-                       class="nav-link group relative flex items-center gap-3 rounded-md px-3 py-[7px] text-[13.5px] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-300
-                              {{ $isActive ? 'bg-white/[0.09] font-medium text-white' : 'text-stone-300 hover:bg-white/[0.05] hover:text-white' }}">
-                        @if($isActive)<span class="absolute -left-3 top-1/2 h-4 w-[3px] -translate-y-1/2 rounded-r bg-orange-300" aria-hidden="true"></span>@endif
-                        <svg class="h-[18px] w-[18px] shrink-0 transition-colors {{ $isActive ? 'text-orange-300' : 'text-stone-500 group-hover:text-stone-300' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $icons[$item['icon']] ?? '' !!}</svg>
-                        <span>{{ $item['label'] }}</span>
-                        @if($badge > 0)
-                            <span class="ml-auto min-w-[1.375rem] rounded-full bg-orange-400 px-1.5 py-0.5 text-center text-[11px] font-semibold leading-none text-stone-950 tabular-nums" aria-label="{{ $badge }} menunggu">{{ $badge }}</span>
-                        @endif
-                    </a>
-                @endforeach
+            @php
+                $slug = \Illuminate\Support\Str::slug($menu['group']);
+                $hasActive = collect($menu['items'])->contains(fn ($i) => request()->routeIs(str_replace('.index', '.*', $i['route'])) || request()->routeIs($i['route']) || ($i['route'] === 'admin.dashboard' && request()->routeIs('admin.dashboard.alt')));
+                $groupBadge = collect($menu['items'])->sum(fn ($i) => (int) ($navBadges[$i['route']] ?? 0));
+                $openDefault = $hasActive || in_array($menu['group'], ['Ringkasan', 'Penjualan', 'Katalog'], true);
+            @endphp
+            <div x-data="{ open: {{ $openDefault ? 'true' : 'false' }} }"
+                 x-init="@if(!$hasActive) try { const v = localStorage.getItem('nav-{{ $slug }}'); if (v !== null) open = v === '1'; } catch (e) {} @endif">
+                <button type="button" @click="open = !open; try { localStorage.setItem('nav-{{ $slug }}', open ? '1' : '0'); } catch (e) {}"
+                        :aria-expanded="open.toString()" aria-controls="nav-{{ $slug }}"
+                        class="flex w-full items-center justify-between rounded-md px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-stone-500 transition hover:text-stone-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500">
+                    <span class="flex items-center gap-2">{{ $menu['group'] }}
+                        @if($groupBadge > 0)<span x-show="!open" class="h-1.5 w-1.5 rounded-full bg-orange-500" aria-hidden="true"></span>@endif
+                    </span>
+                    <svg class="h-3.5 w-3.5 transition-transform duration-150" :class="open ? '' : '-rotate-90'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <div id="nav-{{ $slug }}" x-show="open" class="mt-0.5 space-y-0.5">
+                    @foreach($menu['items'] as $item)
+                        @php
+                            $isActive = request()->routeIs(str_replace('.index', '.*', $item['route'])) || request()->routeIs($item['route'])
+                                || ($item['route'] === 'admin.dashboard' && request()->routeIs('admin.dashboard.alt'));
+                            $badge = (int) ($navBadges[$item['route']] ?? 0);
+                        @endphp
+                        <a href="{{ route($item['route']) }}" data-nav data-nav-group="{{ $menu['group'] }}" data-nav-label="{{ $item['label'] }}"
+                           @if($isActive) aria-current="page" @endif
+                           class="group flex items-center gap-3 rounded-lg px-3 py-2 text-[13.5px] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500
+                                  {{ $isActive ? 'bg-stone-100 font-medium text-stone-900' : 'text-stone-600 hover:bg-stone-50 hover:text-stone-900' }}">
+                            <svg class="h-[18px] w-[18px] shrink-0 {{ $isActive ? 'text-orange-600' : 'text-stone-400 group-hover:text-stone-600' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $icons[$item['icon']] ?? '' !!}</svg>
+                            <span class="truncate">{{ $item['label'] }}</span>
+                            @if($badge > 0)
+                                <span class="ml-auto min-w-[1.375rem] rounded-full bg-orange-500 px-1.5 py-0.5 text-center text-[11px] font-semibold leading-none text-white tabular-nums" aria-label="{{ $badge }} menunggu">{{ $badge }}</span>
+                            @endif
+                        </a>
+                    @endforeach
+                </div>
             </div>
         @endforeach
     </nav>
 
-    <div class="flex shrink-0 items-center justify-between border-t border-white/10 px-5 py-3.5 text-xs text-stone-500">
-        <span>v1.0 — {{ now()->format('Y') }}</span>
-        <span class="hidden items-center gap-1.5 lg:flex"><kbd class="rounded border border-white/15 px-1.5 py-0.5 font-sans text-[10px] text-stone-400">Ctrl</kbd><kbd class="rounded border border-white/15 px-1.5 py-0.5 font-sans text-[10px] text-stone-400">K</kbd></span>
+    <div class="flex shrink-0 items-center justify-between border-t border-stone-200 px-4 py-3 text-xs text-stone-500">
+        <a href="{{ route('home') }}" class="inline-flex items-center gap-1 rounded-md px-1.5 py-1 hover:bg-stone-100 hover:text-stone-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500">Lihat toko
+            <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
+        <span class="hidden items-center gap-1 lg:flex"><kbd class="rounded border border-stone-300 bg-white px-1.5 py-0.5 font-sans text-[10px] text-stone-600">Ctrl</kbd><kbd class="rounded border border-stone-300 bg-white px-1.5 py-0.5 font-sans text-[10px] text-stone-600">K</kbd></span>
     </div>
 </div>

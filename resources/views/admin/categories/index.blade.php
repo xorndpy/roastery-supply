@@ -82,7 +82,7 @@
                         <td class="px-4 py-3">
                             <div class="w-10 h-10 rounded bg-stone-100 overflow-hidden">
                                 @if($category->image)
-                                    <img src="{{ asset('storage/' . $category->image) }}"
+                                    <img src="{{ media_url($category->image) }}"
                                          alt="{{ $category->name }}"
                                          class="w-full h-full object-cover">
                                 @else

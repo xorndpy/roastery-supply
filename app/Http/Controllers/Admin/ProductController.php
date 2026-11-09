@@ -211,12 +211,13 @@ class ProductController extends Controller
 
         // Sync gambar (keep + upload baru)
         $keepImages = $request->input('keep_images', []);
-        if ($request->hasFile('images') || !empty($keepImages)) {
+        if ($request->hasFile('images') || !empty($keepImages) || $request->boolean('images_touched')) {
             $this->productService->syncImages(
                 $product,
                 $request->file('images', []),
                 $keepImages
             );
+            $this->productService->reorderImages($product->refresh(), (array) $request->input('image_order', []));
         }
 
         return redirect()

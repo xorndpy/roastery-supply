@@ -103,9 +103,10 @@
                         <td class="px-4 py-3">
                             <div class="w-12 h-12 rounded bg-stone-100 overflow-hidden">
                                 @if($product->images->first())
-                                    <img src="{{ asset('storage/' . $product->images->first()->image) }}"
-                                         alt="{{ $product->name }}"
-                                         class="w-full h-full object-cover">
+                                    <img src="{{ thumb_url($product->images->first()->image) }}"
+                                         onerror="this.onerror=null;this.src='{{ media_url($product->images->first()->image) }}'"
+                                         alt="{{ $product->name }}" loading="lazy"
+                                         class="w-full h-full object-contain bg-white p-0.5">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center text-stone-400 text-xs">
                                         N/A

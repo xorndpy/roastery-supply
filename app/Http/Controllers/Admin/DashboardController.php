@@ -124,9 +124,17 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        // Foto produk (pencocokan lewat nama, sama seperti pengelompokan di atas).
+        $imgByName = Product::with('images')->whereIn('name', $topProducts->pluck('name'))->get()->keyBy('name');
+        $topProducts->transform(function ($row) use ($imgByName) {
+            $row->image = $imgByName->get($row->name)?->images->first()?->image;
+
+            return $row;
+        });
+
         // ---- Daftar ----
         $recentOrders = Order::with(['customer', 'items'])->latest()->take(8)->get();
-        $lowStockList = Product::whereColumn('stock', '<=', 'stock_threshold')
+        $lowStockList = Product::with('images')->whereColumn('stock', '<=', 'stock_threshold')
             ->where('is_active', true)
             ->orderBy('stock')
             ->take(5)

@@ -12,7 +12,7 @@
     <title>@yield('title', 'Admin') — {{ $siteName }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     {{-- Dipakai halaman Laporan. Dashboard memakai grafik SVG sendiri. --}}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -24,7 +24,7 @@
 
         {{-- Sidebar --}}
         <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
-               class="fixed inset-y-0 left-0 z-50 w-60 transform bg-[#211812] text-stone-100 transition-transform duration-300 lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:translate-x-0">
+               class="fixed inset-y-0 left-0 z-50 w-64 transform border-r border-stone-200 bg-white text-stone-700 transition-transform duration-300 lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:translate-x-0">
             @include('components.sidebar')
         </aside>
 
@@ -34,7 +34,7 @@
         <div class="flex min-w-0 flex-1 flex-col">
 
             {{-- Topbar --}}
-            <header class="sticky top-0 z-30 border-b border-stone-200 bg-white">
+            <header class="sticky top-0 z-30 border-b border-stone-200 bg-white/90 backdrop-blur">
                 <div class="flex h-14 items-center gap-3 px-4 sm:px-7">
                     <button @click="sidebarOpen = !sidebarOpen" class="-ml-1 flex h-9 w-9 items-center justify-center rounded-md text-stone-600 hover:bg-stone-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 lg:hidden" aria-label="Buka menu">
                         <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
@@ -89,7 +89,7 @@
             </header>
 
             {{-- Konten --}}
-            <main id="main" class="flex-1 p-4 sm:p-7">
+            <main id="main" class="mx-auto w-full max-w-[1600px] flex-1 p-4 sm:p-6 lg:p-8">
                 @if(session('success'))
                     <div class="mb-5 rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800" role="status">{{ session('success') }}</div>
                 @endif

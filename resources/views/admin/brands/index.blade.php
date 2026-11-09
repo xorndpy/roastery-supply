@@ -78,7 +78,7 @@
                         <td class="px-4 py-3">
                             <div class="w-12 h-12 rounded bg-stone-100 overflow-hidden">
                                 @if($brand->logo)
-                                    <img src="{{ asset('storage/' . $brand->logo) }}"
+                                    <img src="{{ media_url($brand->logo) }}"
                                          alt="{{ $brand->name }}"
                                          class="w-full h-full object-contain">
                                 @else

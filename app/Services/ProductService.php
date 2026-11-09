@@ -218,4 +218,22 @@ class ProductService
             }
         }
     }
+
+    /**
+     * Terapkan urutan foto dari uploader admin: foto pertama menjadi foto utama.
+     * Hanya foto milik produk ini yang diproses; foto baru tetap berada di belakang.
+     */
+    public function reorderImages(Product $product, array $order): void
+    {
+        $own = $product->images()->pluck('id')->all();
+        $ids = array_values(array_intersect(array_map('intval', $order), $own));
+        foreach ($ids as $i => $id) {
+            ProductImage::where('id', $id)->update(['sort_order' => $i + 1, 'is_primary' => $i === 0]);
+        }
+        // Foto yang baru diunggah ikut setelah foto yang diurutkan.
+        $next = count($ids);
+        foreach ($product->images()->whereNotIn('id', $ids)->get() as $img) {
+            $img->update(['sort_order' => ++$next]);
+        }
+    }
 }

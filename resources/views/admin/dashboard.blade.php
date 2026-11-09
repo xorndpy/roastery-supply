@@ -7,7 +7,7 @@
     $user = auth()->user();
     // Semua nominal uang (omzet, refund, grafik, total) hanya untuk yang punya view_finance.
     $canFinance = $user->can('view_finance');
-    $statusColors = ['menunggu_bayar' => '#d9a97a', 'dikonfirmasi' => '#a8643a', 'diproses' => '#734027', 'dikirim' => '#4a2f21', 'selesai' => '#5b7f4b', 'batal' => '#b3402f'];
+    $statusColors = ['menunggu_bayar' => '#d97706', 'dikonfirmasi' => '#2563eb', 'diproses' => '#7c3aed', 'dikirim' => '#0891b2', 'selesai' => '#16a34a', 'batal' => '#dc2626'];
     $rp = fn ($n) => 'Rp ' . number_format($n, 0, ',', '.');
 
     // Waktu tampil mengikuti WIB (zona waktu aplikasi tetap UTC agar data lama tidak bergeser).
@@ -25,6 +25,10 @@
         'undo' => '<path d="M4 12a8 8 0 1 0 2.6-5.9"/><path d="M4 4.5v4h4"/>',
         'archive' => '<rect x="3.5" y="4" width="17" height="4.5" rx="1"/><path d="M5 8.5v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-10M10 12.5h4"/>',
         'mail' => '<rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M4 7.5l8 6 8-6"/>',
+        'coins' => '<circle cx="12" cy="12" r="8.5"/><path d="M14.6 9.3c-.5-.9-1.4-1.3-2.6-1.3-1.4 0-2.4.7-2.4 1.8 0 2.4 5 1.2 5 3.6 0 1.1-1.1 1.9-2.6 1.9-1.2 0-2.2-.4-2.7-1.4M12 6.5V8M12 16v1.5"/>',
+        'bag' => '<path d="M5 8h14l-1 12H6L5 8z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/>',
+        'users' => '<circle cx="9" cy="8.5" r="3.2"/><path d="M3 19c.6-3.3 3-5 6-5s5.4 1.7 6 5"/><path d="M16 5.6a3.2 3.2 0 0 1 0 5.8M18 14.4c1.7.6 2.7 2.1 3 4.6"/>',
+        'image' => '<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M4 17l5-4.5 4 3.5 3-2.5 4 3.5"/>',
         'star' => '<path d="M12 3.8l2.5 5.1 5.6.8-4.1 4 1 5.6-5-2.7-5 2.7 1-5.6-4.1-4 5.6-.8L12 3.8z"/>',
     ];
     $tasks = collect([
@@ -45,19 +49,15 @@
     $maxQty = max(1, (int) ($topProducts->first()->qty ?? 1));
 @endphp
 
-{{-- Animasi pembuka hanya diputar pada kunjungan pertama dalam satu sesi (atau saat ?intro=1), dan tidak untuk prefers-reduced-motion. --}}
-<script>(function(){try{var f=location.search.indexOf('intro=1')>-1;if(!matchMedia('(prefers-reduced-motion: reduce)').matches&&(f||!sessionStorage.getItem('dashIntro'))){document.documentElement.classList.add('dash-intro');}}catch(e){}})();</script>
-
 <div class="dash">
 
     {{-- ============ Header ============ --}}
     <header class="dash-head">
         <div>
-            <p class="dash-eyebrow dash-rise">{{ $dateLabel }}</p>
-            <h1 class="dash-h1 dash-rise" style="--d:40ms">{{ $greeting }}, {{ $firstName }}</h1>
-            <p class="dash-lede dash-rise" style="--d:80ms">{{ $lede }}</p>
+            <h1 class="dash-h1">{{ $greeting }}, {{ $firstName }}</h1>
+            <p class="dash-lede">{{ $dateLabel }} · {{ $lede }}</p>
         </div>
-        <nav class="dash-range dash-rise" style="--d:120ms" aria-label="Rentang waktu">
+        <nav class="dash-range" aria-label="Rentang waktu">
             @foreach([7, 30, 90] as $r)
                 <a href="{{ route('admin.dashboard', ['range' => $r]) }}" @if($range === $r) aria-current="true" @endif>{{ $r }} hari</a>
             @endforeach
@@ -66,143 +66,140 @@
 
     @if(!($shippingConfigured ?? true))
         @can('view_shipping_rates')
-            <div class="dash-notice dash-rise" style="--d:140ms" role="note">
+            <div class="dash-notice" role="note">
                 <svg class="h-5 w-5 shrink-0 text-amber-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.8l9 15.7H3L12 3.8z"/><path d="M12 10v4M12 17v.1"/></svg>
                 <p><strong>Ongkir belum diatur.</strong> Checkout saat ini berjalan tanpa ongkos kirim. <a href="{{ route('admin.shipping.index') }}">Atur tarif pengiriman →</a></p>
             </div>
         @endcan
     @endif
 
-    {{-- ============ Baris atas: pendapatan + antrean kerja ============ --}}
-    <div class="dash-top">
-
-        <section class="dash-hero dash-rise" style="--d:100ms" aria-labelledby="hero-title">
-            <div class="dash-hero-top">
-                @if($canFinance)
-                <div>
-                    <h2 id="hero-title" class="dash-hero-label">Pendapatan {{ $range }} hari terakhir</h2>
-                    <p class="dash-hero-figure"><span data-count="{{ (int) $revenue }}" data-fmt="rp" data-delay="250" data-dur="1100">{{ $rp($revenue) }}</span></p>
-                    <p class="dash-hero-delta">
-                        @if($revenueDelta === null)
-                            <span class="dash-delta is-none">Belum ada periode pembanding</span>
-                        @else
-                            <span class="dash-delta {{ $revenueDelta >= 0 ? 'is-up' : 'is-down' }}">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="{{ $revenueDelta >= 0 ? '' : 'rotate-180' }}"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
-                                {{ abs($revenueDelta) }}%<span class="sr-only">{{ $revenueDelta >= 0 ? ' naik' : ' turun' }}</span>
-                            </span>
-                            <span class="dash-hero-note">dibanding {{ $range }} hari sebelumnya</span>
-                        @endif
-                    </p>
-                </div>
-                @else
-                <div>
-                    <h2 id="hero-title" class="dash-hero-label">Pesanan {{ $range }} hari terakhir</h2>
-                    <p class="dash-hero-figure"><span>{{ number_format($orders) }}</span></p>
-                    <p class="dash-hero-delta"><span class="dash-hero-note">{{ $pendingOrders > 0 ? $pendingOrders . ' belum dibayar pelanggan' : 'Semua sudah dibayar' }}</span></p>
-                </div>
-                @endif
-
-                <dl class="dash-stats">
-                    <div>
-                        <dt>Pesanan</dt>
-                        <dd><span data-count="{{ (int) $orders }}" data-delay="400" data-dur="800">{{ number_format($orders) }}</span></dd>
-                        <dd class="sub">{{ $pendingOrders > 0 ? $pendingOrders . ' belum dibayar pelanggan' : 'Semua sudah dibayar' }}</dd>
-                    </div>
-                    @if($canFinance)
-                    <div>
-                        <dt>Total keseluruhan</dt>
-                        <dd class="is-money"><span>{{ $rp($totalRevenue) }}</span></dd>
-                        <dd class="sub">{{ $totalRefund > 0 ? 'Sejak toko dibuka, setelah refund ' . $rp($totalRefund) : 'Sejak toko dibuka' }}</dd>
-                    </div>
+    {{-- ============ KPI ============ --}}
+    <section class="dash-kpis" aria-label="Ringkasan">
+        @if($canFinance)
+            <div class="dash-kpi">
+                <div class="dash-kpi-top"><span class="dash-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $ico['coins'] !!}</svg></span><h2>Pendapatan {{ $range }} hari</h2></div>
+                <p class="dash-kpi-num">{{ $rp($revenue) }}</p>
+                <p class="dash-kpi-sub">
+                    @if($revenueDelta === null)
+                        Belum ada periode pembanding
+                    @else
+                        <span class="dash-delta {{ $revenueDelta >= 0 ? 'is-up' : 'is-down' }}">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="{{ $revenueDelta >= 0 ? '' : 'rotate-180' }}"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+                            {{ abs($revenueDelta) }}%<span class="sr-only">{{ $revenueDelta >= 0 ? ' naik' : ' turun' }}</span>
+                        </span>
+                        dibanding periode lalu
                     @endif
-                    <div>
-                        <dt>Produk aktif</dt>
-                        <dd><span data-count="{{ (int) $totalProducts }}" data-delay="480" data-dur="800">{{ number_format($totalProducts) }}</span></dd>
-                        <dd class="sub">{{ $lowStockProducts > 0 ? $lowStockProducts . ' stok menipis' : 'Stok aman' }}</dd>
-                    </div>
-                    <div>
-                        <dt>Pelanggan</dt>
-                        <dd><span data-count="{{ (int) $totalCustomers }}" data-delay="560" data-dur="800">{{ number_format($totalCustomers) }}</span></dd>
-                        <dd class="sub">Terdaftar</dd>
-                    </div>
-                </dl>
+                </p>
             </div>
+        @else
+            <div class="dash-kpi">
+                <div class="dash-kpi-top"><span class="dash-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $ico['box'] !!}</svg></span><h2>Perlu tindakan</h2></div>
+                <p class="dash-kpi-num">{{ number_format($taskTotal) }}</p>
+                <p class="dash-kpi-sub">{{ $taskTotal > 0 ? 'hal menunggu Anda' : 'Semua beres' }}</p>
+            </div>
+        @endif
 
+        <div class="dash-kpi">
+            <div class="dash-kpi-top"><span class="dash-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $ico['bag'] !!}</svg></span><h2>Pesanan {{ $range }} hari</h2></div>
+            <p class="dash-kpi-num">{{ number_format($orders) }}</p>
+            <p class="dash-kpi-sub">{{ $pendingOrders > 0 ? $pendingOrders . ' belum dibayar' : 'Semua sudah dibayar' }}</p>
+        </div>
+
+        <div class="dash-kpi">
+            <div class="dash-kpi-top"><span class="dash-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $ico['box'] !!}</svg></span><h2>Produk aktif</h2></div>
+            <p class="dash-kpi-num">{{ number_format($totalProducts) }}</p>
+            <p class="dash-kpi-sub">{{ $lowStockProducts > 0 ? $lowStockProducts . ' stok menipis' : 'Stok aman' }}</p>
+        </div>
+
+        <div class="dash-kpi">
+            <div class="dash-kpi-top"><span class="dash-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $ico['users'] !!}</svg></span><h2>Pelanggan</h2></div>
+            <p class="dash-kpi-num">{{ number_format($totalCustomers) }}</p>
+            <p class="dash-kpi-sub">Terdaftar</p>
+        </div>
+    </section>
+
+    {{-- ============ Utama: grafik + pesanan | antrean + status ============ --}}
+    <div class="dash-main">
+
+        <div class="dash-col">
             @if($canFinance)
-            <div id="dashChart" class="dash-chart" tabindex="0" role="group"
-                 aria-label="Grafik pendapatan harian {{ $range }} hari terakhir. Gunakan panah kiri dan kanan untuk menelusuri tiap hari."
-                 data-dates='@json($chartDates)' data-values='@json($chartData)'></div>
-            <p id="dashChartLive" class="sr-only" aria-live="polite"></p>
-            <table class="sr-only">
-                <caption>Pendapatan harian</caption>
-                <thead><tr><th>Tanggal</th><th>Pendapatan</th></tr></thead>
-                <tbody>@foreach($chartDates as $i => $d)<tr><td>{{ $d }}</td><td>{{ $rp($chartData[$i]) }}</td></tr>@endforeach</tbody>
-            </table>
-            @endif
-        </section>
-
-        <section class="dash-card dash-queue dash-rise" style="--d:160ms" aria-labelledby="queue-title">
-            <div class="dash-card-head">
-                <h2 id="queue-title">Perlu tindakan</h2>
-                @if($taskTotal > 0)<span class="dash-pill" aria-label="{{ $taskTotal }} hal">{{ $taskTotal }}</span>@endif
-            </div>
-
-            @if($tasks->isNotEmpty())
-                <ul class="dash-tasks">
-                    @foreach($tasks as $i => $t)
-                        <li class="dash-rise" style="--d:{{ 230 + $i * 55 }}ms">
-                            <a href="{{ $t['href'] }}" class="dash-task">
-                                <span class="dash-task-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $ico[$t['icon']] !!}</svg></span>
-                                <span class="dash-task-text"><b>{{ $t['label'] }}</b><small>{{ $t['hint'] }}</small></span>
-                                <span class="dash-task-count" data-count="{{ $t['count'] }}" data-delay="{{ 300 + $i * 55 }}" data-dur="600">{{ $t['count'] }}</span>
-                                <svg class="dash-task-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
-                            </a>
-                        </li>
-                    @endforeach
-                </ul>
-            @else
-                <div class="dash-clear">
-                    <span class="dash-clear-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
-                    <p class="dash-clear-title">Semua beres</p>
-                    <p class="dash-clear-text">Tidak ada pembayaran, pesanan, atau pesan yang menunggu Anda saat ini.</p>
+            <section class="dash-card" aria-labelledby="rev-title">
+                <div class="dash-card-head">
+                    <div>
+                        <h2 id="rev-title">Pendapatan harian</h2>
+                        <p class="dash-sub">{{ $range }} hari terakhir · Total sejak toko dibuka {{ $rp($totalRevenue) }}{{ $totalRefund > 0 ? ' (setelah refund ' . $rp($totalRefund) . ')' : '' }}</p>
+                    </div>
                 </div>
-            @endif
-        </section>
-    </div>
-
-    {{-- ============ Baris bawah ============ --}}
-    <div class="dash-bottom">
-
-        <section class="dash-card dash-rise" style="--d:300ms" aria-labelledby="orders-title">
-            <div class="dash-card-head">
-                <h2 id="orders-title">Pesanan terbaru</h2>
-                <a href="{{ route('admin.orders.index') }}" class="dash-link">Lihat semua →</a>
-            </div>
-            <div class="dash-tablewrap overflow-x-auto">
-                <table class="dash-table">
-                    <thead>
-                        <tr><th>No. pesanan</th><th>Pelanggan</th>@if($canFinance)<th class="text-right">Total</th>@endif<th>Status</th><th class="text-right">Waktu</th></tr>
-                    </thead>
-                    <tbody>
-                        @forelse($recentOrders as $order)
-                            <tr data-href="{{ route('admin.orders.show', $order->id) }}">
-                                <td><a href="{{ route('admin.orders.show', $order->id) }}" class="dash-order-no">{{ $order->order_number }}</a></td>
-                                <td class="is-name" title="{{ $order->customer->name ?? 'Guest' }}">{{ $order->customer->name ?? 'Guest' }}</td>
-                                @if($canFinance)<td class="text-right font-medium tabular-nums">{{ $rp($order->total) }}</td>@endif
-                                <td><span class="dash-badge" style="--c: {{ $statusColors[$order->status] ?? '#a8998b' }}"><i></i>{{ $order->status_label }}</span></td>
-                                <td class="text-right text-xs text-stone-500" title="{{ $order->created_at->copy()->timezone('Asia/Jakarta')->locale('id')->translatedFormat('j F Y, H:i') }} WIB">{{ $order->created_at->locale('id')->diffForHumans() }}</td>
-                            </tr>
-                        @empty
-                            <tr><td colspan="{{ $canFinance ? 5 : 4 }}" class="py-12 text-center text-stone-500">Belum ada pesanan.</td></tr>
-                        @endforelse
-                    </tbody>
+                <div id="dashChart" class="dash-chart" tabindex="0" role="group" data-range="{{ $range }}"
+                     aria-label="Grafik pendapatan harian {{ $range }} hari terakhir. Gunakan panah kiri dan kanan untuk menelusuri tiap hari."
+                     data-dates='@json($chartDates)' data-values='@json($chartData)'></div>
+                <p id="dashChartLive" class="sr-only" aria-live="polite"></p>
+                <table class="sr-only">
+                    <caption>Pendapatan harian</caption>
+                    <thead><tr><th>Tanggal</th><th>Pendapatan</th></tr></thead>
+                    <tbody>@foreach($chartDates as $i => $d)<tr><td>{{ $d }}</td><td>{{ $rp($chartData[$i]) }}</td></tr>@endforeach</tbody>
                 </table>
-            </div>
-        </section>
+            </section>
+            @endif
 
-        <div class="dash-side">
+            <section class="dash-card" aria-labelledby="orders-title">
+                <div class="dash-card-head">
+                    <h2 id="orders-title">Pesanan terbaru</h2>
+                    <a href="{{ route('admin.orders.index') }}" class="dash-link">Lihat semua →</a>
+                </div>
+                <div class="dash-tablewrap overflow-x-auto">
+                    <table class="dash-table">
+                        <thead>
+                            <tr><th>No. pesanan</th><th>Pelanggan</th>@if($canFinance)<th class="text-right">Total</th>@endif<th>Status</th><th class="text-right">Waktu</th></tr>
+                        </thead>
+                        <tbody>
+                            @forelse($recentOrders as $order)
+                                <tr data-href="{{ route('admin.orders.show', $order->id) }}">
+                                    <td><a href="{{ route('admin.orders.show', $order->id) }}" class="dash-order-no">{{ $order->order_number }}</a></td>
+                                    <td class="is-name" title="{{ $order->customer->name ?? 'Guest' }}">{{ $order->customer->name ?? 'Guest' }}</td>
+                                    @if($canFinance)<td class="text-right font-medium tabular-nums">{{ $rp($order->total) }}</td>@endif
+                                    <td><span class="dash-badge" style="--c: {{ $statusColors[$order->status] ?? '#71717a' }}"><i></i>{{ $order->status_label }}</span></td>
+                                    <td class="text-right text-xs text-stone-500" title="{{ $order->created_at->copy()->timezone('Asia/Jakarta')->locale('id')->translatedFormat('j F Y, H:i') }} WIB">{{ $order->created_at->locale('id')->diffForHumans() }}</td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="{{ $canFinance ? 5 : 4 }}" class="py-12 text-center text-stone-500">Belum ada pesanan.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
 
-            <section class="dash-card dash-rise" style="--d:340ms" x-data="{ hov: null }" aria-labelledby="status-title">
+        <div class="dash-col dash-side">
+            <section class="dash-card" aria-labelledby="queue-title">
+                <div class="dash-card-head">
+                    <h2 id="queue-title">Perlu tindakan</h2>
+                    @if($taskTotal > 0)<span class="dash-pill" aria-label="{{ $taskTotal }} hal">{{ $taskTotal }}</span>@endif
+                </div>
+
+                @if($tasks->isNotEmpty())
+                    <ul class="dash-tasks">
+                        @foreach($tasks as $t)
+                            <li>
+                                <a href="{{ $t['href'] }}" class="dash-task">
+                                    <span class="dash-task-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $ico[$t['icon']] !!}</svg></span>
+                                    <span class="dash-task-text"><b>{{ $t['label'] }}</b><small>{{ $t['hint'] }}</small></span>
+                                    <span class="dash-task-count">{{ $t['count'] }}</span>
+                                    <svg class="dash-task-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                @else
+                    <div class="dash-clear">
+                        <span class="dash-clear-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+                        <p class="dash-clear-title">Semua beres</p>
+                        <p class="dash-clear-text">Tidak ada pembayaran, pesanan, atau pesan yang menunggu Anda saat ini.</p>
+                    </div>
+                @endif
+            </section>
+
+            <section class="dash-card" x-data="{ hov: null }" aria-labelledby="status-title">
                 <div class="dash-card-head">
                     <div>
                         <h2 id="status-title">Status pesanan</h2>
@@ -213,10 +210,10 @@
 
                 @if($statusTotal > 0)
                     <div class="dash-segbar" role="img" aria-label="Distribusi status pesanan">
-                        @foreach($statusChart as $i => $s)
+                        @foreach($statusChart as $s)
                             @if($s['count'] > 0)
                                 <a href="{{ route('admin.orders.index', ['status' => $s['key']]) }}" class="dash-seg" tabindex="-1" aria-hidden="true"
-                                   style="flex: {{ $s['count'] }} 1 0%; --c: {{ $statusColors[$s['key']] }}; --d: {{ 420 + $i * 70 }}ms"
+                                   style="flex: {{ $s['count'] }} 1 0%; --c: {{ $statusColors[$s['key']] }}"
                                    :class="hov && hov !== '{{ $s['key'] }}' ? 'is-dim' : ''"
                                    @mouseenter="hov = '{{ $s['key'] }}'" @mouseleave="hov = null"></a>
                             @endif
@@ -240,104 +237,118 @@
                     @endforeach
                 </ul>
             </section>
-
-            @can('verify_payments')
-            <section class="dash-card dash-rise" style="--d:360ms" aria-labelledby="auto-title">
-                <div class="dash-card-head">
-                    <div>
-                        <h2 id="auto-title">Pembayaran online</h2>
-                        <p class="dash-sub">{{ $autoPaymentsWeek }} dikonfirmasi tanpa campur tangan admin (7 hari)</p>
-                    </div>
-                    <a href="{{ route('admin.payments.index', ['tab' => 'otomatis']) }}" class="dash-link">Lihat →</a>
-                </div>
-                @forelse($recentGatewayPayments as $gp)
-                    @if($loop->first)<ul class="dash-stock">@endif
-                    <li>
-                        <div class="min-w-0 flex-1">
-                            <a href="{{ route('admin.payments.show', $gp->id) }}" class="dash-order-no block truncate text-[13px]">{{ $gp->order->order_number }}</a>
-                            <p class="text-xs text-stone-500">{{ $gp->methodLabel() }} · {{ $gp->updated_at->locale('id')->diffForHumans() }}</p>
-                        </div>
-                        <div class="shrink-0 text-right">
-                            @if($canFinance)<p class="text-sm font-medium tabular-nums">{{ $rp($gp->amount) }}</p>@endif
-                            <span class="dash-badge" style="--c: {{ ['verified' => '#5b7f4b', 'review' => '#b3402f', 'duplicate' => '#b3402f', 'expired' => '#a8998b'][$gp->status] ?? '#a8998b' }}"><i></i>{{ $gp->status === 'verified' ? 'Otomatis' : $gp->statusLabel() }}</span>
-                        </div>
-                    </li>
-                    @if($loop->last)</ul>@endif
-                @empty
-                    <p class="dash-empty">Belum ada pembayaran online.</p>
-                @endforelse
-            </section>
-            @endcan
-
-            <section class="dash-card dash-rise" style="--d:380ms" aria-labelledby="top-title">
-                <div class="dash-card-head"><h2 id="top-title">Produk terlaris</h2></div>
-                @forelse($topProducts as $i => $p)
-                    @if($loop->first)<ol class="dash-prods">@endif
-                    <li>
-                        <span class="dash-rank">{{ $i + 1 }}</span>
-                        <div class="min-w-0 flex-1">
-                            <div class="flex items-baseline justify-between gap-3"><span class="truncate text-sm font-medium">{{ $p->name }}</span><span class="shrink-0 text-xs text-stone-600 tabular-nums">{{ (int) $p->qty }} terjual</span></div>
-                            <div class="dash-track"><div class="dash-fill dash-bar-fill" style="width: {{ $p->qty / $maxQty * 100 }}%; --d: {{ 460 + $i * 70 }}ms"></div></div>
-                            @if($canFinance)<p class="mt-1 text-xs text-stone-500 tabular-nums">{{ $rp($p->revenue) }}</p>@endif
-                        </div>
-                    </li>
-                    @if($loop->last)</ol>@endif
-                @empty
-                    <p class="dash-empty">Belum ada penjualan dalam {{ $range }} hari terakhir.</p>
-                @endforelse
-            </section>
-
-            <section class="dash-card dash-rise" style="--d:420ms" aria-labelledby="stock-title">
-                <div class="dash-card-head">
-                    <h2 id="stock-title">Stok menipis</h2>
-                    @can('view_stock')<a href="{{ route('admin.stock.index') }}" class="dash-link">Kelola →</a>@endcan
-                </div>
-                @forelse($lowStockList as $product)
-                    @if($loop->first)<ul class="dash-stock">@endif
-                    <li>
-                        <div class="min-w-0 flex-1">
-                            <p class="truncate text-sm font-medium">{{ $product->name }}</p>
-                            <p class="text-xs text-stone-500">{{ $product->sku }}</p>
-                            <div class="dash-track is-brick"><div class="dash-fill dash-bar-fill" style="width: {{ min(100, $product->stock / max(1, $product->stock_threshold) * 100) }}%; --d: {{ 500 + $loop->index * 70 }}ms"></div></div>
-                        </div>
-                        <div class="shrink-0 text-right"><p class="dash-stock-n">{{ $product->stock }}</p><p class="text-[11px] text-stone-500">min {{ $product->stock_threshold }}</p></div>
-                    </li>
-                    @if($loop->last)</ul>@endif
-                @empty
-                    <p class="dash-empty is-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Semua stok di atas batas minimum.</p>
-                @endforelse
-            </section>
-
-            @can('view_customers')
-            <section class="dash-card dash-rise" style="--d:460ms" aria-labelledby="fu-title">
-                <div class="dash-card-head">
-                    <h2 id="fu-title">Follow-up pelanggan</h2>
-                    <a href="{{ route('admin.customers.index', ['segment' => 'dormant']) }}" class="dash-link">{{ $followUpTotal }} dormant →</a>
-                </div>
-                @forelse($followUps as $c)
-                    @php
-                        $wa = preg_replace('/\D+/', '', (string) $c->phone);
-                        if (str_starts_with($wa, '0')) { $wa = '62' . substr($wa, 1); } elseif (str_starts_with($wa, '8')) { $wa = '62' . $wa; }
-                        $msg = 'Halo ' . $c->name . ', kami dari ' . \App\Models\Setting::get('site_name', config('app.name')) . '. Sudah cukup lama tidak mampir. Ada kebutuhan alat atau sparepart kopi? Kami siap bantu.';
-                    @endphp
-                    @if($loop->first)<ul class="dash-stock">@endif
-                    <li>
-                        <div class="min-w-0 flex-1">
-                            <p class="truncate text-sm font-medium">{{ $c->name }}</p>
-                            <p class="text-xs text-stone-500">Terakhir belanja {{ \Illuminate\Support\Carbon::parse($c->last_paid_at)->locale('id')->diffForHumans() }}@if($canFinance) · total {{ $rp($c->lifetime_total) }}@endif</p>
-                        </div>
-                        @if(strlen($wa) >= 9)
-                            <a href="https://wa.me/{{ $wa }}?text={{ rawurlencode($msg) }}" target="_blank" rel="noopener"
-                               class="shrink-0 rounded-full border border-green-300 bg-green-50 px-3 py-1 text-xs font-medium text-green-800 hover:bg-green-100">WhatsApp</a>
-                        @endif
-                    </li>
-                    @if($loop->last)</ul>@endif
-                @empty
-                    <p class="dash-empty is-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Semua pelanggan berbelanja dalam 90 hari terakhir.</p>
-                @endforelse
-            </section>
-            @endcan
         </div>
+    </div>
+
+    {{-- ============ Baris bawah: produk (berfoto), pembayaran online, follow-up ============ --}}
+    <div class="dash-trio">
+
+        <section class="dash-card" aria-labelledby="top-title">
+            <div class="dash-card-head"><h2 id="top-title">Produk terlaris</h2><span class="dash-sub">{{ $range }} hari</span></div>
+            @forelse($topProducts as $i => $p)
+                @if($loop->first)<ol class="dash-prods">@endif
+                <li>
+                    @if(!empty($p->image))
+                        <img src="{{ thumb_url($p->image) }}" alt="" loading="lazy" class="dash-thumb" onerror="this.onerror=null;this.src='{{ media_url($p->image) }}'">
+                    @else
+                        <span class="dash-thumb is-empty" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">{!! $ico['image'] !!}</svg></span>
+                    @endif
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-baseline justify-between gap-3"><span class="truncate text-sm font-medium">{{ $p->name }}</span><span class="shrink-0 text-xs text-stone-600 tabular-nums">{{ (int) $p->qty }} terjual</span></div>
+                        <div class="dash-track"><div class="dash-fill" style="width: {{ $p->qty / $maxQty * 100 }}%"></div></div>
+                        @if($canFinance)<p class="mt-1 text-xs text-stone-500 tabular-nums">{{ $rp($p->revenue) }}</p>@endif
+                    </div>
+                </li>
+                @if($loop->last)</ol>@endif
+            @empty
+                <p class="dash-empty">Belum ada penjualan dalam {{ $range }} hari terakhir.</p>
+            @endforelse
+        </section>
+
+        <section class="dash-card" aria-labelledby="stock-title">
+            <div class="dash-card-head">
+                <h2 id="stock-title">Stok menipis</h2>
+                @can('view_stock')<a href="{{ route('admin.stock.index') }}" class="dash-link">Kelola →</a>@endcan
+            </div>
+            @forelse($lowStockList as $product)
+                @php $pimg = $product->images->first()->image ?? null; @endphp
+                @if($loop->first)<ul class="dash-stock">@endif
+                <li>
+                    @if($pimg)
+                        <img src="{{ thumb_url($pimg) }}" alt="" loading="lazy" class="dash-thumb" onerror="this.onerror=null;this.src='{{ media_url($pimg) }}'">
+                    @else
+                        <span class="dash-thumb is-empty" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">{!! $ico['image'] !!}</svg></span>
+                    @endif
+                    <div class="min-w-0 flex-1">
+                        <p class="truncate text-sm font-medium">{{ $product->name }}</p>
+                        <p class="text-xs text-stone-500">{{ $product->sku }}</p>
+                        <div class="dash-track is-brick"><div class="dash-fill" style="width: {{ min(100, $product->stock / max(1, $product->stock_threshold) * 100) }}%"></div></div>
+                    </div>
+                    <div class="shrink-0 text-right"><p class="dash-stock-n">{{ $product->stock }}</p><p class="text-[11px] text-stone-500">min {{ $product->stock_threshold }}</p></div>
+                </li>
+                @if($loop->last)</ul>@endif
+            @empty
+                <p class="dash-empty is-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Semua stok di atas batas minimum.</p>
+            @endforelse
+        </section>
+
+        @can('verify_payments')
+        <section class="dash-card" aria-labelledby="auto-title">
+            <div class="dash-card-head">
+                <div>
+                    <h2 id="auto-title">Pembayaran online</h2>
+                    <p class="dash-sub">{{ $autoPaymentsWeek }} dikonfirmasi otomatis (7 hari)</p>
+                </div>
+                <a href="{{ route('admin.payments.index', ['tab' => 'otomatis']) }}" class="dash-link">Lihat →</a>
+            </div>
+            @forelse($recentGatewayPayments as $gp)
+                @if($loop->first)<ul class="dash-stock">@endif
+                <li>
+                    <div class="min-w-0 flex-1">
+                        <a href="{{ route('admin.payments.show', $gp->id) }}" class="dash-order-no block truncate text-[13px]">{{ $gp->order->order_number }}</a>
+                        <p class="text-xs text-stone-500">{{ $gp->methodLabel() }} · {{ $gp->updated_at->locale('id')->diffForHumans() }}</p>
+                    </div>
+                    <div class="shrink-0 text-right">
+                        @if($canFinance)<p class="text-sm font-medium tabular-nums">{{ $rp($gp->amount) }}</p>@endif
+                        <span class="dash-badge" style="--c: {{ ['verified' => '#16a34a', 'review' => '#dc2626', 'duplicate' => '#dc2626', 'expired' => '#71717a'][$gp->status] ?? '#71717a' }}"><i></i>{{ $gp->status === 'verified' ? 'Otomatis' : $gp->status }}</span>
+                    </div>
+                </li>
+                @if($loop->last)</ul>@endif
+            @empty
+                <p class="dash-empty">Belum ada pembayaran online.</p>
+            @endforelse
+        </section>
+        @endcan
+
+        @can('view_customers')
+        <section class="dash-card" aria-labelledby="fu-title">
+            <div class="dash-card-head">
+                <h2 id="fu-title">Follow-up pelanggan</h2>
+                <a href="{{ route('admin.customers.index', ['segment' => 'dormant']) }}" class="dash-link">{{ $followUpTotal }} dormant →</a>
+            </div>
+            @forelse($followUps as $c)
+                @php
+                    $wa = preg_replace('/\D+/', '', (string) $c->phone);
+                    if (str_starts_with($wa, '0')) { $wa = '62' . substr($wa, 1); } elseif (str_starts_with($wa, '8')) { $wa = '62' . $wa; }
+                    $msg = 'Halo ' . $c->name . ', kami dari ' . \App\Models\Setting::get('site_name', config('app.name')) . '. Sudah cukup lama tidak mampir. Ada kebutuhan alat atau sparepart kopi? Kami siap bantu.';
+                @endphp
+                @if($loop->first)<ul class="dash-stock">@endif
+                <li>
+                    <div class="min-w-0 flex-1">
+                        <p class="truncate text-sm font-medium">{{ $c->name }}</p>
+                        <p class="text-xs text-stone-500">Terakhir belanja {{ \Illuminate\Support\Carbon::parse($c->last_paid_at)->locale('id')->diffForHumans() }}@if($canFinance) · total {{ $rp($c->lifetime_total) }}@endif</p>
+                    </div>
+                    @if(strlen($wa) >= 9)
+                        <a href="https://wa.me/{{ $wa }}?text={{ rawurlencode($msg) }}" target="_blank" rel="noopener"
+                           class="shrink-0 rounded-full border border-green-300 bg-green-50 px-3 py-1 text-xs font-medium text-green-800 hover:bg-green-100">WhatsApp</a>
+                    @endif
+                </li>
+                @if($loop->last)</ul>@endif
+            @empty
+                <p class="dash-empty is-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Semua pelanggan berbelanja dalam waktu dekat.</p>
+            @endforelse
+        </section>
+        @endcan
     </div>
 </div>
 
