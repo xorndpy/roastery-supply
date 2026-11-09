@@ -61,8 +61,8 @@ return [
             'home_intro_body'  => ['label' => 'Beranda: Teks Perkenalan', 'type' => 'textarea', 'rows' => 4, 'max' => 600, 'default' => 'Kami menyediakan espresso machine, grinder, dan perlengkapan barista dari distributor resmi, lengkap dengan konsultasi, instalasi, dan layanan purna jual bagi kedai kopi serta roastery di Indonesia.'],
         ],
         'Header Halaman' => [
-            'header_bg_katalog' => ['label' => 'Header Katalog Produk', 'type' => 'image', 'ratio' => '16/6',
-                'help' => 'Latar besar di halaman Produk. Juga jadi cadangan banner kategori yang belum punya foto sendiri. Disarankan 1920 x 640 px (JPG/WEBP, ideal di bawah 300 KB, maks 2 MB). Kosongkan untuk latar polos.'],
+            'header_bg_katalog' => ['label' => 'Header Kategori Produk', 'type' => 'image', 'ratio' => '3/1',
+                'help' => 'Cadangan banner halaman kategori yang belum punya foto sendiri. Rasio 3:1 (mis. 1920 x 640 px, JPG/WEBP, maks 2 MB). Beranda produk tidak memakai foto ini: ia memakai slider dari menu Banner & Promo.'],
             'header_bg_kontak'  => ['label' => 'Header Kontak', 'type' => 'image', 'ratio' => '16/6',
                 'help' => 'Disarankan 1920 x 640 px. Kosongkan untuk latar polos.'],
             'header_bg_faq'     => ['label' => 'Header FAQ', 'type' => 'image', 'ratio' => '16/6',

@@ -5,9 +5,9 @@
 @section('content')
 
 @if($landing)
-    @php $multiPromo = $promos->count() > 1; @endphp
+    @php $promos = $promos->take(5); $multiPromo = $promos->count() > 1; @endphp
 
-    {{-- HERO: polos & besar. Bila ada banner "Katalog" (Admin > Banner), hero ini menjadi slider foto promo/terbaru. --}}
+    {{-- HERO beranda produk: slider 3-5 foto dari Admin > Banner (tampil di "Katalog"); tanpa banner, hero polos. Terpisah dari foto header kategori. --}}
     @if($promos->isNotEmpty())
         <section class="relative isolate overflow-hidden bg-[#26180f]" aria-label="Promo"
                  @if($multiPromo)
@@ -17,7 +17,7 @@
                      x-init="play()" @mouseenter="stop()" @mouseleave="stop(); play()"
                  @endif>
             <h1 class="sr-only">Katalog produk {{ $site['site_name'] }}</h1>
-            <div class="relative aspect-[16/9] max-h-[560px] sm:aspect-[2/1] lg:aspect-[21/8]">
+            <div class="relative aspect-[16/10] max-h-[720px] sm:aspect-[2/1] lg:aspect-[8/3]">
                 @foreach($promos as $k => $promo)
                     @php
                         $promoImg = '<img src="' . e(media_url($promo->image)) . '" alt="' . e($promo->title) . '" class="h-full w-full object-cover"' . ($k === 0 ? ' fetchpriority="high"' : ' loading="lazy"') . '>';
@@ -37,6 +37,15 @@
             </div>
 
             @if($multiPromo)
+                <button type="button" @click="i = (i - 1 + n) % n" class="absolute left-4 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/35 text-white backdrop-blur-sm transition hover:bg-black/55 focus:outline-none focus-visible:ring-2 focus-visible:ring-white sm:flex" aria-label="Promo sebelumnya">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+                </button>
+                <button type="button" @click="i = (i + 1) % n" class="absolute right-4 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/35 text-white backdrop-blur-sm transition hover:bg-black/55 focus:outline-none focus-visible:ring-2 focus-visible:ring-white sm:flex" aria-label="Promo berikutnya">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+                </button>
+            @endif
+
+            @if($multiPromo)
                 <div class="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full bg-black/30 px-3 py-2 backdrop-blur-sm" role="group" aria-label="Pilih promo">
                     @foreach($promos as $k => $promo)
                         <button type="button" @click="i = {{ $k }}" class="h-1.5 rounded-full transition-all duration-300"
@@ -47,21 +56,14 @@
             @endif
         </section>
     @else
-        @php $heroBg = $site['header_bg_katalog'] ?? null; @endphp
         <section class="relative isolate overflow-hidden bg-[#26180f] text-white">
-            @if($heroBg)
-                <img src="{{ media_url($heroBg) }}" alt="" class="absolute inset-0 -z-10 h-full w-full object-cover" fetchpriority="high">
-                <div class="absolute inset-0 -z-10 bg-[#1a0f0a]/75 lg:hidden"></div>
-                <div class="absolute inset-0 -z-10 hidden bg-gradient-to-r from-[#1a0f0a]/90 via-[#1a0f0a]/65 to-[#1a0f0a]/15 lg:block"></div>
-            @else
-                <div class="pointer-events-none absolute -right-24 -top-24 -z-10 h-96 w-96 rounded-full bg-orange-500/25 blur-3xl"></div>
-            @endif
-            <div class="container-x relative flex min-h-[340px] flex-col justify-center py-16 sm:min-h-[460px] lg:min-h-[560px]">
+            <div class="pointer-events-none absolute -right-24 -top-24 -z-10 h-96 w-96 rounded-full bg-orange-500/25 blur-3xl"></div>
+            <div class="container-x relative flex min-h-[300px] flex-col justify-center py-14 sm:min-h-[380px] lg:min-h-[440px]">
                 <p class="eyebrow !text-orange-300">Toko {{ $site['site_name'] }}</p>
-                <h1 class="heading mt-3 max-w-3xl text-[2.25rem] leading-[1.08] [text-wrap:balance] sm:text-6xl lg:text-7xl">
+                <h1 class="heading mt-3 max-w-3xl text-[2.25rem] leading-[1.08] [text-wrap:balance] sm:text-6xl">
                     <span class="text-orange-300">Eksplor.</span> Lengkapi kedai kopi Anda dari satu toko.
                 </h1>
-                <p class="mt-5 max-w-xl text-base text-stone-200 sm:text-lg">{{ $site['tagline'] }}</p>
+                <p class="mt-5 max-w-xl text-base text-stone-300">{{ $site['tagline'] }}</p>
             </div>
         </section>
     @endif
@@ -176,7 +178,7 @@
         {{-- Banner kategori: foto kategori -> foto header Katalog -> latar polos --}}
         @php $bannerPhoto = $current->banner ?: ($site['header_bg_katalog'] ?? null); @endphp
         <section class="container-x pt-6" aria-label="Kategori {{ $current->name }}">
-            <div class="relative isolate flex h-[220px] items-center justify-center overflow-hidden rounded-2xl bg-[#26180f] text-center text-white sm:h-[300px] lg:h-[360px]">
+            <div class="relative isolate flex aspect-[16/9] items-center justify-center overflow-hidden rounded-2xl bg-[#26180f] text-center text-white sm:aspect-[2/1] lg:aspect-[3/1]">
                 @if($bannerPhoto)
                     <img src="{{ media_url($bannerPhoto) }}" alt="" class="absolute inset-0 -z-10 h-full w-full object-cover">
                     <div class="absolute inset-0 -z-10 bg-black/40"></div>

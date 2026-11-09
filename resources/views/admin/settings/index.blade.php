@@ -118,6 +118,13 @@
                 @endif
 
                 @if($tk === 'header')
+                    <a href="{{ route('admin.banners.index') }}" class="flex items-center justify-between gap-4 rounded-xl border border-orange-200 bg-orange-50 p-5 transition hover:bg-orange-100/60">
+                        <div>
+                            <p class="font-bold text-stone-900">Slider beranda produk (3–5 foto)</p>
+                            <p class="mt-0.5 text-sm text-stone-600">Foto terbaru dan promo di paling atas halaman Produk. Atur di Banner &amp; Promo, pilih tampil di "Katalog".</p>
+                        </div>
+                        <span class="shrink-0 text-sm font-medium text-orange-700">Kelola &rarr;</span>
+                    </a>
                     <p class="rounded-xl border border-stone-200 bg-white p-4 text-sm leading-relaxed text-stone-600">Setiap halaman punya fotonya sendiri, jadi tidak lagi seragam. Halaman tanpa foto tampil dengan latar polos. Banner tiap kategori produk diatur di <a href="{{ route('admin.categories.index') }}" class="font-medium text-orange-700 underline">Kategori</a>.</p>
                 @endif
 

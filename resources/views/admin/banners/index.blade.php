@@ -14,6 +14,20 @@
     @endcan
 </div>
 
+@php
+    $katalogLive = $banners->filter(fn ($x) => in_array($x->placement, ['katalog', 'semua'], true) && $x->is_active && (!$x->start_at || !$x->start_at->isFuture()) && (!$x->end_at || !$x->end_at->isPast()))->count();
+@endphp
+<div class="mb-5 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl border px-4 py-3 text-sm {{ $katalogLive >= 3 && $katalogLive <= 5 ? 'border-green-200 bg-green-50 text-green-900' : 'border-amber-200 bg-amber-50 text-amber-900' }}" role="status">
+    <strong>Slider beranda produk: {{ $katalogLive }} foto tayang</strong>
+    <span>
+        @if($katalogLive === 0) Belum ada. Tambah banner dengan tampil di "Katalog".
+        @elseif($katalogLive < 3) Tambah sampai 3–5 foto supaya slider berputar dan pengunjung melihat promo.
+        @elseif($katalogLive > 5) Hanya 5 teratas yang tampil, sisanya disembunyikan.
+        @else Sudah ideal (3–5 foto).
+        @endif
+    </span>
+</div>
+
 <ul id="banner-list" class="space-y-3">
 @forelse($banners as $b)
     @php
