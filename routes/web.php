@@ -167,7 +167,7 @@ Route::prefix('customer')
 // =========================================================================
 Route::prefix('admin')
     ->as('admin.')
-    ->middleware(['auth', 'role:staff|admin|super_admin|gudang', '2fa'])
+    ->middleware(['auth', 'role:staff|admin|super_admin|gudang'])
     ->group(function () {
 
         // Resource dengan izin terpisah per aksi. create harus terdaftar sebelum {param}.
@@ -184,6 +184,7 @@ Route::prefix('admin')
         // Dashboard
         Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard.alt');
+        Route::get('/dashboard/calendar', [AdminDashboardController::class, 'calendar'])->name('dashboard.calendar')->middleware('can:view_orders');
 
         // Katalog
         $crud('products', ProductController::class, 'products');

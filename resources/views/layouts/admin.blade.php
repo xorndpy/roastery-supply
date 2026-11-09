@@ -76,7 +76,6 @@
                                     <p class="truncate text-xs text-stone-500">{{ auth()->user()->email ?? '' }}</p>
                                 </div>
                                 <a href="{{ route('profile.edit') }}" role="menuitem" class="block px-4 py-2 text-sm text-stone-700 hover:bg-stone-50">Profil</a>
-                                <a href="{{ route('two-factor.manage') }}" role="menuitem" class="block px-4 py-2 text-sm text-stone-700 hover:bg-stone-50">Keamanan (2FA)</a>
                                 <a href="{{ route('home') }}" role="menuitem" class="block px-4 py-2 text-sm text-stone-700 hover:bg-stone-50 sm:hidden">Lihat toko</a>
                                 <form method="POST" action="{{ route('logout') }}" class="border-t border-stone-100">
                                     @csrf
