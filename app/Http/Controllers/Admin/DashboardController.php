@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\ReturnOrder;
 use App\Models\StockMovement;
 use App\Models\Testimonial;
+use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -29,8 +30,12 @@ class DashboardController extends Controller
         }
 
         $range = in_array((int) $request->query('range'), [7, 30, 90], true) ? (int) $request->query('range') : 7;
-        $start = now()->subDays($range - 1)->startOfDay();
+        // Hari dihitung menurut WIB (zona waktu aplikasi tetap UTC): "hari ini" di grafik = hari ini di Jakarta.
+        $nowWib = now('Asia/Jakarta');
+        $startWib = $nowWib->copy()->subDays($range - 1)->startOfDay();
+        $start = $startWib->copy()->utc();
         $prevStart = $start->copy()->subDays($range);
+        $todayStr = $nowWib->toDateString();
 
         // ---- Total keseluruhan (tetap seperti sebelumnya) ----
         $totalRefund = (float) ReturnOrder::where('status', 'approved')->sum('refund_amount');
@@ -75,27 +80,50 @@ class DashboardController extends Controller
 
         // ---- Periode terpilih vs periode sebelumnya ----
         $revenue = (float) Order::whereIn('status', self::PAID)->where('created_at', '>=', $start)->sum('total');
-        $revenuePrev = (float) Order::whereIn('status', self::PAID)->whereBetween('created_at', [$prevStart, $start])->sum('total');
+        $revenuePrev = (float) Order::whereIn('status', self::PAID)->where('created_at', '>=', $prevStart)->where('created_at', '<', $start)->sum('total');
         $orders = Order::where('status', '!=', 'batal')->where('created_at', '>=', $start)->count();
-        $ordersPrev = Order::where('status', '!=', 'batal')->whereBetween('created_at', [$prevStart, $start])->count();
+        $ordersPrev = Order::where('status', '!=', 'batal')->where('created_at', '>=', $prevStart)->where('created_at', '<', $start)->count();
         $revenueDelta = $revenuePrev > 0 ? (int) round(($revenue - $revenuePrev) / $revenuePrev * 100) : null;
         $ordersDelta = $ordersPrev > 0 ? (int) round(($orders - $ordersPrev) / $ordersPrev * 100) : null;
 
-        // ---- Grafik pendapatan harian (tanggal kosong diisi 0) ----
-        $daily = Order::whereIn('status', self::PAID)
-            ->where('created_at', '>=', $start)
-            ->selectRaw('DATE(created_at) as d, SUM(total) as total')
-            ->groupBy('d')
-            ->pluck('total', 'd');
+        // ---- Grafik harian (pendapatan & jumlah pesanan; tanggal kosong diisi 0) ----
+        $dailyRev = [];
+        $dailyOrd = [];
+        foreach (Order::where('created_at', '>=', $start)->get(['status', 'total', 'created_at']) as $o) {
+            $d = $o->created_at->copy()->timezone('Asia/Jakarta')->toDateString();
+            if (in_array($o->status, self::PAID, true)) {
+                $dailyRev[$d] = ($dailyRev[$d] ?? 0) + (float) $o->total;
+            }
+            if ($o->status !== 'batal') {
+                $dailyOrd[$d] = ($dailyOrd[$d] ?? 0) + 1;
+            }
+        }
 
         $chartLabels = [];
         $chartDates = [];
         $chartData = [];
-        foreach (CarbonPeriod::create($start, now()->startOfDay()) as $day) {
+        $chartOrders = [];
+        foreach (CarbonPeriod::create($startWib, $nowWib->copy()->startOfDay()) as $day) {
+            $key = $day->toDateString();
             $chartLabels[] = $day->copy()->locale('id')->translatedFormat('j M');
-            $chartDates[] = $day->toDateString();
-            $chartData[] = (float) ($daily[$day->toDateString()] ?? 0);
+            $chartDates[] = $key;
+            $chartData[] = (float) ($dailyRev[$key] ?? 0);
+            $chartOrders[] = (int) ($dailyOrd[$key] ?? 0);
         }
+
+        // ---- Rata-rata nilai pesanan & pelanggan pada periode ----
+        $paidOrders = Order::whereIn('status', self::PAID)->where('created_at', '>=', $start)->count();
+        $paidOrdersPrev = Order::whereIn('status', self::PAID)->where('created_at', '>=', $prevStart)->where('created_at', '<', $start)->count();
+        $aov = $paidOrders > 0 ? $revenue / $paidOrders : 0;
+        $aovPrev = $paidOrdersPrev > 0 ? $revenuePrev / $paidOrdersPrev : 0;
+        $aovDelta = $aovPrev > 0 ? (int) round(($aov - $aovPrev) / $aovPrev * 100) : null;
+
+        $buyers = (int) Order::whereIn('status', self::PAID)->whereNotNull('customer_id')->where('created_at', '>=', $start)->distinct()->count('customer_id');
+        $firstPaid = DB::table('orders')->whereNull('deleted_at')->whereIn('status', self::PAID)->whereNotNull('customer_id')
+            ->groupBy('customer_id')->selectRaw('customer_id, MIN(created_at) as first_at');
+        $newBuyers = (int) DB::query()->fromSub($firstPaid, 'f')->where('first_at', '>=', $start)->count();
+        $newBuyers = min($newBuyers, $buyers);
+        $repeatPct = $buyers > 0 ? (int) round(($buyers - $newBuyers) / $buyers * 100) : 0;
 
         // ---- Distribusi status pesanan (donut) ----
         $statusLabels = [
@@ -132,6 +160,22 @@ class DashboardController extends Controller
             return $row;
         });
 
+        // ---- Penjualan per kategori (kategori induk) pada periode ----
+        $categorySales = DB::table('order_items')
+            ->join('orders', 'orders.id', '=', 'order_items.order_id')
+            ->join('products', 'products.id', '=', 'order_items.product_id')
+            ->join('categories as c', 'c.id', '=', 'products.category_id')
+            ->leftJoin('categories as p', 'p.id', '=', 'c.parent_id')
+            ->whereNull('order_items.deleted_at')
+            ->whereNull('orders.deleted_at')
+            ->whereIn('orders.status', self::PAID)
+            ->where('orders.created_at', '>=', $start)
+            ->selectRaw('COALESCE(p.name, c.name) as name, SUM(order_items.quantity) as qty, SUM(order_items.subtotal) as revenue')
+            ->groupByRaw('COALESCE(p.name, c.name)')
+            ->orderByDesc('revenue')
+            ->limit(5)
+            ->get();
+
         // ---- Daftar ----
         $recentOrders = Order::with(['customer', 'items'])->latest()->take(8)->get();
         $lowStockList = Product::with('images')->whereColumn('stock', '<=', 'stock_threshold')
@@ -148,11 +192,47 @@ class DashboardController extends Controller
 
         return view('admin.dashboard', compact(
             'range', 'revenue', 'revenueDelta', 'orders', 'ordersDelta',
-            'chartLabels', 'chartDates', 'chartData', 'statusChart', 'topProducts', 'ordersToProcess', 'ordersToShip', 'lateToProcess', 'lateToShip', 'followUps', 'followUpTotal', 'autoPaymentsWeek', 'recentGatewayPayments',
+            'chartLabels', 'chartDates', 'chartData', 'chartOrders', 'todayStr', 'paidOrders', 'aov', 'aovDelta', 'buyers', 'newBuyers', 'repeatPct', 'categorySales', 'statusChart', 'topProducts', 'ordersToProcess', 'ordersToShip', 'lateToProcess', 'lateToShip', 'followUps', 'followUpTotal', 'autoPaymentsWeek', 'recentGatewayPayments',
             'unreadMessages', 'pendingTestimonials', 'pendingReturns', 'shippingConfigured',
             'totalRefund', 'totalRevenue', 'totalOrders', 'pendingOrders', 'totalProducts',
             'totalCustomers', 'lowStockProducts', 'pendingPayments', 'recentOrders', 'lowStockList'
         ));
+    }
+
+    /** Data kalender pesanan: pesanan satu bulan, dikelompokkan per tanggal (WIB). */
+    public function calendar(Request $request)
+    {
+        $data = $request->validate(['month' => ['nullable', 'regex:/^\d{4}-(0[1-9]|1[0-2])$/']]);
+        $month = $data['month'] ?? now('Asia/Jakarta')->format('Y-m');
+
+        $from = Carbon::createFromFormat('Y-m-d H:i:s', $month . '-01 00:00:00', 'Asia/Jakarta');
+        $to = $from->copy()->endOfMonth();
+        $finance = $request->user()->can('view_finance');
+
+        $days = [];
+        $orders = Order::with('customer:id,name')
+            ->whereBetween('created_at', [$from->copy()->utc(), $to->copy()->utc()])
+            ->orderBy('created_at')
+            ->limit(600)
+            ->get();
+
+        foreach ($orders as $o) {
+            $local = $o->created_at->copy()->timezone('Asia/Jakarta');
+            $row = [
+                'n' => $o->order_number,
+                'c' => $o->customer->name ?? 'Guest',
+                's' => $o->status,
+                'l' => $o->status_label,
+                'h' => $local->format('H:i'),
+                'u' => route('admin.orders.show', $o->id),
+            ];
+            if ($finance) {
+                $row['t'] = (float) $o->total;
+            }
+            $days[$local->toDateString()][] = $row;
+        }
+
+        return response()->json(['month' => $month, 'days' => $days]);
     }
 
     /** Dashboard khusus Admin Gudang. */
