@@ -26,7 +26,7 @@ class PartnerController extends Controller
     public function store(Request $request)
     {
         $data = $this->validated($request, true);
-        $data['logo'] = $this->storeImage($request->file('logo'), 'partners');
+        $data['logo'] = $this->storeLogo($request->file('logo'), 'partners');
 
         Partner::create($data);
 
@@ -44,7 +44,7 @@ class PartnerController extends Controller
 
         if ($request->hasFile('logo')) {
             $this->deleteImage($partner->logo);
-            $data['logo'] = $this->storeImage($request->file('logo'), 'partners');
+            $data['logo'] = $this->storeLogo($request->file('logo'), 'partners');
         }
 
         $partner->update($data);

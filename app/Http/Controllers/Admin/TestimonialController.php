@@ -58,6 +58,9 @@ class TestimonialController extends Controller
         if ($request->hasFile('customer_photo')) {
             $this->deleteImage($testimonial->customer_photo);
             $data['customer_photo'] = $this->storeImage($request->file('customer_photo'), 'testimonials');
+        } elseif ($request->boolean('remove_photo') && $testimonial->customer_photo) {
+            $this->deleteImage($testimonial->customer_photo);
+            $data['customer_photo'] = null;
         }
 
         $testimonial->update($data);
@@ -108,6 +111,7 @@ class TestimonialController extends Controller
     {
         $data = $request->validate([
             'customer_name'  => 'required|string|max:100',
+            'company'        => 'nullable|string|max:120',
             'content'        => 'required|string|min:10|max:1000',
             'rating'         => 'required|integer|between:1,5',
             'customer_photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Concerns\HandlesImageUploads;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreBrandRequest;
 use App\Http\Requests\UpdateBrandRequest;
@@ -12,6 +13,8 @@ use Illuminate\Support\Str;
 
 class BrandController extends Controller
 {
+    use HandlesImageUploads;
+
     public function index(Request $request)
     {
         $query = Brand::withCount('products');
@@ -56,7 +59,7 @@ class BrandController extends Controller
 
         // Handle upload logo
         if ($request->hasFile('logo')) {
-            $data['logo'] = $request->file('logo')->store('brands', 'public');
+            $data['logo'] = $this->storeLogo($request->file('logo'), 'brands');
         }
 
         $brand = Brand::create($data);
@@ -96,7 +99,7 @@ class BrandController extends Controller
             if ($brand->logo && Storage::disk('public')->exists($brand->logo)) {
                 Storage::disk('public')->delete($brand->logo);
             }
-            $data['logo'] = $request->file('logo')->store('brands', 'public');
+            $data['logo'] = $this->storeLogo($request->file('logo'), 'brands');
         }
 
         $brand->update($data);

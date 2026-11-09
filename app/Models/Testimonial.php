@@ -15,6 +15,7 @@ class Testimonial extends Model
         'user_id',
         'order_id',
         'customer_name',
+        'company',
         'customer_photo',
         'content',
         'rating',

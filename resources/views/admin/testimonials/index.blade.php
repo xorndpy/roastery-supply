@@ -37,6 +37,7 @@
                 <div class="font-medium">{{ $t->customer_name }}
                     <span class="text-amber-500 ml-2" aria-label="{{ $t->rating }} dari 5">{{ str_repeat('★', $t->rating) }}<span class="text-stone-300">{{ str_repeat('★', 5 - $t->rating) }}</span></span>
                 </div>
+                @if($t->company)<div class="text-xs text-stone-500">{{ $t->company }}</div>@endif
                 <div class="text-xs text-stone-400">{{ $t->created_at->format('d M Y') }}@if($t->order_id) · dari pesanan #{{ $t->order_id }}@else · input manual @endif</div>
             </div>
             <div class="flex gap-2 self-start">

@@ -188,16 +188,23 @@
         </div>
         <div class="mt-10 flex flex-wrap justify-center gap-5">
             @foreach($testimonials as $t)
-                <figure class="flex w-full flex-col rounded-2xl border border-stone-200 bg-white p-8 md:w-[calc(50%-10px)] lg:w-[calc(33.333%-14px)]" data-reveal style="--d: {{ ($loop->index % 3) * 80 }}ms">
-                    <div class="flex gap-1 text-amber-500" role="img" aria-label="Rating {{ $t->rating }} dari 5">
+                <figure class="flex w-full flex-col rounded-2xl border border-stone-200/80 bg-white/60 p-7 sm:p-8 md:w-[calc(50%-10px)] lg:w-[calc(33.333%-14px)]" data-reveal style="--d: {{ ($loop->index % 3) * 80 }}ms">
+                    <div class="flex gap-0.5 text-amber-500" role="img" aria-label="Rating {{ $t->rating }} dari 5">
                         @for($i = 1; $i <= 5; $i++)
-                            <svg class="h-5 w-5 {{ $i <= $t->rating ? '' : 'opacity-25' }}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3.8l2.5 5.1 5.6.8-4.1 4 1 5.6-5-2.7-5 2.7 1-5.6-4.1-4 5.6-.8L12 3.8z"/></svg>
+                            <svg class="h-3.5 w-3.5 {{ $i <= $t->rating ? '' : 'opacity-25' }}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3.8l2.5 5.1 5.6.8-4.1 4 1 5.6-5-2.7-5 2.7 1-5.6-4.1-4 5.6-.8L12 3.8z"/></svg>
                         @endfor
                     </div>
-                    <blockquote class="mt-5 flex-1 text-base leading-relaxed text-stone-700">“{{ $t->content }}”</blockquote>
-                    <figcaption class="mt-6 flex items-center gap-3 border-t border-stone-100 pt-5">
-                        <span class="flex h-11 w-11 items-center justify-center rounded-full bg-stone-200 text-sm font-semibold text-stone-600">{{ strtoupper(\Illuminate\Support\Str::substr($t->customer_name, 0, 2)) }}</span>
-                        <span class="text-sm font-semibold text-stone-900">{{ $t->customer_name }}</span>
+                    <blockquote class="mt-5 flex-1 text-[15px] font-normal leading-7 text-stone-600">“{{ $t->content }}”</blockquote>
+                    <figcaption class="mt-6 flex items-center gap-3.5 border-t border-stone-200/70 pt-5">
+                        @if($t->customer_photo)
+                            <img src="{{ media_url($t->customer_photo) }}" alt="" loading="lazy" class="h-11 w-11 shrink-0 rounded-full object-cover ring-1 ring-stone-200">
+                        @else
+                            <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-stone-200/70 text-[13px] font-semibold text-stone-600">{{ strtoupper(\Illuminate\Support\Str::substr($t->customer_name, 0, 2)) }}</span>
+                        @endif
+                        <span class="min-w-0">
+                            <span class="block text-[15px] font-semibold leading-tight text-stone-900">{{ $t->customer_name }}</span>
+                            @if($t->company)<span class="mt-1 block text-[13px] leading-snug text-stone-500">{{ $t->company }}</span>@endif
+                        </span>
                     </figcaption>
                 </figure>
             @endforeach
