@@ -16,7 +16,19 @@ class SettingController extends Controller
         $groups = config('cms.settings');
         $values = Setting::stored();
 
-        return view('admin.settings.index', compact('groups', 'values'));
+        // Hanya baca: kunci API tetap di environment server, tidak pernah ditampilkan utuh.
+        $mid = app(\App\Services\Payments\MidtransService::class);
+        $ck = (string) $mid->clientKey();
+        $midtrans = [
+            'configured' => $mid->configured(),
+            'production' => $mid->isProduction(),
+            'client_key' => $ck === '' ? null : (strlen($ck) > 14 ? substr($ck, 0, 9) . '••••' . substr($ck, -4) : '••••'),
+            'webhook' => route('webhooks.midtrans'),
+            'expiry_hours' => round(((int) config('services.midtrans.expiry_minutes', 1440)) / 60, 1),
+            'inline' => (bool) config('services.midtrans.process_inline'),
+        ];
+
+        return view('admin.settings.index', compact('groups', 'values', 'midtrans'));
     }
 
     public function update(Request $request)

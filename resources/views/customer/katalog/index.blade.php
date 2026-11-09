@@ -47,14 +47,21 @@
             @endif
         </section>
     @else
-        <section class="relative overflow-hidden bg-[#26180f] text-white">
-            <div class="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-orange-500/25 blur-3xl"></div>
-            <div class="container-x relative flex min-h-[300px] flex-col justify-center py-14 sm:min-h-[380px] lg:min-h-[440px]">
+        @php $heroBg = $site['header_bg_katalog'] ?? null; @endphp
+        <section class="relative isolate overflow-hidden bg-[#26180f] text-white">
+            @if($heroBg)
+                <img src="{{ media_url($heroBg) }}" alt="" class="absolute inset-0 -z-10 h-full w-full object-cover" fetchpriority="high">
+                <div class="absolute inset-0 -z-10 bg-[#1a0f0a]/75 lg:hidden"></div>
+                <div class="absolute inset-0 -z-10 hidden bg-gradient-to-r from-[#1a0f0a]/90 via-[#1a0f0a]/65 to-[#1a0f0a]/15 lg:block"></div>
+            @else
+                <div class="pointer-events-none absolute -right-24 -top-24 -z-10 h-96 w-96 rounded-full bg-orange-500/25 blur-3xl"></div>
+            @endif
+            <div class="container-x relative flex min-h-[340px] flex-col justify-center py-16 sm:min-h-[460px] lg:min-h-[560px]">
                 <p class="eyebrow !text-orange-300">Toko {{ $site['site_name'] }}</p>
-                <h1 class="heading mt-3 max-w-3xl text-[2.25rem] leading-[1.08] [text-wrap:balance] sm:text-6xl">
+                <h1 class="heading mt-3 max-w-3xl text-[2.25rem] leading-[1.08] [text-wrap:balance] sm:text-6xl lg:text-7xl">
                     <span class="text-orange-300">Eksplor.</span> Lengkapi kedai kopi Anda dari satu toko.
                 </h1>
-                <p class="mt-5 max-w-xl text-base text-stone-300">{{ $site['tagline'] }}</p>
+                <p class="mt-5 max-w-xl text-base text-stone-200 sm:text-lg">{{ $site['tagline'] }}</p>
             </div>
         </section>
     @endif
@@ -64,13 +71,13 @@
         <section class="container-x pt-10 sm:pt-12" aria-label="Kategori produk">
             <x-rail>
                 @foreach($categoryCards as $c)
-                    <a href="{{ route('products.index', ['category' => $c->slug]) }}" class="group flex w-[104px] shrink-0 snap-start flex-col items-center text-center first:ml-auto last:mr-auto sm:w-[132px]">
+                    <a href="{{ route('products.index', ['category' => $c->slug]) }}" class="group flex w-[120px] shrink-0 snap-start flex-col items-center text-center first:ml-auto last:mr-auto sm:w-[168px]">
                         @if(!empty($c->image))
-                            <img src="{{ media_url($c->image) }}" alt="" loading="lazy" class="h-16 w-16 object-contain transition duration-300 group-hover:scale-110 sm:h-20 sm:w-20">
+                            <img src="{{ media_url($c->image) }}" alt="" loading="lazy" class="h-20 w-20 object-contain transition duration-300 group-hover:scale-110 sm:h-28 sm:w-28">
                         @else
-                            <span class="heading flex h-16 w-16 items-center justify-center rounded-full bg-orange-50 text-2xl text-orange-600 sm:h-20 sm:w-20">{{ \Illuminate\Support\Str::substr($c->name, 0, 1) }}</span>
+                            <span class="heading flex h-20 w-20 items-center justify-center rounded-full bg-orange-50 text-3xl text-orange-600 sm:h-28 sm:w-28">{{ \Illuminate\Support\Str::substr($c->name, 0, 1) }}</span>
                         @endif
-                        <span class="mt-3 text-[13px] font-semibold text-orange-600 group-hover:text-orange-700">{{ $c->name }}</span>
+                        <span class="mt-3 text-[13px] font-semibold text-orange-600 group-hover:text-orange-700 sm:text-sm">{{ $c->name }}</span>
                     </a>
                 @endforeach
             </x-rail>
@@ -166,10 +173,10 @@
     @endphp
 
     @if($current)
-        {{-- Banner kategori: foto kategori -> foto header umum -> latar polos --}}
-        @php $bannerPhoto = $current->banner ?: ($site['header_bg'] ?? null); @endphp
+        {{-- Banner kategori: foto kategori -> foto header Katalog -> latar polos --}}
+        @php $bannerPhoto = $current->banner ?: ($site['header_bg_katalog'] ?? null); @endphp
         <section class="container-x pt-6" aria-label="Kategori {{ $current->name }}">
-            <div class="relative isolate flex h-[180px] items-center justify-center overflow-hidden rounded-2xl bg-[#26180f] text-center text-white sm:h-[240px] lg:h-[280px]">
+            <div class="relative isolate flex h-[220px] items-center justify-center overflow-hidden rounded-2xl bg-[#26180f] text-center text-white sm:h-[300px] lg:h-[360px]">
                 @if($bannerPhoto)
                     <img src="{{ media_url($bannerPhoto) }}" alt="" class="absolute inset-0 -z-10 h-full w-full object-cover">
                     <div class="absolute inset-0 -z-10 bg-black/40"></div>

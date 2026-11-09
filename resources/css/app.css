@@ -446,3 +446,6 @@
 .admin-ui main tbody tr:hover { background-color: #fafafa; }
 .admin-ui main form h2 { border-bottom-color: #f1f1f3; }
 .admin-ui main .bg-white.rounded-lg { border-radius: 0.75rem; }
+
+/* panah buka/tutup untuk <details> di admin */
+.admin-ui details[open] > summary .chev { transform: rotate(180deg); }
