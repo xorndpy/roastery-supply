@@ -29,13 +29,22 @@ class DashboardController extends Controller
             return $this->gudang();
         }
 
-        $range = in_array((int) $request->query('range'), [7, 30, 90], true) ? (int) $request->query('range') : 7;
+        // Periode: preset (?range=today|7|30|90|month|lastmonth) atau rentang bebas (?from=Y-m-d&to=Y-m-d), semuanya menurut WIB.
         // Hari dihitung menurut WIB (zona waktu aplikasi tetap UTC): "hari ini" di grafik = hari ini di Jakarta.
         $nowWib = now('Asia/Jakarta');
-        $startWib = $nowWib->copy()->subDays($range - 1)->startOfDay();
+        [$startWib, $endWib, $preset] = $this->resolvePeriod($request, $nowWib);
+        $days = (int) abs($startWib->diffInDays($endWib->copy()->startOfDay())) + 1;
         $start = $startWib->copy()->utc();
-        $prevStart = $start->copy()->subDays($range);
+        $end = $endWib->copy()->utc();
+        $prevStart = $start->copy()->subDays($days);
         $todayStr = $nowWib->toDateString();
+        $fromStr = $startWib->toDateString();
+        $toStr = $endWib->toDateString();
+        $periodText = $this->periodText($startWib, $endWib);
+        $rangeLabel = match ($preset) {
+            'today' => 'Hari ini', '7' => '7 hari terakhir', '30' => '30 hari terakhir', '90' => '90 hari terakhir',
+            'month' => 'Bulan ini', 'lastmonth' => 'Bulan lalu', default => $periodText,
+        };
 
         // ---- Total keseluruhan (tetap seperti sebelumnya) ----
         $totalRefund = (float) ReturnOrder::where('status', 'approved')->sum('refund_amount');
@@ -79,9 +88,9 @@ class DashboardController extends Controller
         }
 
         // ---- Periode terpilih vs periode sebelumnya ----
-        $revenue = (float) Order::whereIn('status', self::PAID)->where('created_at', '>=', $start)->sum('total');
+        $revenue = (float) Order::whereIn('status', self::PAID)->where('created_at', '>=', $start)->where('created_at', '<=', $end)->sum('total');
         $revenuePrev = (float) Order::whereIn('status', self::PAID)->where('created_at', '>=', $prevStart)->where('created_at', '<', $start)->sum('total');
-        $orders = Order::where('status', '!=', 'batal')->where('created_at', '>=', $start)->count();
+        $orders = Order::where('status', '!=', 'batal')->where('created_at', '>=', $start)->where('created_at', '<=', $end)->count();
         $ordersPrev = Order::where('status', '!=', 'batal')->where('created_at', '>=', $prevStart)->where('created_at', '<', $start)->count();
         $revenueDelta = $revenuePrev > 0 ? (int) round(($revenue - $revenuePrev) / $revenuePrev * 100) : null;
         $ordersDelta = $ordersPrev > 0 ? (int) round(($orders - $ordersPrev) / $ordersPrev * 100) : null;
@@ -103,7 +112,7 @@ class DashboardController extends Controller
         $chartDates = [];
         $chartData = [];
         $chartOrders = [];
-        foreach (CarbonPeriod::create($startWib, $nowWib->copy()->startOfDay()) as $day) {
+        foreach (CarbonPeriod::create($startWib, $endWib->copy()->startOfDay()) as $day) {
             $key = $day->toDateString();
             $chartLabels[] = $day->copy()->locale('id')->translatedFormat('j M');
             $chartDates[] = $key;
@@ -112,16 +121,16 @@ class DashboardController extends Controller
         }
 
         // ---- Rata-rata nilai pesanan & pelanggan pada periode ----
-        $paidOrders = Order::whereIn('status', self::PAID)->where('created_at', '>=', $start)->count();
+        $paidOrders = Order::whereIn('status', self::PAID)->where('created_at', '>=', $start)->where('created_at', '<=', $end)->count();
         $paidOrdersPrev = Order::whereIn('status', self::PAID)->where('created_at', '>=', $prevStart)->where('created_at', '<', $start)->count();
         $aov = $paidOrders > 0 ? $revenue / $paidOrders : 0;
         $aovPrev = $paidOrdersPrev > 0 ? $revenuePrev / $paidOrdersPrev : 0;
         $aovDelta = $aovPrev > 0 ? (int) round(($aov - $aovPrev) / $aovPrev * 100) : null;
 
-        $buyers = (int) Order::whereIn('status', self::PAID)->whereNotNull('customer_id')->where('created_at', '>=', $start)->distinct()->count('customer_id');
+        $buyers = (int) Order::whereIn('status', self::PAID)->whereNotNull('customer_id')->where('created_at', '>=', $start)->where('created_at', '<=', $end)->distinct()->count('customer_id');
         $firstPaid = DB::table('orders')->whereNull('deleted_at')->whereIn('status', self::PAID)->whereNotNull('customer_id')
             ->groupBy('customer_id')->selectRaw('customer_id, MIN(created_at) as first_at');
-        $newBuyers = (int) DB::query()->fromSub($firstPaid, 'f')->where('first_at', '>=', $start)->count();
+        $newBuyers = (int) DB::query()->fromSub($firstPaid, 'f')->where('first_at', '>=', $start)->where('first_at', '<=', $end)->count();
         $newBuyers = min($newBuyers, $buyers);
         $repeatPct = $buyers > 0 ? (int) round(($buyers - $newBuyers) / $buyers * 100) : 0;
 
@@ -145,7 +154,7 @@ class DashboardController extends Controller
             ->whereNull('order_items.deleted_at')
             ->whereNull('orders.deleted_at')
             ->whereIn('orders.status', self::PAID)
-            ->where('orders.created_at', '>=', $start)
+            ->where('orders.created_at', '>=', $start)->where('orders.created_at', '<=', $end)
             ->groupBy('order_items.product_name')
             ->selectRaw('order_items.product_name as name, SUM(order_items.quantity) as qty, SUM(order_items.subtotal) as revenue')
             ->orderByDesc('qty')
@@ -169,7 +178,7 @@ class DashboardController extends Controller
             ->whereNull('order_items.deleted_at')
             ->whereNull('orders.deleted_at')
             ->whereIn('orders.status', self::PAID)
-            ->where('orders.created_at', '>=', $start)
+            ->where('orders.created_at', '>=', $start)->where('orders.created_at', '<=', $end)
             ->selectRaw('COALESCE(p.name, c.name) as name, SUM(order_items.quantity) as qty, SUM(order_items.subtotal) as revenue')
             ->groupByRaw('COALESCE(p.name, c.name)')
             ->orderByDesc('revenue')
@@ -191,12 +200,65 @@ class DashboardController extends Controller
         $shippingConfigured = app(\App\Services\ShippingService::class)->configured();
 
         return view('admin.dashboard', compact(
-            'range', 'revenue', 'revenueDelta', 'orders', 'ordersDelta',
+            'days', 'rangeLabel', 'periodText', 'preset', 'fromStr', 'toStr', 'revenue', 'revenueDelta', 'orders', 'ordersDelta',
             'chartLabels', 'chartDates', 'chartData', 'chartOrders', 'todayStr', 'paidOrders', 'aov', 'aovDelta', 'buyers', 'newBuyers', 'repeatPct', 'categorySales', 'statusChart', 'topProducts', 'ordersToProcess', 'ordersToShip', 'lateToProcess', 'lateToShip', 'followUps', 'followUpTotal', 'autoPaymentsWeek', 'recentGatewayPayments',
             'unreadMessages', 'pendingTestimonials', 'pendingReturns', 'shippingConfigured',
             'totalRefund', 'totalRevenue', 'totalOrders', 'pendingOrders', 'totalProducts',
             'totalCustomers', 'lowStockProducts', 'pendingPayments', 'recentOrders', 'lowStockList'
         ));
+    }
+
+    /** Tentukan periode dari preset atau from/to. Hasil: [awal WIB, akhir WIB, kode preset|'custom']. */
+    private function resolvePeriod(Request $request, Carbon $nowWib): array
+    {
+        $today = $nowWib->copy()->startOfDay();
+        $preset = (string) $request->query('range', '');
+
+        $range = match ($preset) {
+            'today' => [$today->copy(), $today->copy()],
+            '7', '30', '90' => [$today->copy()->subDays((int) $preset - 1), $today->copy()],
+            'month' => [$today->copy()->startOfMonth(), $today->copy()],
+            'lastmonth' => [$today->copy()->subMonthNoOverflow()->startOfMonth(), $today->copy()->subMonthNoOverflow()->endOfMonth()->startOfDay()],
+            default => null,
+        };
+
+        if ($range === null) {
+            $isDate = fn ($v) => is_string($v) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $v) && checkdate((int) substr($v, 5, 2), (int) substr($v, 8, 2), (int) substr($v, 0, 4));
+            $from = $request->query('from');
+            $to = $request->query('to');
+
+            if ($isDate($from) && $isDate($to)) {
+                $a = Carbon::createFromFormat('Y-m-d', $from, 'Asia/Jakarta')->startOfDay();
+                $b = Carbon::createFromFormat('Y-m-d', $to, 'Asia/Jakarta')->startOfDay();
+                if ($a->gt($b)) {
+                    [$a, $b] = [$b, $a];
+                }
+                $b = $b->gt($today) ? $today->copy() : $b;
+                $a = $a->gt($b) ? $b->copy() : $a;
+                $a = $a->lt($b->copy()->subDays(365)) ? $b->copy()->subDays(365) : $a; // maksimal 366 hari
+                $range = [$a, $b];
+                $preset = 'custom';
+            } else {
+                $range = [$today->copy()->subDays(29), $today->copy()];
+                $preset = '30';
+            }
+        }
+
+        return [$range[0]->startOfDay(), $range[1]->copy()->endOfDay(), $preset];
+    }
+
+    /** "9 Nov 2026" atau "10 Okt – 9 Nov 2026". */
+    private function periodText(Carbon $a, Carbon $b): string
+    {
+        $a = $a->copy()->locale('id');
+        $b = $b->copy()->locale('id');
+        if ($a->isSameDay($b)) {
+            return $b->translatedFormat('j M Y');
+        }
+
+        return $a->year === $b->year
+            ? $a->translatedFormat('j M') . ' – ' . $b->translatedFormat('j M Y')
+            : $a->translatedFormat('j M Y') . ' – ' . $b->translatedFormat('j M Y');
     }
 
     /** Data kalender pesanan: pesanan satu bulan, dikelompokkan per tanggal (WIB). */
