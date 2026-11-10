@@ -53,7 +53,7 @@
                     <a href="{{ route('admin.users.edit', $u->id) }}" class="text-orange-600 hover:underline mr-3">Edit</a>
                     @if($u->id !== auth()->id())
                     <form method="POST" action="{{ route('admin.users.destroy', $u->id) }}" class="inline"
-                          onsubmit="return confirm('Hapus user {{ $u->name }}?')">
+                          data-confirm-title="Hapus user {{ $u->name }}?" data-confirm-text="Akun ini tidak akan bisa masuk ke sistem lagi." data-confirm-ok="Ya, hapus user" data-confirm-tone="danger">
                         @csrf @method('DELETE')
                         <button class="text-red-600 hover:underline">Hapus</button>
                     </form>

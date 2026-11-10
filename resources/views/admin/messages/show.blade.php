@@ -4,7 +4,7 @@
 
 @section('content')
 
-<div class="mb-6"><a href="{{ route('admin.messages.index') }}" class="text-sm text-stone-500 hover:text-stone-700">← Kembali ke Pesan Masuk</a></div>
+<div class="mb-6"><a href="{{ route('admin.messages.index') }}" class="text-sm text-stone-500 hover:text-stone-700">Kembali ke Pesan Masuk</a></div>
 
 <div class="max-w-3xl bg-white p-6 rounded-lg border border-stone-200">
     <h1 class="text-xl font-bold">{{ $message->subject ?: '(tanpa subjek)' }}</h1>
@@ -33,7 +33,7 @@
         @endcan
 
         @can('delete_contact_messages')
-        <form method="POST" action="{{ route('admin.messages.destroy', $message->id) }}" onsubmit="return confirm('Hapus pesan ini?')" class="ml-auto">
+        <form method="POST" action="{{ route('admin.messages.destroy', $message->id) }}" data-confirm-title="Hapus pesan ini?" data-confirm-text="Pesan dari pengunjung ini akan dihapus dari kotak masuk." data-confirm-ok="Ya, hapus pesan" data-confirm-tone="danger" class="ml-auto">
             @csrf @method('DELETE')
             <button class="text-red-600 hover:underline text-sm">Hapus</button>
         </form>

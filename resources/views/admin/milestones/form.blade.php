@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="dash max-w-2xl">
-    <a href="{{ route('admin.milestones.index') }}" class="text-sm text-stone-500 hover:text-stone-800">← Kembali ke Milestone</a>
+    <a href="{{ route('admin.milestones.index') }}" class="text-sm text-stone-500 hover:text-stone-800">Kembali ke Milestone</a>
     <header class="dash-head" style="margin-top:.75rem"><div><h1 class="dash-h1" style="margin-top:0">{{ $milestone->exists ? 'Edit milestone' : 'Tambah milestone' }}</h1></div></header>
 
     @if($errors->any())

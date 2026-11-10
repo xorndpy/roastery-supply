@@ -7,7 +7,7 @@
 @section('content')
 
 <div class="mb-6">
-    <a href="{{ route('admin.users.index') }}" class="text-sm text-stone-500 hover:text-stone-700">← Kembali ke Daftar User</a>
+    <a href="{{ route('admin.users.index') }}" class="text-sm text-stone-500 hover:text-stone-700">Kembali ke Daftar User</a>
 </div>
 
 @if ($errors->any())

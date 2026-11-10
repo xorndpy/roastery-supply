@@ -26,7 +26,7 @@
                 <td class="px-4 py-3 text-right whitespace-nowrap">
                     @can('edit_partners')<a href="{{ route('admin.partners.edit', $p->id) }}" class="text-orange-600 hover:underline mr-3">Edit</a>@endcan
                     @can('delete_partners')
-                    <form method="POST" action="{{ route('admin.partners.destroy', $p->id) }}" class="inline" onsubmit="return confirm('Hapus partner ini?')">@csrf @method('DELETE')<button class="text-red-600 hover:underline">Hapus</button></form>
+                    <form method="POST" action="{{ route('admin.partners.destroy', $p->id) }}" class="inline" data-confirm-title="Hapus partner ini?" data-confirm-text="Logo partner tidak akan tampil lagi di halaman Tentang." data-confirm-ok="Ya, hapus partner" data-confirm-tone="danger">@csrf @method('DELETE')<button class="text-red-600 hover:underline">Hapus</button></form>
                     @endcan
                 </td>
             </tr>

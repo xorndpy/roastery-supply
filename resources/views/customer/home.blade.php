@@ -54,7 +54,6 @@
             <p class="auth-rise mt-6 max-w-xl text-lg leading-relaxed text-stone-100" style="--d:140ms">{{ $site['hero_text'] }}</p>
             <div class="auth-rise mt-9 flex flex-wrap gap-3" style="--d:210ms">
                 <a href="{{ route('products.index') }}" class="btn btn-light btn-lg">Lihat Katalog</a>
-                <a href="{{ route('about') }}" class="btn btn-ghost-light btn-lg">Kenali Kami</a>
             </div>
             @if($multi)
                 <div class="mt-8 flex items-center gap-2" role="group" aria-label="Pilih foto latar">
@@ -90,7 +89,7 @@
             <p class="eyebrow">Mengenal kami</p>
             <h2 id="kenali-title" class="heading mt-3 text-3xl leading-[1.15] [text-wrap:balance] sm:text-[2.5rem]">{{ $site['home_intro_title'] }}</h2>
             <p class="mt-4 max-w-md text-[15px] leading-relaxed text-stone-600">{{ $site['home_intro_body'] }}</p>
-            <a href="{{ route('about') }}" class="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-orange-700 transition hover:gap-2.5 hover:underline">Tentang {{ $site['site_name'] }} <span aria-hidden="true">→</span></a>
+            <a href="{{ route('about') }}" class="mt-6 inline-flex items-center text-sm font-medium text-orange-700 underline underline-offset-4 hover:decoration-2">Tentang {{ $site['site_name'] }}</a>
         </div>
 
         <ol class="svc-list">
@@ -135,7 +134,7 @@
         <div class="mt-12">
             <x-milestones :items="$milestones->take(4)" compact />
         </div>
-        <p class="mt-6 text-center"><a href="{{ route('about') }}#perjalanan" class="text-sm font-medium text-orange-700 hover:underline">Lihat perjalanan selengkapnya →</a></p>
+        <p class="mt-6 text-center"><a href="{{ route('about') }}#perjalanan" class="text-sm font-medium text-orange-700 underline underline-offset-4 hover:decoration-2">Lihat perjalanan selengkapnya</a></p>
     </section>
 @endif
 
@@ -221,7 +220,7 @@
                 <h2 id="artikel-title" class="heading mt-3 text-3xl leading-[1.15] [text-wrap:balance] sm:text-[2.25rem]">Wawasan untuk usaha kopi Anda.</h2>
                 <p class="mt-3 text-[15px] text-stone-600">Panduan memilih peralatan, perawatan, dan tren seputar bisnis kopi.</p>
             </div>
-            <a href="{{ route('articles.index') }}" class="btn btn-outline btn-sm">Lihat Semua Artikel →</a>
+            <a href="{{ route('articles.index') }}" class="btn btn-outline btn-sm">Lihat semua artikel</a>
         </div>
         <div class="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             @foreach($articles as $a)

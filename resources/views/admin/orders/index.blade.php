@@ -102,8 +102,8 @@
                     </td>
                     <td class="px-4 py-3 text-right">
                         <a href="{{ route('admin.orders.show', $order->id) }}"
-                           class="text-orange-500 hover:text-orange-600 font-medium text-sm">
-                            Detail →
+                           class="text-orange-500 hover:text-orange-600 font-medium text-sm underline underline-offset-4 hover:decoration-2">
+                            Detail <span class="sr-only">pesanan {{ $order->order_number }}</span>
                         </a>
                     </td>
                 </tr>

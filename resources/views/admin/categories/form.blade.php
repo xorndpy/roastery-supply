@@ -6,7 +6,7 @@
 
 <div class="mb-6">
     <a href="{{ route('admin.categories.index') }}" class="text-sm text-stone-500 hover:text-stone-700">
-        ← Kembali ke Daftar Kategori
+        Kembali ke Daftar Kategori
     </a>
 </div>
 

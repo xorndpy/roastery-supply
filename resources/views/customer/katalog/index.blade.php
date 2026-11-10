@@ -91,7 +91,7 @@
         <section class="container-x pt-14 sm:pt-16" aria-labelledby="terbaru-title">
             <div class="mb-6 flex items-end justify-between gap-4">
                 <h2 id="terbaru-title" class="heading text-2xl sm:text-3xl"><span class="text-orange-500">Terbaru.</span> Temukan sekarang.</h2>
-                <a href="#semua" class="hidden text-sm font-medium text-orange-700 hover:underline sm:block">Lihat semua →</a>
+                <a href="#semua" class="hidden text-sm font-medium text-orange-700 underline underline-offset-4 hover:decoration-2 sm:block">Lihat semua produk</a>
             </div>
             <x-rail>
                 @foreach($latest as $product)

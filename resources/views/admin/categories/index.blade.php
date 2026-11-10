@@ -125,7 +125,7 @@
 @endcan
                                 @can('delete_categories')
 <form method="POST" action="{{ route('admin.categories.destroy', $category->id) }}"
-                                      onsubmit="return confirm('Yakin hapus kategori {{ $category->name }}?')">
+                                      data-confirm-title="Hapus kategori {{ $category->name }}?" data-confirm-text="Kategori akan hilang dari katalog dan filter produk." data-confirm-ok="Ya, hapus kategori" data-confirm-tone="danger">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-xs text-red-600 hover:text-red-800 font-medium">

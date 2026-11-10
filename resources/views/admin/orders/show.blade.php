@@ -6,7 +6,7 @@
 
 <div class="mb-6">
     <a href="{{ route('admin.orders.index') }}" class="text-sm text-stone-500 hover:text-stone-700">
-        ← Kembali ke Daftar Pesanan
+        Kembali ke Daftar Pesanan
     </a>
 </div>
 
@@ -135,14 +135,6 @@
             </div>
         @endif
 
-        {{-- Pelacakan --}}
-        @if(! in_array($order->status, ['menunggu_bayar', 'batal'], true))
-            <div class="bg-white p-6 rounded-lg border border-stone-200">
-                <h3 class="font-bold mb-4">Status Pengiriman</h3>
-                <x-shipment-tracker :order="$order" />
-            </div>
-        @endif
-
         {{-- Shipment Info --}}
         @if($order->shipment && $order->shipment->tracking_number)
             <div class="bg-white p-6 rounded-lg border border-stone-200">
@@ -220,7 +212,7 @@
                 <form method="POST" action="{{ route('admin.orders.cancel', $order->id) }}">
                     @csrf
                     <button type="submit"
-                            onclick="return confirm('Yakin batalkan pesanan ini?')"
+                            data-confirm-title="Batalkan pesanan {{ $order->order_number }}?" data-confirm-text="Status berubah menjadi dibatalkan. Jika stok sudah terpotong, stok dikembalikan. Aksi ini tidak bisa diurungkan." data-confirm-ok="Ya, batalkan pesanan" data-confirm-cancel="Kembali" data-confirm-tone="danger"
                             class="w-full border border-red-300 text-red-600 hover:bg-red-50 py-3 rounded-lg font-medium transition">
                         Batalkan Pesanan
                     </button>

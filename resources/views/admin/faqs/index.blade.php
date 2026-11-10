@@ -35,7 +35,7 @@
                     <div class="whitespace-nowrap text-sm">
                         @can('edit_faqs')<a href="{{ route('admin.faqs.edit', $f->id) }}" class="text-orange-600 hover:underline mr-3">Edit</a>@endcan
                         @can('delete_faqs')
-                        <form method="POST" action="{{ route('admin.faqs.destroy', $f->id) }}" class="inline" onsubmit="return confirm('Hapus FAQ ini?')">@csrf @method('DELETE')<button class="text-red-600 hover:underline">Hapus</button></form>
+                        <form method="POST" action="{{ route('admin.faqs.destroy', $f->id) }}" class="inline" data-confirm-title="Hapus FAQ ini?" data-confirm-text="FAQ akan hilang dari halaman bantuan." data-confirm-ok="Ya, hapus FAQ" data-confirm-tone="danger">@csrf @method('DELETE')<button class="text-red-600 hover:underline">Hapus</button></form>
                         @endcan
                     </div>
                 </div>

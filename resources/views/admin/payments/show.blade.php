@@ -15,7 +15,7 @@
 @endphp
 
 <div class="dash">
-    <a href="{{ route('admin.payments.index') }}" class="text-sm text-stone-500 hover:text-stone-800">← Kembali ke Pembayaran</a>
+    <a href="{{ route('admin.payments.index') }}" class="text-sm text-stone-500 hover:text-stone-800">Kembali ke Pembayaran</a>
     <header class="dash-head" style="margin-top:.75rem">
         <div class="flex flex-wrap items-center gap-3">
             <h1 class="dash-h1" style="margin-top:0"><span class="font-mono text-[1.6rem]">{{ $payment->isGateway() ? $payment->provider_order_id : $order->order_number }}</span></h1>
@@ -196,7 +196,7 @@
                     @endforeach
                 </ul>
                 @can('view_orders')
-                    <a href="{{ route('admin.orders.show', $order->id) }}" class="dash-link mt-3 inline-block">Buka pesanan →</a>
+                    <a href="{{ route('admin.orders.show', $order->id) }}" class="dash-link mt-3 inline-block">Buka pesanan</a>
                 @endcan
             </section>
         </div>

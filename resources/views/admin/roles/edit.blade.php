@@ -5,7 +5,7 @@
 @section('content')
 
 <div class="mb-6">
-    <a href="{{ route('admin.roles.index') }}" class="text-sm text-stone-500 hover:text-stone-700">← Kembali ke Roles</a>
+    <a href="{{ route('admin.roles.index') }}" class="text-sm text-stone-500 hover:text-stone-700">Kembali ke Roles</a>
     <h1 class="text-2xl font-bold text-stone-900 mt-2">Hak Akses: {{ $role->name }}</h1>
 </div>
 

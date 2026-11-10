@@ -57,7 +57,7 @@
                                         <a href="{{ route('admin.articles.edit', $a->id) }}" class="pay-btn is-primary !py-1.5">Edit</a>
                                     @endcan
                                     @can('delete_articles')
-                                        <form method="POST" action="{{ route('admin.articles.destroy', $a->id) }}" onsubmit="return confirm('Hapus artikel ini?')">@csrf @method('DELETE')<button class="pay-btn is-quiet !py-1.5 !text-red-700">Hapus</button></form>
+                                        <form method="POST" action="{{ route('admin.articles.destroy', $a->id) }}" data-confirm-title="Hapus artikel ini?" data-confirm-text="Artikel tidak akan tampil lagi di website." data-confirm-ok="Ya, hapus artikel" data-confirm-tone="danger">@csrf @method('DELETE')<button class="pay-btn is-quiet !py-1.5 !text-red-700">Hapus</button></form>
                                     @endcan
                                 </div>
                             </td>

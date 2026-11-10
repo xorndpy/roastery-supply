@@ -5,7 +5,7 @@
 @section('content')
 
 <div class="mb-6">
-    <a href="{{ route('admin.customers.index') }}" class="text-sm text-stone-500 hover:text-stone-700">← Kembali ke Pelanggan</a>
+    <a href="{{ route('admin.customers.index') }}" class="text-sm text-stone-500 hover:text-stone-700">Kembali ke Pelanggan</a>
     <div class="flex flex-wrap items-center gap-3 mt-2">
         <h1 class="text-2xl font-bold text-stone-900">{{ $customer->name }}</h1>
         <span class="px-2.5 py-1 rounded text-xs bg-stone-100 text-stone-700">{{ $segments[$segment] }}</span>

@@ -5,7 +5,7 @@
 @section('content')
 <div class="max-w-3xl mx-auto px-4 sm:px-6 py-10">
 
-    <a href="{{ route('customer.returns.index') }}" class="text-sm text-stone-500 hover:text-stone-700">← Retur Saya</a>
+    <a href="{{ route('customer.returns.index') }}" class="text-sm text-stone-500 hover:text-stone-700">Retur Saya</a>
 
     @php
         $stage = $return->stage;

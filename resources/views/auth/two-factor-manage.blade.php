@@ -27,7 +27,7 @@
     </form>
 
     <form method="POST" action="{{ route('two-factor.reset') }}" class="mt-6 space-y-4 rounded-xl border border-stone-200 bg-white p-4"
-          onsubmit="return confirm('Ganti authenticator? Anda akan memasang ulang dari awal.')">
+          data-confirm-title="Ganti authenticator?" data-confirm-text="Kode di authenticator lama tidak berlaku lagi. Kamu perlu memasang ulang dari awal dengan kode baru." data-confirm-ok="Ya, ganti authenticator" data-confirm-tone="danger">
         @csrf
         <p class="text-sm font-medium">Ganti HP / authenticator</p>
         <x-auth-input name="password" label="Password" type="password" icon="lock" toggle required id="reset_password"
@@ -37,5 +37,5 @@
         <button type="submit" class="auth-btn">Atur ulang</button>
     </form>
 
-    <a href="{{ route('dashboard') }}" class="mt-8 inline-block text-sm text-stone-600 hover:underline">&larr; Kembali ke dashboard</a>
+    <a href="{{ route('dashboard') }}" class="mt-8 inline-block text-sm text-stone-600 hover:underline">Kembali ke dashboard</a>
 </x-guest-layout>

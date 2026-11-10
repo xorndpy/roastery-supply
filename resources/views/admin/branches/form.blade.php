@@ -5,7 +5,7 @@
 
 @section('content')
 
-<div class="mb-6"><a href="{{ route('admin.branches.index') }}" class="text-sm text-stone-500 hover:text-stone-700">← Kembali ke Cabang</a></div>
+<div class="mb-6"><a href="{{ route('admin.branches.index') }}" class="text-sm text-stone-500 hover:text-stone-700">Kembali ke Cabang</a></div>
 
 @if ($errors->any())
     <div class="mb-4 p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg text-sm"><ul class="list-disc list-inside">@foreach ($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul></div>
@@ -37,7 +37,7 @@
             <input type="text" inputmode="decimal" name="longitude" value="{{ old('longitude', $branch->longitude) }}" placeholder="106.8456" class="w-full border border-stone-300 rounded-lg px-3 py-2">
         </div>
     </div>
-    <p class="text-xs text-stone-500 -mt-2">Cara dapat koordinat: buka Google Maps → klik kanan di lokasi → klik angka koordinat untuk menyalin.</p>
+    <p class="text-xs text-stone-500 -mt-2">Cara dapat koordinat: buka Google Maps, klik kanan di lokasi, lalu klik angka koordinat untuk menyalin.</p>
     <div>
         <label class="block text-sm font-medium mb-1.5">Link Google Maps (opsional)</label>
         <input type="url" name="maps_url" value="{{ old('maps_url', $branch->maps_url) }}" placeholder="https://maps.app.goo.gl/..." class="w-full border border-stone-300 rounded-lg px-3 py-2">

@@ -143,7 +143,7 @@
             <div class="rounded-lg bg-stone-50 border border-stone-200 px-4 py-3 text-sm flex items-center justify-between">
                 <span class="text-stone-500">Stok sekarang <b class="text-stone-900" x-text="p.stock"></b></span>
                 <span>
-                    <span class="text-stone-400">→</span>
+                    <span class="text-stone-500">Menjadi</span>
                     <b class="text-lg" :class="result === null ? 'text-stone-300' : (result < 0 ? 'text-red-600' : 'text-stone-900')" x-text="result === null ? '–' : result"></b>
                 </span>
             </div>

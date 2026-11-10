@@ -123,7 +123,7 @@
 @endcan
                                 @can('delete_brands')
 <form method="POST" action="{{ route('admin.brands.destroy', $brand->id) }}"
-                                      onsubmit="return confirm('Yakin hapus merek {{ $brand->name }}?')">
+                                      data-confirm-title="Hapus merek {{ $brand->name }}?" data-confirm-text="Merek akan hilang dari katalog dan filter produk." data-confirm-ok="Ya, hapus merek" data-confirm-tone="danger">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-xs text-red-600 hover:text-red-800 font-medium">

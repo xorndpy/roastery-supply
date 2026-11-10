@@ -229,19 +229,11 @@
 
             <form method="POST" action="{{ route('customer.orders.cancel', $order->order_number) }}" class="mt-4">
                 @csrf
-                <button type="submit" onclick="return confirm('Yakin batalkan pesanan ini?')"
+                <button type="submit" data-confirm-title="Batalkan pesanan ini?" data-confirm-text="Pesanan {{ $order->order_number }} akan dibatalkan dan tidak bisa dilanjutkan lagi." data-confirm-ok="Ya, batalkan pesanan" data-confirm-cancel="Tidak, lanjutkan" data-confirm-tone="danger"
                         class="text-sm text-red-600 hover:underline">
                     Batalkan pesanan
                 </button>
             </form>
-        </div>
-    @endif
-
-    {{-- Pelacakan pesanan --}}
-    @if(! in_array($order->status, ['menunggu_bayar', 'batal'], true))
-        <div class="bg-white rounded-lg border border-stone-200 p-6 mb-6">
-            <h2 class="font-bold mb-4">Lacak Pesanan</h2>
-            <x-shipment-tracker :order="$order" />
         </div>
     @endif
 
@@ -261,7 +253,7 @@
                     <div><span class="text-stone-500">Dikirim:</span> {{ $order->shipment->shipped_at->copy()->timezone('Asia/Jakarta')->locale('id')->translatedFormat('j F Y') }}</div>
                 @endif
                 <a href="{{ config('couriers.tracker_url') }}" target="_blank" rel="noopener noreferrer"
-                   class="inline-block text-sm text-orange-700 underline">Lacak paket di situs cek resi →</a>
+                   class="inline-block text-sm text-orange-700 underline">Lacak paket di situs cek resi</a>
             </div>
         </div>
     @endif
@@ -274,7 +266,7 @@
                     <h2 class="font-bold">Retur</h2>
                     <p class="text-sm text-stone-600">{{ ['pending' => 'Pengajuan retur sedang ditinjau.', 'approved' => 'Retur disetujui, menunggu refund.', 'refunded' => 'Retur selesai, refund sudah ditransfer.', 'rejected' => 'Pengajuan retur ditolak.'][$rs] }}</p>
                 </div>
-                <a href="{{ route('customer.returns.show', $order->return->id) }}" class="text-sm text-orange-600 hover:underline">Lihat detail →</a>
+                <a href="{{ route('customer.returns.show', $order->return->id) }}" class="text-sm text-orange-600 underline underline-offset-4 hover:decoration-2">Lihat detail retur</a>
             </div>
         @elseif($returnEligible)
             <div class="bg-white rounded-lg border border-stone-200 p-6 mb-6 flex flex-wrap justify-between items-center gap-3">
@@ -312,7 +304,7 @@
     @if($order->status === 'dikirim')
         <form method="POST" action="{{ route('customer.orders.received', $order->order_number) }}" class="mb-6">
             @csrf
-            <button type="submit" onclick="return confirm('Pesanan sudah kamu terima?')"
+            <button type="submit" data-confirm-title="Konfirmasi pesanan diterima?" data-confirm-text="Pesanan akan ditandai selesai. Kalau ada barang yang kurang atau rusak, cek dulu sebelum mengonfirmasi." data-confirm-ok="Ya, pesanan sudah sampai" data-confirm-cancel="Belum"
                     class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-medium transition">
                 Pesanan Sudah Diterima
             </button>
@@ -327,7 +319,7 @@
     <div class="text-center">
         <a href="{{ route('customer.orders.index') }}" 
            class="text-sm text-stone-500 hover:text-stone-700">
-            ← Kembali ke Daftar Pesanan
+            Kembali ke Daftar Pesanan
         </a>
     </div>
 </div>

@@ -82,7 +82,7 @@
                                 <div class="flex items-center justify-end gap-2">
                                     @if($payment->status === 'pending')
                                         @can('verify_payments')
-                                            <form method="POST" action="{{ route('admin.payments.verify', $payment->id) }}" class="inline" onsubmit="return confirm('Nominal sudah masuk ke rekening? Verifikasi akan mengurangi stok.')">
+                                            <form method="POST" action="{{ route('admin.payments.verify', $payment->id) }}" class="inline" data-confirm-title="Verifikasi pembayaran ini?" data-confirm-text="Pastikan nominal sudah masuk ke rekening. Setelah diverifikasi, status pesanan berubah dan stok produk dikurangi." data-confirm-ok="Ya, nominal sudah masuk" data-confirm-cancel="Belum">
                                                 @csrf
                                                 <button class="pay-btn is-primary !py-1.5">Verifikasi</button>
                                             </form>

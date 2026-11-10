@@ -5,7 +5,7 @@
 @section('content')
 
 <div class="mb-6">
-    <a href="{{ route('admin.shipping.index') }}" class="text-sm text-stone-500 hover:text-stone-700">← Kembali ke Tarif Pengiriman</a>
+    <a href="{{ route('admin.shipping.index') }}" class="text-sm text-stone-500 hover:text-stone-700">Kembali ke Tarif Pengiriman</a>
     <h1 class="text-2xl font-bold text-stone-900 mt-2">{{ $method->name }}</h1>
 </div>
 
@@ -52,7 +52,7 @@
                     <td class="px-4 py-2.5 text-stone-500">{{ $r->etd_label ?? '-' }}</td>
                     <td class="px-4 py-2.5 text-right">
                         @can('manage_shipping_rates')
-                        <form method="POST" action="{{ route('admin.shipping.rates.destroy', [$method->id, $r->id]) }}" onsubmit="return confirm('Hapus tarif ini?')">@csrf @method('DELETE')<button class="text-red-600 hover:underline">Hapus</button></form>
+                        <form method="POST" action="{{ route('admin.shipping.rates.destroy', [$method->id, $r->id]) }}" data-confirm-title="Hapus tarif pengiriman ini?" data-confirm-text="Tarif untuk wilayah ini akan dihapus dari layanan." data-confirm-ok="Ya, hapus tarif" data-confirm-tone="danger">@csrf @method('DELETE')<button class="text-red-600 hover:underline">Hapus</button></form>
                         @endcan
                     </td>
                 </tr>
@@ -82,7 +82,7 @@
         </form>
 
         {{-- Isi semua provinsi --}}
-        <form method="POST" action="{{ route('admin.shipping.rates.bulk', $method->id) }}" class="bg-white p-5 rounded-lg border border-stone-200 space-y-3" onsubmit="return confirm('Terapkan tarif ini ke semua provinsi?')">
+        <form method="POST" action="{{ route('admin.shipping.rates.bulk', $method->id) }}" class="bg-white p-5 rounded-lg border border-stone-200 space-y-3" data-confirm-title="Terapkan tarif ke semua provinsi?" data-confirm-text="Satu tarif dipakai untuk semua provinsi. Provinsi yang sudah punya tarif hanya berubah jika kotak Timpa tarif dicentang." data-confirm-ok="Ya, terapkan tarif">
             @csrf
             <h2 class="font-bold">Isi semua provinsi</h2>
             <p class="text-xs text-stone-500">Cara cepat memulai: satu tarif untuk 38 provinsi, lalu ubah provinsi/kota tertentu di atas.</p>
@@ -96,7 +96,7 @@
             <button class="border border-stone-300 hover:bg-stone-50 px-5 py-2 rounded-lg text-sm">Terapkan ke Semua Provinsi</button>
         </form>
 
-        <form method="POST" action="{{ route('admin.shipping.destroy', $method->id) }}" onsubmit="return confirm('Hapus layanan {{ $method->name }} beserta tarifnya?')">
+        <form method="POST" action="{{ route('admin.shipping.destroy', $method->id) }}" data-confirm-title="Hapus layanan {{ $method->name }}?" data-confirm-text="Layanan ini dan seluruh tarifnya akan dihapus." data-confirm-ok="Ya, hapus layanan" data-confirm-tone="danger">
             @csrf @method('DELETE')
             <button class="text-sm text-red-600 hover:underline">Hapus layanan ini</button>
         </form>

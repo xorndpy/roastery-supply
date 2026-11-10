@@ -12,7 +12,7 @@
 @endphp
 
 <div class="mb-6">
-    <a href="{{ route('admin.returns.index') }}" class="text-sm text-stone-500 hover:text-stone-700">← Kembali ke Retur</a>
+    <a href="{{ route('admin.returns.index') }}" class="text-sm text-stone-500 hover:text-stone-700">Kembali ke Retur</a>
     <div class="flex flex-wrap items-center gap-3 mt-2">
         <h1 class="text-2xl font-bold font-mono">{{ $order->order_number }}</h1>
         <span class="px-2.5 py-1 rounded text-xs font-medium {{ $color }}">{{ $label }}</span>
@@ -77,7 +77,7 @@
                     Transfer <strong>Rp {{ number_format($return->refund_amount, 0, ',', '.') }}</strong> ke
                     <strong>{{ $return->refund_bank }} {{ $return->refund_account_number }}</strong> a/n {{ $return->refund_account_name }}, lalu tandai selesai.
                 </p>
-                <form method="POST" action="{{ route('admin.returns.refunded', $return->id) }}" onsubmit="return confirm('Dana sudah ditransfer ke customer?')">
+                <form method="POST" action="{{ route('admin.returns.refunded', $return->id) }}" data-confirm-title="Tandai refund selesai?" data-confirm-text="Pastikan Rp {{ number_format($return->refund_amount, 0, ',', '.') }} sudah masuk ke {{ $return->refund_bank }} {{ $return->refund_account_number }} a/n {{ $return->refund_account_name }}. Customer akan menerima pemberitahuan bahwa refund selesai." data-confirm-ok="Ya, dana sudah ditransfer" data-confirm-cancel="Belum">
                     @csrf
                     <button class="bg-stone-900 hover:bg-stone-800 text-white px-5 py-2.5 rounded-lg font-medium">Tandai Refund Selesai</button>
                 </form>
@@ -98,7 +98,7 @@
             <ul class="pt-2 border-t border-stone-100 space-y-1">
                 @foreach($order->items as $item)<li class="flex justify-between gap-3"><span>{{ $item->product_name }} × {{ $item->quantity }}</span></li>@endforeach
             </ul>
-            @can('view_orders')<a href="{{ route('admin.orders.show', $order->id) }}" class="inline-block pt-2 text-orange-600 hover:underline">Buka pesanan →</a>@endcan
+            @can('view_orders')<a href="{{ route('admin.orders.show', $order->id) }}" class="inline-block pt-2 text-orange-600 underline underline-offset-4 hover:decoration-2">Buka pesanan</a>@endcan
         </div>
 
         @can('view_finance')

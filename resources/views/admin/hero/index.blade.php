@@ -8,7 +8,7 @@
     <h1 class="text-2xl font-bold text-stone-900">Hero Beranda</h1>
     <p class="text-sm text-stone-500 mt-1">
         Foto latar slideshow di bagian paling atas beranda. Judul dan teksnya diatur di
-        <a href="{{ route('admin.settings.index', ['tab' => 'tampilan']) }}" class="text-orange-600 hover:underline">Pengaturan &rarr; Tampilan</a>.
+        <a href="{{ route('admin.settings.index', ['tab' => 'tampilan']) }}" class="text-orange-600 hover:underline">Pengaturan &gt; Tampilan</a>.
     </p>
 </div>
 
@@ -69,15 +69,15 @@
                 <div class="flex items-center justify-between gap-2 p-3 text-sm">
                     @can('edit_settings')
                     <div class="flex gap-1">
-                        <button type="button" data-move="-1" class="px-2 py-1 rounded border border-stone-300 hover:bg-stone-50" aria-label="Geser ke depan">&larr;</button>
-                        <button type="button" data-move="1" class="px-2 py-1 rounded border border-stone-300 hover:bg-stone-50" aria-label="Geser ke belakang">&rarr;</button>
+                        <button type="button" data-move="-1" class="px-2 py-1 rounded border border-stone-300 hover:bg-stone-50" >Ke depan</button>
+                        <button type="button" data-move="1" class="px-2 py-1 rounded border border-stone-300 hover:bg-stone-50" >Ke belakang</button>
                     </div>
                     <div class="flex items-center gap-3">
                         <form method="POST" action="{{ route('admin.hero.toggle', $s->id) }}">
                             @csrf @method('PATCH')
                             <button class="text-orange-600 hover:underline">{{ $s->is_active ? 'Nonaktifkan' : 'Aktifkan' }}</button>
                         </form>
-                        <form method="POST" action="{{ route('admin.hero.destroy', $s->id) }}" onsubmit="return confirm('Hapus foto ini?')">
+                        <form method="POST" action="{{ route('admin.hero.destroy', $s->id) }}" data-confirm-title="Hapus foto hero ini?" data-confirm-text="Foto akan hilang dari slideshow halaman utama." data-confirm-ok="Ya, hapus foto" data-confirm-tone="danger">
                             @csrf @method('DELETE')
                             <button class="text-red-600 hover:underline">Hapus</button>
                         </form>

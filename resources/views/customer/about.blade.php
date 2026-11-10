@@ -40,10 +40,6 @@
             <p class="eyebrow auth-rise !text-orange-300">{{ $site['about_title'] }}</p>
             <h1 class="heading auth-rise mt-4 text-4xl leading-[1.1] sm:text-[3.25rem] [text-wrap:balance]" style="--d:70ms">{{ $site['about_headline'] }}</h1>
             <p class="auth-rise mt-6 text-base leading-relaxed text-stone-100 sm:text-[17px]" style="--d:140ms">{{ $site['about_lead'] }}</p>
-            <div class="auth-rise mt-8 flex flex-wrap gap-3" style="--d:210ms">
-                <a href="{{ route('products.index') }}" class="btn btn-light">Lihat Katalog</a>
-                <a href="{{ route('contact.index') }}" class="btn btn-ghost-light">Hubungi Kami</a>
-            </div>
         </div>
     </div>
 </section>

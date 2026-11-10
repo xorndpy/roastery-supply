@@ -20,7 +20,7 @@
                 @if($branch->phone)<p class="mt-3 text-sm"><span class="text-stone-500">Telepon:</span> <a href="tel:{{ preg_replace('/[^0-9+]/', '', $branch->phone) }}" class="hover:underline">{{ $branch->phone }}</a></p>@endif
                 @if($branch->maps_url || $hasMap)
                     <a href="{{ $branch->maps_url ?: 'https://www.google.com/maps?q=' . $lat . ',' . $lng }}" target="_blank" rel="noopener noreferrer"
-                       class="inline-block mt-4 text-sm text-orange-600 hover:underline">Buka di Google Maps →</a>
+                       class="inline-block mt-4 text-sm text-orange-600 underline underline-offset-4 hover:decoration-2">Buka di Google Maps</a>
                 @endif
             </div>
             @if($hasMap)

@@ -100,10 +100,10 @@
                                     <span x-text="copied ? 'Tersalin' : 'Salin'" aria-live="polite">Salin</span>
                                 </button>
                             </div>
-                            <p class="mt-1.5 text-xs leading-relaxed text-stone-500">Tempel di dashboard Midtrans (menu Settings → Configuration → Payment Notification URL).</p>
+                            <p class="mt-1.5 text-xs leading-relaxed text-stone-500">Tempel di dashboard Midtrans (menu Settings &gt; Configuration &gt; Payment Notification URL).</p>
                         </div>
 
-                        <p class="mt-5 border-t border-stone-100 pt-4 text-xs leading-relaxed text-stone-500">Kunci API sengaja tidak diubah dari halaman ini supaya tidak bocor lewat panel. Atur di server (Railway → Variables): <span class="font-mono">MIDTRANS_SERVER_KEY</span>, <span class="font-mono">MIDTRANS_CLIENT_KEY</span>, <span class="font-mono">MIDTRANS_IS_PRODUCTION</span>.</p>
+                        <p class="mt-5 border-t border-stone-100 pt-4 text-xs leading-relaxed text-stone-500">Kunci API sengaja tidak diubah dari halaman ini supaya tidak bocor lewat panel. Atur di server (Railway &gt; Variables): <span class="font-mono">MIDTRANS_SERVER_KEY</span>, <span class="font-mono">MIDTRANS_CLIENT_KEY</span>, <span class="font-mono">MIDTRANS_IS_PRODUCTION</span>.</p>
                     </section>
                 @endif
 
@@ -113,7 +113,7 @@
                             <p class="font-bold text-stone-900">Foto latar hero beranda (slideshow)</p>
                             <p class="mt-0.5 text-sm text-stone-600">Unggah banyak foto sekaligus, atur urutannya, dan aktif/nonaktifkan.</p>
                         </div>
-                        <span class="shrink-0 text-sm font-medium text-orange-700">Kelola &rarr;</span>
+                        <span class="shrink-0 text-sm font-medium text-orange-700 underline underline-offset-4">Kelola</span>
                     </a>
                 @endif
 
@@ -123,7 +123,7 @@
                             <p class="font-bold text-stone-900">Slider beranda produk (3–5 foto)</p>
                             <p class="mt-0.5 text-sm text-stone-600">Foto terbaru dan promo di paling atas halaman Produk. Atur di Banner &amp; Promo, pilih tampil di "Katalog".</p>
                         </div>
-                        <span class="shrink-0 text-sm font-medium text-orange-700">Kelola &rarr;</span>
+                        <span class="shrink-0 text-sm font-medium text-orange-700 underline underline-offset-4">Kelola</span>
                     </a>
                     <p class="rounded-xl border border-stone-200 bg-white p-4 text-sm leading-relaxed text-stone-600">Setiap halaman punya fotonya sendiri, jadi tidak lagi seragam. Halaman tanpa foto tampil dengan latar polos. Banner tiap kategori produk diatur di <a href="{{ route('admin.categories.index') }}" class="font-medium text-orange-700 underline">Kategori</a>.</p>
                 @endif

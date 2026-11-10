@@ -5,7 +5,7 @@
 @section('content')
 <div class="max-w-2xl mx-auto px-4 sm:px-6 py-10">
 
-    <a href="{{ route('customer.returns.index') }}" class="text-sm text-stone-500 hover:text-stone-700">← Retur Saya</a>
+    <a href="{{ route('customer.returns.index') }}" class="text-sm text-stone-500 hover:text-stone-700">Retur Saya</a>
     <h1 class="text-3xl font-bold mt-2 mb-6">Ajukan Retur</h1>
 
     @if(session('error'))<div class="mb-4 p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg">{{ session('error') }}</div>@endif

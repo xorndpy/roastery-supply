@@ -63,7 +63,7 @@
             <a href="{{ route('admin.testimonials.edit', $t->id) }}" class="text-orange-600 hover:underline">Edit</a>
             @endcan
             @can('delete_testimonials')
-            <form method="POST" action="{{ route('admin.testimonials.destroy', $t->id) }}" onsubmit="return confirm('Hapus testimoni ini?')">
+            <form method="POST" action="{{ route('admin.testimonials.destroy', $t->id) }}" data-confirm-title="Hapus testimoni ini?" data-confirm-text="Testimoni tidak akan tampil lagi di website." data-confirm-ok="Ya, hapus testimoni" data-confirm-tone="danger">
                 @csrf @method('DELETE')
                 <button class="text-red-600 hover:underline">Hapus</button>
             </form>

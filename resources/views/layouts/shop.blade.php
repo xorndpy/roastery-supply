@@ -22,5 +22,6 @@
     <x-whatsapp-float />
 
     @stack('scripts')
+    <x-confirm-dialog />
 </body>
 </html>

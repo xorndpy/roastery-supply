@@ -207,8 +207,8 @@
     .dash-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: .85rem; }
     .dash-card-head h2 { font-size: .9375rem; font-weight: 600; line-height: 1.3; letter-spacing: -.005em; }
     .dash-sub { margin-top: .15rem; font-size: 12.5px; color: var(--muted); }
-    .dash-link { white-space: nowrap; font-size: 12.5px; font-weight: 500; color: var(--accent-d); border-radius: 4px; }
-    .dash-link:hover { text-decoration: underline; }
+    .dash-link { white-space: nowrap; font-size: 12.5px; font-weight: 500; color: var(--accent-d); border-radius: 4px; text-decoration: underline; text-underline-offset: 3px; }
+    .dash-link:hover { text-decoration-thickness: 2px; }
     .dash-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     .dash-pill { min-width: 1.5rem; padding: .05rem .5rem; border-radius: 999px; background: var(--accent); color: #fff; font-size: 12px; font-weight: 600; text-align: center; font-variant-numeric: tabular-nums; }
     .dash-empty { display: flex; align-items: center; gap: .5rem; font-size: 13px; color: var(--muted); }

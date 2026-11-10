@@ -57,7 +57,7 @@
     <div class="overflow-hidden rounded-xl border border-stone-200 bg-white">
         <div class="flex items-center justify-between px-6 py-4">
             <h2 class="heading text-lg">Pesanan Terakhir</h2>
-            <a href="{{ route('customer.orders.index') }}" class="text-sm text-orange-600 hover:underline">Lihat semua →</a>
+            <a href="{{ route('customer.orders.index') }}" class="text-sm text-orange-600 underline underline-offset-4 hover:decoration-2">Lihat semua pesanan</a>
         </div>
 
         @forelse($recentOrders as $order)

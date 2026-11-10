@@ -56,13 +56,13 @@
                     <div class="text-xs text-stone-500">{{ $v->per_user_limit > 0 ? $v->per_user_limit . '× per user' : 'tanpa batas per user' }}</div>
                 </td>
                 <td class="px-4 py-3 text-stone-600 text-xs">
-                    {{ $v->start_at?->format('d M Y') ?? 'sekarang' }} → {{ $v->end_at?->format('d M Y') ?? 'tanpa batas' }}
+                    {{ $v->start_at?->format('d M Y') ?? 'sekarang' }} hingga {{ $v->end_at?->format('d M Y') ?? 'tanpa batas' }}
                 </td>
                 <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-xs {{ $stateColors[$v->state] }}">{{ $stateLabels[$v->state] }}</span></td>
                 <td class="px-4 py-3 text-right whitespace-nowrap">
                     @can('edit_vouchers')<a href="{{ route('admin.vouchers.edit', $v->id) }}" class="text-orange-600 hover:underline mr-3">Edit</a>@endcan
                     @can('delete_vouchers')
-                    <form method="POST" action="{{ route('admin.vouchers.destroy', $v->id) }}" class="inline" onsubmit="return confirm('Hapus voucher {{ $v->code }}?')">@csrf @method('DELETE')<button class="text-red-600 hover:underline">Hapus</button></form>
+                    <form method="POST" action="{{ route('admin.vouchers.destroy', $v->id) }}" class="inline" data-confirm-title="Hapus voucher {{ $v->code }}?" data-confirm-text="Voucher tidak bisa dipakai lagi di checkout." data-confirm-ok="Ya, hapus voucher" data-confirm-tone="danger">@csrf @method('DELETE')<button class="text-red-600 hover:underline">Hapus</button></form>
                     @endcan
                 </td>
             </tr>

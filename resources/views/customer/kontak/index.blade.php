@@ -47,7 +47,7 @@
             </{{ $tag }}>
         @empty
             <div class="rounded-xl border border-dashed border-stone-300 bg-white p-5 text-sm text-stone-500">
-                Data kontak belum diisi. Lengkapi di Admin &rarr; Pengaturan.
+                Data kontak belum diisi. Lengkapi di Admin &gt; Pengaturan.
             </div>
         @endforelse
     </div>
@@ -131,8 +131,8 @@
                 <div class="text-sm font-semibold uppercase tracking-wide" x-text="b.name"></div>
                 <p class="mt-1.5 whitespace-pre-line text-[13px] leading-relaxed text-stone-500" x-text="b.address"></p>
                 <div class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[13px] font-medium">
-                    <a :href="b.url" target="_blank" rel="noopener noreferrer" class="text-orange-600 hover:underline">Buka di Maps →</a>
-                    <template x-if="b.phone"><a :href="'tel:' + b.phone" class="text-orange-600 hover:underline">Hubungi cabang ini →</a></template>
+                    <a :href="b.url" target="_blank" rel="noopener noreferrer" class="text-orange-600 underline underline-offset-4 hover:decoration-2">Buka di Maps</a>
+                    <template x-if="b.phone"><a :href="'tel:' + b.phone" class="text-orange-600 underline underline-offset-4 hover:decoration-2">Hubungi cabang ini</a></template>
                 </div>
             </div>
         </div>

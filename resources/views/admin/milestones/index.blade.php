@@ -27,7 +27,7 @@
                             <td class="text-right">
                                 <div class="flex items-center justify-end gap-2">
                                     @can('edit_milestones')<a href="{{ route('admin.milestones.edit', $m->id) }}" class="pay-btn is-primary !py-1.5">Edit</a>@endcan
-                                    @can('delete_milestones')<form method="POST" action="{{ route('admin.milestones.destroy', $m->id) }}" onsubmit="return confirm('Hapus milestone ini?')">@csrf @method('DELETE')<button class="pay-btn is-quiet !py-1.5 !text-red-700">Hapus</button></form>@endcan
+                                    @can('delete_milestones')<form method="POST" action="{{ route('admin.milestones.destroy', $m->id) }}" data-confirm-title="Hapus milestone ini?" data-confirm-text="Milestone akan hilang dari halaman Tentang." data-confirm-ok="Ya, hapus milestone" data-confirm-tone="danger">@csrf @method('DELETE')<button class="pay-btn is-quiet !py-1.5 !text-red-700">Hapus</button></form>@endcan
                                 </div>
                             </td>
                         </tr>

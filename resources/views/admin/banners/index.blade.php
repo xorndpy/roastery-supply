@@ -43,7 +43,7 @@
             <div class="font-medium truncate">{{ $b->title }} <span class="ml-1 rounded bg-stone-100 px-1.5 py-0.5 text-[11px] font-normal text-stone-600">{{ \App\Models\Banner::PLACEMENTS[$b->placement] ?? 'Beranda' }}</span></div>
             <div class="text-xs text-stone-500 mt-1">
                 @if($b->start_at || $b->end_at)
-                    {{ $b->start_at?->format('d M Y H:i') ?? 'sekarang' }} → {{ $b->end_at?->format('d M Y H:i') ?? 'tanpa batas' }}
+                    {{ $b->start_at?->format('d M Y H:i') ?? 'sekarang' }} hingga {{ $b->end_at?->format('d M Y H:i') ?? 'tanpa batas' }}
                 @else
                     Selalu tayang
                 @endif
@@ -53,7 +53,7 @@
         <div class="whitespace-nowrap text-sm">
             @can('edit_banners')<a href="{{ route('admin.banners.edit', $b->id) }}" class="text-orange-600 hover:underline mr-3">Edit</a>@endcan
             @can('delete_banners')
-            <form method="POST" action="{{ route('admin.banners.destroy', $b->id) }}" class="inline" onsubmit="return confirm('Hapus banner ini?')">
+            <form method="POST" action="{{ route('admin.banners.destroy', $b->id) }}" class="inline" data-confirm-title="Hapus banner ini?" data-confirm-text="Banner tidak akan tampil lagi di website." data-confirm-ok="Ya, hapus banner" data-confirm-tone="danger">
                 @csrf @method('DELETE')
                 <button class="text-red-600 hover:underline">Hapus</button>
             </form>

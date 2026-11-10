@@ -27,7 +27,7 @@
         </nav>
 
         <div class="ml-auto flex items-center gap-4">
-            <a href="{{ route('home') }}" class="hidden whitespace-nowrap text-sm text-stone-500 transition hover:text-stone-900 sm:inline">Website utama →</a>
+            <a href="{{ route('home') }}" class="hidden whitespace-nowrap text-sm text-stone-500 transition hover:text-stone-900 sm:inline">Website utama</a>
             <button @click="open = !open" class="text-stone-800 xl:hidden" aria-label="Menu kategori" :aria-expanded="open">
                 <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path x-show="!open" d="M4 7h16M4 12h16M4 17h16"/><path x-show="open" x-cloak d="M6 6l12 12M18 6L6 18"/></svg>
             </button>
@@ -44,7 +44,7 @@
                     <a href="{{ route('articles.index', ['kategori' => \Illuminate\Support\Str::slug($c)]) }}" class="rounded-full border px-3.5 py-1.5 text-sm {{ $current === $c ? 'border-orange-500 bg-orange-50 text-orange-700' : 'border-stone-200 text-stone-600' }}">{{ $c }}</a>
                 @endforeach
             </div>
-            <a href="{{ route('home') }}" class="mt-3 block text-sm text-stone-500">Website utama →</a>
+            <a href="{{ route('home') }}" class="mt-3 block text-sm text-stone-500">Website utama</a>
         </div>
     </div>
 </header>

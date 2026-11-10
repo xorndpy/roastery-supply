@@ -6,7 +6,7 @@
 
 <div class="mb-6">
     <a href="{{ route('admin.products.index') }}" class="text-sm text-stone-500 hover:text-stone-700">
-        ← Kembali ke Daftar Produk
+        Kembali ke Daftar Produk
     </a>
 </div>
 

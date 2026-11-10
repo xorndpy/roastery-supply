@@ -7,7 +7,7 @@
 
     <div class="mb-6">
         <a href="{{ route('customer.dashboard') }}" class="text-sm text-stone-500 hover:text-stone-700">
-            ← Kembali ke Dashboard
+            Kembali ke Dashboard
         </a>
     </div>
 

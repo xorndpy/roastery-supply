@@ -55,7 +55,7 @@
                 <td class="px-4 py-3 text-xs text-stone-600">
                     @forelse($new as $key => $val)
                         <div><span class="text-stone-400">{{ $key }}:</span>
-                            @if(array_key_exists($key, $old))<span class="line-through text-stone-400">{{ is_scalar($old[$key]) || is_null($old[$key]) ? $old[$key] : json_encode($old[$key]) }}</span> → @endif
+                            @if(array_key_exists($key, $old))<span class="line-through text-stone-400">{{ is_scalar($old[$key]) || is_null($old[$key]) ? $old[$key] : json_encode($old[$key]) }}</span> <span class="text-stone-400">menjadi</span> @endif
                             {{ is_scalar($val) || is_null($val) ? $val : json_encode($val) }}
                         </div>
                     @empty

@@ -5,7 +5,7 @@
 
 @section('content')
 
-<div class="mb-6"><a href="{{ route('admin.testimonials.index') }}" class="text-sm text-stone-500 hover:text-stone-700">← Kembali ke Testimoni</a></div>
+<div class="mb-6"><a href="{{ route('admin.testimonials.index') }}" class="text-sm text-stone-500 hover:text-stone-700">Kembali ke Testimoni</a></div>
 
 @if ($errors->any())
     <div class="mb-4 p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg text-sm"><ul class="list-disc list-inside">@foreach ($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul></div>

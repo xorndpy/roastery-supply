@@ -6,7 +6,7 @@
 
 <div class="mb-6">
     <a href="{{ route('admin.brands.index') }}" class="text-sm text-stone-500 hover:text-stone-700">
-        ← Kembali ke Daftar Merek
+        Kembali ke Daftar Merek
     </a>
 </div>
 

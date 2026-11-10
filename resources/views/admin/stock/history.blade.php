@@ -5,7 +5,7 @@
 @section('content')
 
 <div class="mb-6">
-    <a href="{{ route('admin.stock.index') }}" class="text-sm text-stone-500 hover:text-stone-700">← Kembali ke Stok</a>
+    <a href="{{ route('admin.stock.index') }}" class="text-sm text-stone-500 hover:text-stone-700">Kembali ke Stok</a>
     <h1 class="text-2xl font-bold text-stone-900 mt-2">Riwayat Mutasi Stok</h1>
 </div>
 

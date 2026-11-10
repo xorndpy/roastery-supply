@@ -8,7 +8,7 @@
     $publishedAt = old('published_at', $article->published_at?->copy()->timezone('Asia/Jakarta')->format('Y-m-d\TH:i'));
 @endphp
 <div class="dash">
-    <a href="{{ route('admin.articles.index') }}" class="text-sm text-stone-500 hover:text-stone-800">← Kembali ke Artikel</a>
+    <a href="{{ route('admin.articles.index') }}" class="text-sm text-stone-500 hover:text-stone-800">Kembali ke Artikel</a>
     <header class="dash-head" style="margin-top:.75rem"><div><h1 class="dash-h1" style="margin-top:0">{{ $article->exists ? 'Edit artikel' : 'Tulis artikel' }}</h1></div></header>
 
     @if($errors->any())
@@ -16,15 +16,15 @@
     @endif
 
     <form method="POST" enctype="multipart/form-data" action="{{ $article->exists ? route('admin.articles.update', $article->id) : route('admin.articles.store') }}" class="grid gap-5 lg:grid-cols-3"
-          x-data="{ preview: null, busy: false, async upload(e) {
-              const file = e.target.files[0]; if (!file) return; this.busy = true;
+          x-data="{ preview: null, busy: false, uploadError: '', async upload(e) {
+              const file = e.target.files[0]; if (!file) return; this.busy = true; this.uploadError = '';
               const fd = new FormData(); fd.append('image', file);
               try {
                   const r = await fetch('{{ route('admin.articles.upload-image') }}', { method: 'POST', headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content, Accept: 'application/json' }, body: fd });
                   const j = await r.json(); if (!r.ok) throw new Error(j.message || 'Gagal mengunggah foto.');
                   const t = this.$refs.body, pos = t.selectionStart ?? t.value.length;
                   t.value = t.value.slice(0, pos) + '\n\n![Deskripsi foto](' + j.url + ')\n\n' + t.value.slice(pos);
-              } catch (err) { alert(err.message); } finally { this.busy = false; e.target.value = ''; }
+              } catch (err) { this.uploadError = err.message; } finally { this.busy = false; e.target.value = ''; }
           } }">
         @csrf
         @if($article->exists) @method('PUT') @endif
@@ -45,6 +45,7 @@
                             <input type="file" accept="image/png,image/jpeg,image/webp" class="sr-only" @change="upload($event)" :disabled="busy">
                         </label>
                     </div>
+                    <p x-show="uploadError" x-text="uploadError" x-cloak role="alert" class="mb-2 text-xs text-red-700"></p>
                     <textarea id="body" x-ref="body" name="body" rows="18" required class="block w-full rounded-lg border border-stone-300 px-3 py-2.5 font-mono text-[13.5px] leading-relaxed">{{ $f('body') }}</textarea>
                     <details class="mt-2 text-xs text-stone-600">
                         <summary class="cursor-pointer font-medium">Panduan penulisan (Markdown)</summary>
