@@ -23,6 +23,11 @@
 
     $rp = fn ($n) => 'Rp ' . number_format($n, 0, ',', '.');
 
+    // Periode aktif (preset atau rentang bebas). Jumlah hari diambil dari data grafik.
+    $periodDays   = max(1, count($chartDates ?? []));
+    $periodLabel  = (isset($rangeLabel) && trim((string) $rangeLabel) !== '') ? (string) $rangeLabel : $periodDays . ' hari terakhir';
+    $periodLabelL = \Illuminate\Support\Str::lcfirst($periodLabel);
+
     // Waktu tampil mengikuti WIB (zona waktu aplikasi tetap UTC agar data lama tidak bergeser).
     $now       = now('Asia/Jakarta');
     $hour      = (int) $now->format('G');
@@ -117,10 +122,10 @@
     if ($canFinance) {
         $kpis[] = [
             'icon'  => 'coins',
-            'label' => 'Pendapatan ' . $range . ' hari terakhir',
+            'label' => 'Pendapatan ' . $periodLabelL,
             'value' => $rp($revenue),
             'delta' => $revenueDelta,
-            'sub'   => 'dibanding ' . $range . ' hari sebelumnya',
+            'sub'   => 'dibanding periode sebelumnya',
         ];
     } else {
         $kpis[] = [
@@ -134,7 +139,7 @@
 
     $kpis[] = [
         'icon'  => 'bag',
-        'label' => 'Pesanan ' . $range . ' hari terakhir',
+        'label' => 'Pesanan ' . $periodLabelL,
         'value' => number_format($orders),
         'delta' => $ordersDelta,
         'sub'   => $pendingOrders > 0 ? $pendingOrders . ' belum dibayar' : 'Semua sudah dibayar',
@@ -603,9 +608,13 @@
             <h1 class="dash-h1">{{ $greeting }}, {{ $firstName }}</h1>
             <p class="dash-lede">{{ $dateLabel }} · {{ $lede }}</p>
         </div>
+        @php
+            $activePreset = ($preset ?? '') !== '' ? (string) $preset : (request()->filled('from') ? 'custom' : '30');
+            $presetLinks  = ['today' => 'Hari ini', '7' => '7 hari', '30' => '30 hari', '90' => '90 hari', 'month' => 'Bulan ini', 'lastmonth' => 'Bulan lalu'];
+        @endphp
         <nav class="dash-range" aria-label="Rentang waktu">
-            @foreach ([7, 30, 90] as $r)
-                <a href="{{ route('admin.dashboard', ['range' => $r]) }}" @if ($range === $r) aria-current="true" @endif>{{ $r }} hari</a>
+            @foreach ($presetLinks as $key => $text)
+                <a href="{{ route('admin.dashboard', ['range' => $key]) }}" @if ($activePreset === (string) $key) aria-current="true" @endif>{{ $text }}</a>
             @endforeach
         </nav>
     </header>
@@ -660,7 +669,7 @@
                     <h2 id="sales-title">Penjualan</h2>
                     {{-- Catatan: beri spasi sebelum @if, kalau menempel ke huruf Blade tidak mengenalinya sebagai directive. --}}
                     <p class="td-sub">
-                        {{ $range }} hari terakhir
+                        {{ $periodLabel }}
                         @if ($canFinance)
                             · Total sejak toko dibuka {{ $rp($totalRevenue) }}{{ $totalRefund > 0 ? ' (setelah refund ' . $rp($totalRefund) . ')' : '' }}
                         @endif
@@ -682,7 +691,7 @@
             </dl>
 
             <div id="tdChart" class="td-chart" tabindex="0" role="group"
-                 aria-label="Grafik batang penjualan {{ $range }} hari terakhir. Gunakan panah kiri dan kanan untuk menelusuri tiap hari."
+                 aria-label="Grafik batang penjualan {{ $periodLabelL }}. Gunakan panah kiri dan kanan untuk menelusuri tiap hari."
                  data-dates='@json($chartDates)'
                  data-ord='@json($chartOrders)'
                  @if ($canFinance) data-rev='@json($chartData)' @endif
@@ -757,7 +766,7 @@
             <div class="td-head">
                 <div>
                     <h2 id="status-title">Status pesanan</h2>
-                    <p class="td-sub">{{ $range }} hari terakhir</p>
+                    <p class="td-sub">{{ $periodLabel }}</p>
                 </div>
             </div>
 
@@ -802,7 +811,7 @@
         <section class="td-card td-c4" aria-labelledby="top-title">
             <div class="td-head">
                 <h2 id="top-title">Produk terlaris</h2>
-                <span class="td-sub">{{ $range }} hari</span>
+                <span class="td-sub">{{ $periodLabel }}</span>
             </div>
 
             @if ($topProducts->isNotEmpty())
@@ -834,7 +843,7 @@
                     @endforeach
                 </ol>
             @else
-                <p class="dash-empty">Belum ada penjualan dalam {{ $range }} hari terakhir.</p>
+                <p class="dash-empty">Belum ada penjualan dalam periode ini.</p>
             @endif
         </section>
 
@@ -843,7 +852,7 @@
             <div class="td-head">
                 <div>
                     <h2 id="cat-title">Penjualan per kategori</h2>
-                    <p class="td-sub">{{ $canFinance ? 'Berdasarkan pendapatan' : 'Berdasarkan jumlah terjual' }} · {{ $range }} hari</p>
+                    <p class="td-sub">{{ $canFinance ? 'Berdasarkan pendapatan' : 'Berdasarkan jumlah terjual' }} · {{ $periodLabel }}</p>
                 </div>
             </div>
 
@@ -863,7 +872,7 @@
                     @endforeach
                 </div>
             @else
-                <p class="dash-empty">Belum ada penjualan dalam {{ $range }} hari terakhir.</p>
+                <p class="dash-empty">Belum ada penjualan dalam periode ini.</p>
             @endif
         </section>
 
@@ -872,7 +881,7 @@
             <div class="td-head">
                 <div>
                     <h2 id="cust-title">Pelanggan</h2>
-                    <p class="td-sub">Pembeli {{ $range }} hari terakhir</p>
+                    <p class="td-sub">Pembeli {{ $periodLabelL }}</p>
                 </div>
             </div>
 
@@ -1361,7 +1370,7 @@ window.tdCalendar = function (url, finance, today, colors) {
 
         s += '</svg>';
         s += total === 0
-            ? `<div class="td-empty"><p>Belum ada ${metric === 'rev' ? 'pendapatan' : 'pesanan'} dalam ${N} hari terakhir</p></div>`
+            ? `<div class="td-empty"><p>Belum ada ${metric === 'rev' ? 'pendapatan' : 'pesanan'} dalam periode ini</p></div>`
             : '<div class="td-tip" role="presentation"></div>';
 
         host.innerHTML = s;
