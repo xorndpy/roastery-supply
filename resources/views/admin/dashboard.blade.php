@@ -417,9 +417,8 @@
 
             <div class="td-cal-list" aria-live="polite">
                 <p class="text-xs font-semibold text-stone-500" x-text="selectedLabel"></p>
-                <p class="mt-2 text-[13px] text-stone-500" x-show="error" x-cloak>Kalender gagal dimuat. Coba muat ulang halaman.</p>
-                <p class="mt-2 text-[13px] text-stone-500" x-show="!error && selected && selectedOrders.length === 0" x-cloak>Tidak ada pesanan pada tanggal ini.</p>
-                <p class="mt-2 text-[13px] text-stone-500" x-show="!error && !selected" x-cloak>Pilih tanggal untuk melihat pesanannya.</p>
+                <p class="mt-2 text-[13px] text-stone-500" x-show="!error &amp;&amp; selected &amp;&amp; selectedOrders.length === 0" x-cloak>Tidak ada pesanan pada tanggal ini.</p>
+                <p class="mt-2 text-[13px] text-stone-500" x-show="!error &amp;&amp; !selected" x-cloak>Pilih tanggal untuk melihat pesanannya.</p>
                 <ul class="mt-1">
                     <template x-for="o in selectedOrders.slice(0, 5)" :key="o.n">
                         <li>
