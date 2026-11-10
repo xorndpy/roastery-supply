@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\HandlesImageUploads;
 use App\Http\Requests\ProfileUpdateRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -11,11 +12,18 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
+    use HandlesImageUploads;
+
     /**
      * Display the user's profile form.
      */
-    public function edit(Request $request): View
+    public function edit(Request $request): View|RedirectResponse
     {
+        // Halaman ini memakai tampilan panel admin; pelanggan punya halaman profil sendiri.
+        if (! $request->user()->hasAnyRole(['super_admin', 'admin', 'staff', 'gudang'])) {
+            return Redirect::route('customer.profile.edit');
+        }
+
         return view('profile.edit', [
             'user' => $request->user(),
         ]);
@@ -26,15 +34,33 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $user->fill($request->safe()->only(['name', 'email']));
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
         }
 
-        $request->user()->save();
+        // Foto profil: unggah baru (ganti yang lama) atau hapus.
+        if ($request->hasFile('avatar')) {
+            $this->deleteOwnAvatar($user->avatar);
+            $user->avatar = $this->storeImage($request->file('avatar'), 'avatars');
+        } elseif ($request->boolean('remove_avatar')) {
+            $this->deleteOwnAvatar($user->avatar);
+            $user->avatar = null;
+        }
+
+        $user->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
+    }
+
+    /** Hanya file unggahan yang dihapus dari disk; URL foto Google dibiarkan. */
+    private function deleteOwnAvatar(?string $path): void
+    {
+        if ($path && ! str_starts_with($path, 'http')) {
+            $this->deleteImage($path);
+        }
     }
 
     /**

@@ -64,16 +64,19 @@
                         <div x-data="{ open: false }" @keydown.escape="open = false" class="relative">
                             <button @click="open = !open" :aria-expanded="open.toString()" aria-haspopup="menu"
                                     class="flex items-center gap-2.5 rounded-full py-1 pl-1 pr-2.5 text-sm text-stone-700 transition hover:bg-stone-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500">
-                                <span class="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-[12px] font-semibold tracking-wide text-orange-100" aria-hidden="true">{{ $initials }}</span>
+                                <x-avatar :user="auth()->user()" :size="32" />
                                 <span class="hidden max-w-[10rem] truncate sm:block">{{ $userName }}</span>
                                 <svg class="h-3.5 w-3.5 text-stone-500 transition-transform duration-200" :class="open && 'rotate-180'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
                             </button>
                             <div x-show="open" @click.outside="open = false" x-cloak role="menu"
                                  x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
-                                 class="absolute right-0 mt-2 w-52 overflow-hidden rounded-lg border border-stone-200 bg-white py-1 shadow-lg shadow-stone-900/5">
-                                <div class="border-b border-stone-100 px-4 py-2.5">
-                                    <p class="truncate text-sm font-medium text-stone-900">{{ $userName }}</p>
-                                    <p class="truncate text-xs text-stone-500">{{ auth()->user()->email ?? '' }}</p>
+                                 class="absolute right-0 mt-2 w-64 overflow-hidden rounded-lg border border-stone-200 bg-white py-1 shadow-lg shadow-stone-900/5">
+                                <div class="flex items-center gap-3 border-b border-stone-100 px-4 py-3">
+                                    <x-avatar :user="auth()->user()" :size="40" />
+                                    <div class="min-w-0">
+                                        <p class="truncate text-sm font-medium text-stone-900">{{ $userName }}</p>
+                                        <p class="truncate text-xs text-stone-500">{{ auth()->user()->email ?? '' }}</p>
+                                    </div>
                                 </div>
                                 <a href="{{ route('profile.edit') }}" role="menuitem" class="block px-4 py-2 text-sm text-stone-700 hover:bg-stone-50">Profil</a>
                                 <a href="{{ route('home') }}" role="menuitem" class="block px-4 py-2 text-sm text-stone-700 hover:bg-stone-50 sm:hidden">Lihat toko</a>

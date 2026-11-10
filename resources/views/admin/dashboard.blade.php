@@ -17,6 +17,8 @@
     $hour = (int) $now->format('G');
     $greeting = $hour < 11 ? 'Selamat pagi' : ($hour < 15 ? 'Selamat siang' : ($hour < 18 ? 'Selamat sore' : 'Selamat malam'));
     $firstName = \Illuminate\Support\Str::before($user->name ?? 'Admin', ' ');
+    // Ganti gambar banner: simpan foto di public/images/dashboard-hero.jpg (atau .webp). Tanpa file, dipakai gradient + pola bawaan.
+    $heroImg = collect(['jpg', 'jpeg', 'webp', 'png'])->map(fn ($e) => 'images/dashboard-hero.' . $e)->first(fn ($f) => file_exists(public_path($f)));
     $dateLabel = $now->copy()->locale('id')->translatedFormat('l, j F Y');
 
     $ico = [
@@ -228,15 +230,38 @@
     .td-fu { display: flex; align-items: center; gap: .75rem; padding: .5rem 0; }
     .td-fu + .td-fu { border-top: 1px solid #f6f6f7; }
     @media (prefers-reduced-motion: reduce) { .rp-btn { transition: none; } }
+
+    /* ===== Hero banner ===== */
+    .td .td-hero { position: relative; z-index: auto; align-items: center; margin-bottom: 0; padding: 1.75rem 1.75rem 4.25rem; border-radius: 20px; }
+    .td-hero-bg { position: absolute; inset: 0; z-index: 0; overflow: hidden; border-radius: 20px; background: linear-gradient(115deg, #24150e 0%, #4a2f21 55%, #8f5230 130%); box-shadow: 0 10px 30px -12px rgb(36 21 14 / .55); }
+    .td-hero-bg svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .td-hero-who { position: relative; z-index: 2; display: flex; align-items: center; gap: 1rem; flex: 1 1 22rem; min-width: 0; } .td-hero .rp { flex: none; z-index: 30; }
+    .td-hero .dash-h1 { color: #fff; font-size: 1.625rem; }
+    .td-hero .dash-lede { color: rgb(255 255 255 / .74); }
+    .td-hero .rp-btn { border-color: rgb(255 255 255 / .22); background: rgb(255 255 255 / .96); }
+    .td-kpis ~ .dash-notice { margin: 1.25rem 0 0; }
+    .td-kpis { position: relative; z-index: 1; margin-top: -2.5rem; padding: 0 1rem; }
+    @media (max-width: 640px) { .td-knum { font-size: 1.3rem; } .td-kpi { padding: 1rem; } .td .td-hero { padding: 1.25rem 1.25rem 3.75rem; } .td-hero .dash-h1 { font-size: 1.25rem; } .td-kpis { padding: 0; } }
 </style>
 
 <div class="dash td">
 
     {{-- ============ Header + pemilih periode ============ --}}
-    <header class="dash-head">
-        <div>
-            <h1 class="dash-h1">{{ $greeting }}, {{ $firstName }}</h1>
-            <p class="dash-lede">{{ $dateLabel }} · {{ $lede }}</p>
+    <header class="dash-head td-hero">
+        <div class="td-hero-bg" aria-hidden="true" @if($heroImg) style="background-image: linear-gradient(110deg, rgb(36 21 14 / .92), rgb(74 47 33 / .72) 60%, rgb(143 82 48 / .45)), url('{{ asset($heroImg) }}'); background-size: cover; background-position: center;" @endif>
+            @unless($heroImg)
+                <svg viewBox="0 0 1200 220" preserveAspectRatio="xMidYMid slice" fill="none" stroke="#fff" stroke-opacity=".13" stroke-width="1.3">
+                    <circle cx="1040" cy="40" r="60"/><circle cx="1040" cy="40" r="110"/><circle cx="1040" cy="40" r="160"/><circle cx="1040" cy="40" r="210"/><circle cx="1040" cy="40" r="260"/><circle cx="1040" cy="40" r="310"/>
+                    <circle cx="120" cy="250" r="70"/><circle cx="120" cy="250" r="130"/><circle cx="120" cy="250" r="190"/>
+                </svg>
+            @endunless
+        </div>
+        <div class="td-hero-who">
+            <x-avatar :user="$user" :size="52" :ring="true" />
+            <div>
+                <h1 class="dash-h1">{{ $greeting }}, {{ $firstName }}</h1>
+                <p class="dash-lede">{{ $dateLabel }} · {{ $lede }}</p>
+            </div>
         </div>
 
         <div class="rp" x-data="tdRange(@js(['from' => $fromStr, 'to' => $toStr, 'preset' => $preset, 'today' => $todayStr, 'base' => route('admin.dashboard'), 'cal' => auth()->user()->can('view_orders') ? route('admin.dashboard.calendar') : null]))"
@@ -280,15 +305,6 @@
         </div>
     </header>
 
-    @if(!($shippingConfigured ?? true))
-        @can('view_shipping_rates')
-            <div class="dash-notice" role="note">
-                <svg class="h-5 w-5 shrink-0 text-amber-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.8l9 15.7H3L12 3.8z"/><path d="M12 10v4M12 17v.1"/></svg>
-                <p><strong>Ongkir belum diatur.</strong> Checkout saat ini berjalan tanpa ongkos kirim. <a href="{{ route('admin.shipping.index') }}">Atur tarif pengiriman →</a></p>
-            </div>
-        @endcan
-    @endif
-
     {{-- ============ KPI ============ --}}
     <section class="td-kpis" aria-label="Ringkasan {{ $rangeLabel }}">
         @foreach($kpis as $k)
@@ -307,6 +323,15 @@
             </div>
         @endforeach
     </section>
+
+    @if(!($shippingConfigured ?? true))
+        @can('view_shipping_rates')
+            <div class="dash-notice" role="note">
+                <svg class="h-5 w-5 shrink-0 text-amber-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.8l9 15.7H3L12 3.8z"/><path d="M12 10v4M12 17v.1"/></svg>
+                <p><strong>Ongkir belum diatur.</strong> Checkout saat ini berjalan tanpa ongkos kirim. <a href="{{ route('admin.shipping.index') }}">Atur tarif pengiriman →</a></p>
+            </div>
+        @endcan
+    @endif
 
     <div class="td-grid">
 

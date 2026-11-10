@@ -135,6 +135,14 @@
             </div>
         @endif
 
+        {{-- Pelacakan --}}
+        @if(! in_array($order->status, ['menunggu_bayar', 'batal'], true))
+            <div class="bg-white p-6 rounded-lg border border-stone-200">
+                <h3 class="font-bold mb-4">Status Pengiriman</h3>
+                <x-shipment-tracker :order="$order" />
+            </div>
+        @endif
+
         {{-- Shipment Info --}}
         @if($order->shipment && $order->shipment->tracking_number)
             <div class="bg-white p-6 rounded-lg border border-stone-200">

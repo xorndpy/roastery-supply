@@ -74,6 +74,7 @@
                 <th class="px-4 py-3">Pesanan</th>
                 <th class="px-4 py-3">Penerima</th>
                 <th class="px-4 py-3">Kurir / Resi</th>
+                <th class="px-4 py-3">Perjalanan</th>
                 <th class="px-4 py-3">Dikirim</th>
                 <th class="px-4 py-3">Sampai</th>
             </tr>
@@ -94,11 +95,12 @@
                         <button class="border border-stone-300 hover:bg-stone-50 px-2.5 py-1 rounded text-xs">Simpan</button>
                     </form>
                 </td>
+                <td class="px-4 py-3"><x-shipment-tracker :order="$s->order" :shipment="$s" :compact="true" /></td>
                 <td class="px-4 py-3 text-stone-500">{{ $s->shipped_at?->format('d M Y') ?? '-' }}</td>
                 <td class="px-4 py-3 text-stone-500">{{ $s->delivered_at?->format('d M Y') ?? '-' }}</td>
             </tr>
         @empty
-            <tr><td colspan="5" class="px-4 py-10 text-center text-stone-500">Belum ada data.</td></tr>
+            <tr><td colspan="6" class="px-4 py-10 text-center text-stone-500">Belum ada data.</td></tr>
         @endforelse
         </tbody>
     </table>

@@ -59,6 +59,26 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * URL foto profil, atau null bila belum ada.
+     * Kolom `avatar` berisi URL penuh (foto akun Google) atau path file unggahan di disk public.
+     */
+    public function getAvatarUrlAttribute(): ?string
+    {
+        if (! $this->avatar) {
+            return null;
+        }
+
+        return str_starts_with($this->avatar, 'http') ? $this->avatar : media_url($this->avatar);
+    }
+
+    /** Inisial 2 huruf untuk avatar bila belum ada foto. */
+    public function getInitialsAttribute(): string
+    {
+        return collect(preg_split('/\s+/', trim((string) $this->name)))->filter()->take(2)
+            ->map(fn ($w) => mb_strtoupper(mb_substr($w, 0, 1)))->implode('') ?: 'U';
+    }
+
     public function hasTwoFactor(): bool
     {
         return $this->two_factor_confirmed_at !== null && filled($this->two_factor_secret);
