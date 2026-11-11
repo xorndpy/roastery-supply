@@ -34,7 +34,7 @@ class ShipInputTest extends TestCase
         return $u;
     }
 
-    private function order(string $status = 'dikonfirmasi', ?string $method = 'JNE REG', ?User $user = null): Order
+    private function order(string $status = 'diproses', ?string $method = 'JNE REG', ?User $user = null): Order
     {
         $customer = Customer::create(['user_id' => $user?->id, 'name' => 'Budi', 'email' => 'b' . uniqid() . '@example.com', 'phone' => '0811']);
 
@@ -101,7 +101,42 @@ class ShipInputTest extends TestCase
             ->assertSessionHasNoErrors();
     }
 
-    public function test_gudang_can_ship_from_the_queue_and_sees_customer_choice_prefilled(): void
+    public function test_gudang_prepares_resi_but_only_admin_can_press_ship(): void
+    {
+        $o = $this->order('diproses', 'JNE REG');
+        $gudang = $this->as('gudang');
+        $staff = $this->as('staff');
+
+        // Gudang menyimpan kurir & resi: status tetap diproses, pelanggan belum dapat resi.
+        $this->actingAs($gudang)->post(route('admin.orders.prepare-shipment', $o->id), ['courier' => 'JNE', 'tracking_number' => 'GDG123456'])
+            ->assertSessionHasNoErrors();
+        $this->assertSame('diproses', $o->fresh()->status);
+        $this->assertDatabaseHas('shipments', ['order_id' => $o->id, 'tracking_number' => 'GDG123456', 'status' => 'pending']);
+
+        // Gudang tidak boleh menekan Kirim.
+        $this->actingAs($gudang)->post(route('admin.orders.ship', $o->id))->assertForbidden();
+
+        // Admin/staff menekan Kirim tanpa mengetik ulang: resi diambil dari isian gudang.
+        $this->actingAs($staff)->post(route('admin.orders.ship', $o->id))->assertSessionHasNoErrors();
+        $this->assertSame('dikirim', $o->fresh()->status);
+        $this->assertDatabaseHas('shipments', ['order_id' => $o->id, 'tracking_number' => 'GDG123456', 'status' => 'shipped']);
+    }
+
+    public function test_ship_is_refused_before_warehouse_packed_or_without_resi(): void
+    {
+        $confirmed = $this->order('dikonfirmasi');
+        $packed = $this->order('diproses');
+        $staff = $this->as('staff');
+
+        $this->actingAs($staff)->post(route('admin.orders.ship', $confirmed->id), ['courier' => 'JNE', 'tracking_number' => 'ABC12345'])
+            ->assertSessionHas('error');
+        $this->assertSame('dikonfirmasi', $confirmed->fresh()->status);
+
+        $this->actingAs($staff)->post(route('admin.orders.ship', $packed->id))->assertSessionHas('error');
+        $this->assertSame('diproses', $packed->fresh()->status);
+    }
+
+    public function test_gudang_sees_queue_and_customer_choice_prefilled(): void
     {
         $o = $this->order('diproses', 'JNE REG');
         $gudang = $this->as('gudang');
@@ -109,15 +144,11 @@ class ShipInputTest extends TestCase
         $this->actingAs($gudang)->get(route('admin.shipments.index'))
             ->assertOk()->assertSee('JNE REG')->assertSee('estimasi 2-3 hari')->assertSee('name="tracking_number"', false)
             ->assertSee('<option value="JNE" selected', false);
-
-        $this->actingAs($gudang)->post(route('admin.orders.ship', $o->id), ['courier' => 'JNE', 'tracking_number' => 'GDG123456'])
-            ->assertSessionHasNoErrors();
-        $this->assertSame('dikirim', $o->fresh()->status);
     }
 
     public function test_order_detail_shows_form_with_customer_choice(): void
     {
-        $o = $this->order('dikonfirmasi', 'SiCepat Halu');
+        $o = $this->order('diproses', 'SiCepat Halu');
 
         $this->actingAs($this->as('staff'))->get(route('admin.orders.show', $o->id))
             ->assertOk()->assertSee('Pelanggan memilih')->assertSee('SiCepat Halu')->assertSee('Lainnya…');

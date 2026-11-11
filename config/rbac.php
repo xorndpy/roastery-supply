@@ -17,7 +17,7 @@ return [
         ],
         'Penjualan' => [
             'view_orders', 'edit_orders', 'process_orders', 'complete_orders', 'cancel_orders', 'download_invoices', 'view_finance',
-            'verify_payments', 'reject_payments', 'manage_shipments', 'view_shipping_rates', 'manage_shipping_rates',
+            'verify_payments', 'reject_payments', 'manage_shipments', 'ship_orders', 'view_shipping_rates', 'manage_shipping_rates',
             'view_returns', 'approve_returns', 'reject_returns',
         ],
         'Pelanggan' => ['view_customers', 'edit_customers', 'export_customers'],
@@ -51,6 +51,6 @@ return [
         'manage' => 'Kelola', 'verify' => 'Verifikasi', 'reject' => 'Tolak', 'approve' => 'Setujui',
         'cancel' => 'Batalkan', 'download' => 'Unduh', 'export' => 'Ekspor', 'reply' => 'Balas',
         'request' => 'Ajukan', 'import_export' => 'Impor/Ekspor',
-        'process' => 'Proses', 'complete' => 'Selesaikan',
+        'process' => 'Proses', 'complete' => 'Selesaikan', 'ship' => 'Kirim',
     ],
 ];

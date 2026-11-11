@@ -13,7 +13,7 @@
 
     $cards = [
         ['Perlu dikemas', $toPack, 'Sudah dibayar, belum dikemas', route('admin.orders.index', ['status' => 'dikonfirmasi']), 'view_orders', 'text-orange-700'],
-        ['Siap dikirim', $toShip, 'Sudah dikemas, belum diserahkan ke kurir', route('admin.orders.index', ['status' => 'diproses']), 'view_orders', 'text-amber-700'],
+        ['Siap dikirim', $toShip, 'Sudah dikemas: isi resi, lalu admin yang kirim', route('admin.orders.index', ['status' => 'diproses']), 'view_orders', 'text-amber-700'],
         ['Dalam pengiriman', $inTransit, 'Sedang di jalan', route('admin.orders.index', ['status' => 'dikirim']), 'view_orders', 'text-stone-800'],
         ['Retur terbuka', $returnsOpen, 'Menunggu keputusan atau barang kembali', route('admin.returns.index'), 'view_returns', 'text-red-700'],
     ];
@@ -55,7 +55,7 @@
         </div>
         <table class="w-full text-sm">
             <thead class="bg-stone-50 text-left text-stone-500">
-                <tr><th class="px-4 py-3">Pesanan</th><th class="px-4 py-3">Tujuan</th><th class="px-4 py-3 text-right">Barang</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Menunggu</th><th class="px-4 py-3">Dokumen</th></tr>
+                <tr><th class="px-4 py-3">Pesanan</th><th class="px-4 py-3">Tujuan</th><th class="px-4 py-3 text-right">Barang</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Menunggu</th><th class="px-4 py-3">Aksi</th></tr>
             </thead>
             <tbody class="divide-y divide-stone-100">
             @forelse($queue as $o)
@@ -65,11 +65,29 @@
                     <td class="px-4 py-3 text-right">{{ (int) $o->items->sum('quantity') }} pcs</td>
                     <td class="px-4 py-3">
                         <span class="px-2 py-0.5 rounded text-xs {{ $o->status === 'dikonfirmasi' ? 'bg-orange-100 text-orange-800' : 'bg-amber-100 text-amber-800' }}">
-                            {{ $o->status === 'dikonfirmasi' ? 'Perlu dikemas' : 'Siap dikirim' }}
+                            {{ $o->status === 'dikonfirmasi' ? 'Perlu dikemas' : ($o->shipment?->tracking_number ? 'Menunggu admin kirim' : 'Perlu resi') }}
                         </span>
                     </td>
                     <td class="px-4 py-3 text-stone-500">{{ $o->created_at->locale('id')->diffForHumans() }}</td>
-                    <td class="px-4 py-3"><a href="{{ route('admin.orders.delivery-note', $o->id) }}" target="_blank" class="text-orange-700 hover:underline">Surat jalan</a></td>
+                    <td class="px-4 py-3">
+                        <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                            <a href="{{ route('admin.orders.delivery-note', $o->id) }}" target="_blank" class="text-orange-700 hover:underline">Surat jalan</a>
+                            @if($o->status === 'dikonfirmasi')
+                                @can('process_orders')
+                                    <form method="POST" action="{{ route('admin.orders.process', $o->id) }}">
+                                        @csrf
+                                        <button type="submit" class="rounded border border-stone-300 px-2.5 py-1 text-xs font-medium text-stone-800 hover:bg-stone-50">Tandai dikemas</button>
+                                    </form>
+                                @endcan
+                            @elseif($o->shipment?->tracking_number)
+                                <span class="text-xs text-stone-500">Resi tersimpan · menunggu admin kirim</span>
+                            @else
+                                @can('manage_shipments')
+                                    <a href="{{ route('admin.shipments.index', ['tab' => 'ready', 'search' => $o->order_number]) }}" class="rounded border border-stone-300 px-2.5 py-1 text-xs font-medium text-stone-800 hover:bg-stone-50">Isi kurir &amp; resi</a>
+                                @endcan
+                            @endif
+                        </div>
+                    </td>
                 </tr>
             @empty
                 <tr><td colspan="6" class="px-4 py-10 text-center text-stone-500">Tidak ada pesanan yang menunggu.</td></tr>

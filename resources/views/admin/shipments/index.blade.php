@@ -61,7 +61,30 @@
                     <a href="{{ route('admin.orders.delivery-note', $o->id) }}" target="_blank" class="text-orange-600 hover:underline">Surat jalan</a>
                 </td>
                 <td class="px-4 py-3">
-                    @include('admin.orders._ship-form', ['order' => $o, 'compact' => true])
+                    @if($o->status === 'dikonfirmasi')
+                        <div class="text-xs text-stone-500">Menunggu gudang mengemas.</div>
+                        @can('process_orders')
+                            <form method="POST" action="{{ route('admin.orders.process', $o->id) }}" class="mt-2">
+                                @csrf
+                                <button type="submit" class="rounded border border-stone-300 px-2.5 py-1 text-xs font-medium text-stone-800 hover:bg-stone-50">Tandai dikemas</button>
+                            </form>
+                        @endcan
+                    @else
+                        @php $hasResi = $o->shipment && $o->shipment->status === 'pending' && $o->shipment->tracking_number; @endphp
+                        @include('admin.orders._ship-form', ['order' => $o, 'compact' => true])
+                        @can('ship_orders')
+                            @if($hasResi)
+                                <form method="POST" action="{{ route('admin.orders.ship', $o->id) }}" class="mt-2">
+                                    @csrf
+                                    <button type="submit" class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm">Kirim Pesanan</button>
+                                </form>
+                            @else
+                                <div class="mt-2 text-xs text-amber-800">Menunggu gudang mengisi kurir &amp; resi.</div>
+                            @endif
+                        @else
+                            @if($hasResi)<div class="mt-2 text-xs text-green-800">Resi tersimpan. Menunggu admin menekan Kirim.</div>@endif
+                        @endcan
+                    @endif
                 </td>
             </tr>
         @empty

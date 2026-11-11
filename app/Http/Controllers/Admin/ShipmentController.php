@@ -23,7 +23,7 @@ class ShipmentController extends Controller
         ];
 
         if ($tab === 'ready') {
-            $orders = Order::with(['customer', 'items'])
+            $orders = Order::with(['customer', 'items', 'shipment'])
                 ->whereIn('status', ['dikonfirmasi', 'diproses'])
                 ->when($request->search, fn ($q, $s) => $q->where('order_number', 'like', "%{$s}%"))
                 ->oldest()

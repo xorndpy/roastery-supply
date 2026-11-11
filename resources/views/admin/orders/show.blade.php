@@ -191,12 +191,30 @@
             @endif
             @endcan
 
-            {{-- Ship --}}
-            @can('manage_shipments')
-            @if(in_array($order->status, ['dikonfirmasi', 'diproses']))
-                @include('admin.orders._ship-form', ['order' => $order])
+            {{-- Kirim: gudang mengemas & mengisi resi dulu, admin yang menekan Kirim --}}
+            @if($order->status === 'dikonfirmasi')
+                @can('manage_shipments')
+                    <p class="mb-3 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-xs text-stone-600">Menunggu gudang mengemas pesanan (Mulai Proses). Kurir &amp; resi diisi setelah dikemas.</p>
+                @endcan
+            @elseif($order->status === 'diproses')
+                @php $hasResi = $order->shipment && $order->shipment->status === 'pending' && $order->shipment->tracking_number; @endphp
+                @can('manage_shipments')
+                    <p class="mb-2 text-xs text-stone-500">Gudang mengisi kurir &amp; resi. Admin yang menekan Kirim.</p>
+                    @include('admin.orders._ship-form', ['order' => $order])
+                @endcan
+                @can('ship_orders')
+                    @if($hasResi)
+                        <form method="POST" action="{{ route('admin.orders.ship', $order->id) }}" class="mb-3">
+                            @csrf
+                            <button type="submit" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-3 rounded-lg font-medium transition">Kirim Pesanan</button>
+                        </form>
+                    @else
+                        <p class="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">Belum bisa dikirim: gudang belum mengisi kurir &amp; resi.</p>
+                    @endif
+                @else
+                    @if($hasResi)<p class="mb-3 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-xs text-green-800">Resi tersimpan. Menunggu admin menekan Kirim.</p>@endif
+                @endcan
             @endif
-            @endcan
 
             {{-- Complete --}}
             @can('complete_orders')

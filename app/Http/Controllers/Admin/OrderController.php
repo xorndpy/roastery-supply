@@ -88,9 +88,46 @@ class OrderController extends Controller
     }
 
     /**
-     * Input resi & kirim pesanan.
+     * Gudang: simpan kurir & resi (belum mengirim). Status tetap "diproses".
+     */
+    public function prepareShipment(Request $request, Order $order)
+    {
+        $validated = $this->shipFields($request, $order);
+
+        return $this->run(
+            fn () => $this->orders->prepareShipment($order, $validated),
+            'Kurir & resi tersimpan. Menunggu admin menekan Kirim.'
+        );
+    }
+
+    /**
+     * Admin: kirim pesanan. Hanya setelah gudang mengemas (diproses). Kurir & resi diambil dari isian gudang,
+     * kecuali admin mengirim data baru dari formulir.
      */
     public function ship(Request $request, Order $order)
+    {
+        if ($order->status !== 'diproses') {
+            return back()->with('error', 'Pesanan belum dikemas gudang. Gudang perlu menandai dikemas dan mengisi resi dulu.');
+        }
+
+        $draft = $order->shipment;
+        if (!$request->filled('tracking_number')) {
+            if (!$draft || !$draft->tracking_number) {
+                return back()->with('error', 'Gudang belum mengisi kurir & resi.');
+            }
+            $request->merge(['courier' => $draft->courier, 'service' => $draft->service, 'tracking_number' => $draft->tracking_number]);
+        }
+
+        $validated = $this->shipFields($request, $order);
+
+        return $this->run(
+            fn () => $this->orders->ship($order, $validated),
+            'Pesanan dikirim. Pelanggan sudah diberi tahu.'
+        );
+    }
+
+    /** Validasi & rapikan isian kurir/resi (dipakai gudang dan admin). */
+    private function shipFields(Request $request, Order $order): array
     {
         $validated = $request->validate([
             'courier' => 'required|string|max:100',
@@ -109,10 +146,7 @@ class OrderController extends Controller
         unset($validated['courier_other']);
         $validated['tracking_number'] = $this->cleanResi($validated['courier'], $validated['tracking_number'], $order->id);
 
-        return $this->run(
-            fn () => $this->orders->ship($order, $validated),
-            'Resi berhasil diinput. Pesanan sedang dikirim.'
-        );
+        return $validated;
     }
 
     /** Rapikan & periksa nomor resi: format wajar dan belum dipakai pesanan lain. */

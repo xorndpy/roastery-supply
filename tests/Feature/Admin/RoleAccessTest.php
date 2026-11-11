@@ -50,6 +50,7 @@ class RoleAccessTest extends TestCase
 
         $this->assertTrue($gudang->can('process_orders'));
         $this->assertTrue($gudang->can('manage_shipments'));
+        $this->assertFalse($gudang->can('ship_orders')); // gudang mengisi resi, admin yang menekan Kirim
         $this->assertFalse($gudang->can('complete_orders'));
         $this->assertFalse($gudang->can('verify_payments'));
         $this->assertFalse($gudang->can('view_finance'));

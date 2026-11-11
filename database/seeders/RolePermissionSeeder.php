@@ -55,6 +55,7 @@ class RolePermissionSeeder extends Seeder
                 'verify_payments',
                 'reject_payments',
                 'manage_shipments',
+                'ship_orders',
                 'view_returns',
                 'download_invoices',
                 'view_customers',

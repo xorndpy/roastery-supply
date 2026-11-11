@@ -147,6 +147,33 @@ class OrderService
         return $order;
     }
 
+    /**
+     * Gudang mencatat kurir & resi setelah barang dikemas. BELUM mengirim: status tetap "diproses",
+     * pelanggan belum diberi tahu. Admin yang menekan Kirim (ship) setelah mengecek data ini.
+     *
+     * @param array{courier:string, service?:?string, tracking_number:string, cost?:mixed} $data
+     */
+    public function prepareShipment(Order $order, array $data): Order
+    {
+        return DB::transaction(function () use ($order, $data) {
+            $order = $this->lock($order);
+            $this->assertStatus($order, ['diproses'], 'Kurir & resi diisi setelah pesanan dikemas (status Diproses).');
+
+            Shipment::updateOrCreate(
+                ['order_id' => $order->id],
+                [
+                    'courier'         => $data['courier'],
+                    'service'         => $data['service'] ?? null,
+                    'tracking_number' => $data['tracking_number'],
+                    'cost'            => $data['cost'] ?? 0,
+                    'status'          => 'pending',
+                ]
+            );
+
+            return $order;
+        });
+    }
+
     /** @param array{courier:string, service?:?string, tracking_number:string, cost?:mixed} $data */
     public function ship(Order $order, array $data): Order
     {

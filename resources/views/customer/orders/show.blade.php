@@ -243,7 +243,7 @@
     @endif
 
     {{-- Info Pengiriman --}}
-    @if($order->shipment && $order->shipment->tracking_number)
+    @if($order->shipment && $order->shipment->tracking_number && $order->shipment->status !== 'pending')
         <div class="bg-white rounded-lg border border-stone-200 p-6 mb-6">
             <h2 class="font-bold mb-4">Info Pengiriman</h2>
             <div class="text-sm space-y-2">

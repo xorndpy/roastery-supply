@@ -3,10 +3,14 @@
     $compact = $compact ?? false;
     $guess = \App\Support\Couriers::guess($order->shipping_method);
     $mine = (string) old('ship_order') === (string) $order->id;
-    $selected = $mine ? old('courier') : $guess;
+    // Isian gudang yang sudah tersimpan (belum dikirim) tampil kembali saat form dibuka.
+    $draft = $order->shipment && $order->shipment->status === 'pending' ? $order->shipment : null;
+    $draftCourier = $draft?->courier;
+    $draftKnown = $draftCourier && in_array($draftCourier, \App\Support\Couriers::options(), true);
+    $selected = $mine ? old('courier') : ($draftCourier ? ($draftKnown ? $draftCourier : '__other') : $guess);
     $fieldCls = 'w-full border border-stone-300 rounded-lg px-3 py-2 text-sm';
 @endphp
-<form method="POST" action="{{ route('admin.orders.ship', $order->id) }}"
+<form method="POST" action="{{ route('admin.orders.prepare-shipment', $order->id) }}"
       class="{{ $compact ? 'flex flex-wrap items-start gap-2' : 'mb-3 space-y-3' }}"
       x-data="{ c: @js($selected ?? '') }">
     @csrf
@@ -27,25 +31,25 @@
             @endforeach
             <option value="__other" @selected($selected === '__other')>Lainnya…</option>
         </select>
-        <input type="text" name="courier_other" value="{{ $mine ? old('courier_other') : '' }}" placeholder="Nama kurir"
+        <input type="text" name="courier_other" value="{{ $mine ? old('courier_other') : ($draftCourier && !$draftKnown ? $draftCourier : '') }}" placeholder="Nama kurir"
                x-show="c === '__other'" :required="c === '__other'" @if($selected !== '__other') style="display:none" @endif
                class="{{ $fieldCls }} mt-2">
     </div>
 
     <div class="{{ $compact ? 'w-28' : '' }}">
         @unless($compact)<label class="block text-sm font-medium mb-1">Layanan <span class="text-stone-400 font-normal">(opsional)</span></label>@endunless
-        <input type="text" name="service" value="{{ $mine ? old('service') : '' }}" placeholder="REG, YES…" maxlength="100" class="{{ $fieldCls }}">
+        <input type="text" name="service" value="{{ $mine ? old('service') : ($draft?->service ?? '') }}" placeholder="REG, YES…" maxlength="100" class="{{ $fieldCls }}">
     </div>
 
     <div class="{{ $compact ? 'w-48' : '' }}">
         @unless($compact)<label class="block text-sm font-medium mb-1">No. Resi *</label>@endunless
-        <input type="text" name="tracking_number" value="{{ $mine ? old('tracking_number') : '' }}" required maxlength="60"
+        <input type="text" name="tracking_number" value="{{ $mine ? old('tracking_number') : ($draft?->tracking_number ?? '') }}" required maxlength="60"
                placeholder="Tempel nomor resi" autocomplete="off" class="{{ $fieldCls }} font-mono">
     </div>
 
     <button type="submit"
-            class="{{ $compact ? 'bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm' : 'w-full bg-indigo-500 hover:bg-indigo-600 text-white py-3 rounded-lg font-medium transition' }}">
-        Kirim Pesanan
+            class="{{ $compact ? 'border border-stone-300 bg-white hover:bg-stone-50 text-stone-800 px-4 py-2 rounded-lg text-sm' : 'w-full border border-stone-300 bg-white hover:bg-stone-50 text-stone-800 py-3 rounded-lg font-medium transition' }}">
+        {{ $draft ? 'Perbarui kurir & resi' : 'Simpan kurir & resi' }}
     </button>
 
     @if($mine && $errors->any())
