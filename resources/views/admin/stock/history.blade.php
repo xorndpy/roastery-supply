@@ -43,7 +43,7 @@
                 $color = $sign === '−' ? 'text-red-600' : 'text-green-600';
             @endphp
             <tr>
-                <td class="px-4 py-3 whitespace-nowrap text-stone-500">{{ $m->created_at->format('d M Y H:i') }}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-stone-500">{{ wib($m->created_at, 'd M Y, H:i') }}</td>
                 <td class="px-4 py-3">
                     <div class="font-medium">{{ $m->product->name ?? '(produk dihapus)' }}</div>
                     <div class="text-xs font-mono text-stone-500">{{ $m->product->sku ?? '' }}</div>

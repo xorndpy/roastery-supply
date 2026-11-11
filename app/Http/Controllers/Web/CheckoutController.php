@@ -175,7 +175,7 @@ class CheckoutController extends Controller
 
                 session()->forget(['cart', 'checkout_key', 'checkout_voucher']);
 
-                return $this->toOrder($order, 'Pesanan berhasil dibuat. Silakan lakukan pembayaran sebelum ' . $order->payment_deadline->format('d M Y H:i') . '.');
+                return $this->toOrder($order, 'Pesanan berhasil dibuat. Silakan lakukan pembayaran sebelum ' . wib($order->payment_deadline, 'd M Y, H:i', true) . '.');
             } catch (ShippingUnavailable $e) {
                 return back()->withInput()->with('error', $e->getMessage());
             } catch (DomainException $e) {

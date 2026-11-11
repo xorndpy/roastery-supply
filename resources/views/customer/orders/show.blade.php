@@ -59,6 +59,11 @@
         </div>
     </div>
 
+    {{-- Posisi pesanan --}}
+    <div class="bg-white rounded-lg border border-stone-200 p-6 mb-6">
+        <x-order-stepper :order="$order" />
+    </div>
+
     {{-- Detail Item --}}
     <div class="bg-white rounded-lg border border-stone-200 p-6 mb-6">
         <h2 class="font-bold mb-4">Item Pesanan</h2>
@@ -342,7 +347,7 @@
 
         async function poll() {
             try {
-                const j = await (await fetch(statusUrl, { headers: { Accept: 'application/json' } })).json();
+                const j = await (await fetch(statusUrl + '?check=1', { headers: { Accept: 'application/json' } })).json();
                 if (j.state === 'paid') { say(j.message, 'ok'); stop(); setTimeout(() => location.reload(), 1200); return; }
                 if (j.done) { say(j.message, j.state === 'review' ? 'warn' : 'info'); stop(); if (['expired', 'failed'].includes(j.state)) resetBtn(); return; }
                 say(j.message || 'Menunggu konfirmasi pembayaran…', 'wait');

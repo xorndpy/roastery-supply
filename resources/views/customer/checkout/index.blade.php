@@ -94,9 +94,10 @@
                                             <h3 class="text-sm font-semibold text-stone-900" x-text="g.label"></h3>
                                             <span class="text-xs text-stone-500" x-text="g.hint"></span>
                                         </div>
-                                        <div class="space-y-3">
+                                        <p class="mb-1.5 text-xs text-stone-500" x-show="g.items.length > 4" x-text="g.items.length + ' layanan · gulir untuk melihat lainnya'"></p>
+                                        <div class="space-y-2" role="radiogroup" :aria-label="g.label" style="max-height: 19rem; overflow-y: auto; padding-right: .25rem;">
                                             <template x-for="m in g.items" :key="m.id">
-                                                <label class="flex items-start gap-3 border rounded-lg p-4 cursor-pointer"
+                                                <label class="flex items-start gap-3 border rounded-lg p-3 cursor-pointer"
                                                        :class="String(methodId) === String(m.id) ? 'border-orange-500 bg-orange-50' : 'border-stone-200'">
                                                     <input type="radio" name="shipping_method_id" :value="m.id" x-model="methodId" class="mt-1">
                                                     <span class="flex-1">

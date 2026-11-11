@@ -55,7 +55,7 @@
         </div>
         <table class="w-full text-sm">
             <thead class="bg-stone-50 text-left text-stone-500">
-                <tr><th class="px-4 py-3">Pesanan</th><th class="px-4 py-3">Tujuan</th><th class="px-4 py-3 text-right">Barang</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Menunggu</th></tr>
+                <tr><th class="px-4 py-3">Pesanan</th><th class="px-4 py-3">Tujuan</th><th class="px-4 py-3 text-right">Barang</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Menunggu</th><th class="px-4 py-3">Dokumen</th></tr>
             </thead>
             <tbody class="divide-y divide-stone-100">
             @forelse($queue as $o)
@@ -69,9 +69,10 @@
                         </span>
                     </td>
                     <td class="px-4 py-3 text-stone-500">{{ $o->created_at->locale('id')->diffForHumans() }}</td>
+                    <td class="px-4 py-3"><a href="{{ route('admin.orders.delivery-note', $o->id) }}" target="_blank" class="text-orange-700 hover:underline">Surat jalan</a></td>
                 </tr>
             @empty
-                <tr><td colspan="5" class="px-4 py-10 text-center text-stone-500">Tidak ada pesanan yang menunggu.</td></tr>
+                <tr><td colspan="6" class="px-4 py-10 text-center text-stone-500">Tidak ada pesanan yang menunggu.</td></tr>
             @endforelse
             </tbody>
         </table>

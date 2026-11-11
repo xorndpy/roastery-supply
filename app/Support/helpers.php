@@ -27,3 +27,19 @@ if (! function_exists('thumb_url')) {
         return $path ? media_url(thumb_path($path)) : '';
     }
 }
+
+if (! function_exists('wib')) {
+    /**
+     * Tampilkan waktu dalam WIB (database & zona waktu aplikasi tetap UTC, jadi konversi dilakukan saat tampil).
+     * Dipakai di halaman pesanan/pengiriman agar jam sama dengan yang dilihat pembeli.
+     */
+    function wib($date, string $format = 'd M Y, H:i', bool $suffix = false): string
+    {
+        if (!$date) {
+            return '-';
+        }
+        $d = $date instanceof \Carbon\CarbonInterface ? $date : \Illuminate\Support\Carbon::parse($date);
+
+        return $d->copy()->timezone('Asia/Jakarta')->locale('id')->translatedFormat($format) . ($suffix ? ' WIB' : '');
+    }
+}

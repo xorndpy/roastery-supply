@@ -32,7 +32,7 @@
             <div class="flex justify-between items-start mb-4">
                 <div>
                     <h2 class="text-xl font-bold">{{ $order->order_number }}</h2>
-                    <div class="text-sm text-stone-500 mt-1">{{ $order->created_at->format('d M Y, H:i') }}</div>
+                    <div class="text-sm text-stone-500 mt-1">{{ wib($order->created_at, 'd M Y, H:i', true) }}</div>
                 </div>
                 <span class="text-sm px-4 py-2 rounded-full font-medium
                     @if($order->status === 'menunggu_bayar') bg-yellow-100 text-yellow-800
@@ -66,6 +66,11 @@
                     <div class="text-sm">{{ $order->note }}</div>
                 </div>
             @endif
+        </div>
+
+        {{-- Posisi pesanan --}}
+        <div class="bg-white p-6 rounded-lg border border-stone-200">
+            <x-order-stepper :order="$order" />
         </div>
 
         {{-- Items --}}
@@ -220,12 +225,21 @@
                 @endcan
             @endif
 
-            {{-- Invoice --}}
+            {{-- Surat jalan (tanpa harga) untuk gudang; invoice hanya untuk yang berhak --}}
+            @if(in_array($order->status, ['dikonfirmasi', 'diproses', 'dikirim', 'selesai']))
+                <a href="{{ route('admin.orders.delivery-note', $order->id) }}"
+                   target="_blank"
+                   class="block mt-3 text-center border border-stone-300 hover:bg-stone-50 py-2 rounded-lg text-sm">
+                    Cetak Surat Jalan
+                </a>
+            @endif
+            @can('download_invoices')
             <a href="{{ route('admin.orders.invoice', $order->id) }}"
                target="_blank"
                class="block mt-3 text-center border border-stone-300 hover:bg-stone-50 py-2 rounded-lg text-sm">
                 Cetak Invoice
             </a>
+            @endcan
         </div>
     </div>
 </div>

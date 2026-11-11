@@ -73,7 +73,7 @@
                         <div>{{ $order->customer->name ?? 'Guest' }}</div>
                         <div class="text-xs text-stone-500">{{ $order->customer->phone ?? '-' }}</div>
                     </td>
-                    <td class="px-4 py-3 text-stone-600">{{ $order->created_at->format('d M Y, H:i') }}</td>
+                    <td class="px-4 py-3 text-stone-600">{{ wib($order->created_at, 'd M Y, H:i', true) }}</td>
 @can('view_finance')
                     <td class="px-4 py-3 text-right font-medium">Rp {{ number_format($order->total, 0, ',', '.') }}</td>
 @endcan

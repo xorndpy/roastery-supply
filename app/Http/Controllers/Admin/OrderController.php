@@ -164,6 +164,19 @@ class OrderController extends Controller
             ->stream('invoice-' . $order->order_number . '.pdf');
     }
 
+    /** Surat jalan / packing list tanpa harga, untuk gudang. Hanya pesanan yang sudah dibayar. */
+    public function deliveryNote(Order $order)
+    {
+        if (!in_array($order->status, ['dikonfirmasi', 'diproses', 'dikirim', 'selesai'], true)) {
+            return back()->with('error', 'Surat jalan baru tersedia setelah pembayaran dikonfirmasi.');
+        }
+        $order->load(['customer', 'items']);
+
+        return Pdf::loadView('pdf.surat-jalan', compact('order'))
+            ->setPaper('a4')
+            ->stream('surat-jalan-' . $order->order_number . '.pdf');
+    }
+
     private function run(\Closure $action, string $successMessage)
     {
         try {

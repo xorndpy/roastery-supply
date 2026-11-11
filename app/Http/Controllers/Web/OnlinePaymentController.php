@@ -121,6 +121,15 @@ class OnlinePaymentController extends Controller
         $order = $this->findOwn($orderNumber);
         $payment = $order->payments()->whereNotNull('provider')->latest('id')->first();
 
+        // Webhook Midtrans tidak selalu sampai (mis. server lokal tanpa alamat publik). Bila pelanggan baru membayar,
+        // tanyakan langsung ke Midtrans lewat jalur yang sama dengan webhook, jadi tidak perlu "sinkronisasi" manual admin.
+        if (request()->boolean('check') && $order->status === 'menunggu_bayar' && $payment && $payment->status === 'waiting'
+            && (!$payment->last_checked_at || $payment->last_checked_at->lt(now()->subSeconds(4)))) {
+            app(\App\Services\Payments\PaymentReconciler::class)->check($payment, sync: true);
+            $order->refresh();
+            $payment = $order->payments()->whereNotNull('provider')->latest('id')->first();
+        }
+
         [$state, $message] = $this->describe($order, $payment);
 
         return response()->json([

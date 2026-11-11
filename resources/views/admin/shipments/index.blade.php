@@ -46,7 +46,7 @@
             <tr>
                 <td class="px-4 py-3">
                     <div class="font-mono font-medium">{{ $o->order_number }}</div>
-                    <div class="text-xs text-stone-500">{{ $o->created_at->format('d M Y') }}</div>
+                    <div class="text-xs text-stone-500">{{ wib($o->created_at, 'd M Y, H:i', true) }}</div>
                 </td>
                 <td class="px-4 py-3">
                     <div>{{ $o->shipping_name ?: ($o->customer->name ?? '-') }}</div>
@@ -57,6 +57,8 @@
                     <div class="font-medium text-stone-800">{{ $o->shipping_method ?: '-' }}</div>
                     @if($o->shipping_etd)<div class="text-stone-500">estimasi {{ $o->shipping_etd }}</div>@endif
                     <a href="{{ route('admin.orders.show', $o->id) }}" class="text-orange-600 hover:underline">Detail</a>
+                    <span class="text-stone-300" aria-hidden="true">·</span>
+                    <a href="{{ route('admin.orders.delivery-note', $o->id) }}" target="_blank" class="text-orange-600 hover:underline">Surat jalan</a>
                 </td>
                 <td class="px-4 py-3">
                     @include('admin.orders._ship-form', ['order' => $o, 'compact' => true])
@@ -96,8 +98,8 @@
                     </form>
                 </td>
                 <td class="px-4 py-3"><x-shipment-tracker :order="$s->order" :shipment="$s" :compact="true" /></td>
-                <td class="px-4 py-3 text-stone-500">{{ $s->shipped_at?->format('d M Y') ?? '-' }}</td>
-                <td class="px-4 py-3 text-stone-500">{{ $s->delivered_at?->format('d M Y') ?? '-' }}</td>
+                <td class="px-4 py-3 text-stone-500">{{ wib($s->shipped_at, 'd M Y, H:i') }}</td>
+                <td class="px-4 py-3 text-stone-500">{{ wib($s->delivered_at, 'd M Y, H:i') }}</td>
             </tr>
         @empty
             <tr><td colspan="6" class="px-4 py-10 text-center text-stone-500">Belum ada data.</td></tr>

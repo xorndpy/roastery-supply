@@ -26,7 +26,7 @@
                         <div>
                             <div class="text-xs text-stone-500">No. Pesanan</div>
                             <div class="font-semibold">{{ $order->order_number }}</div>
-                            <div class="mt-0.5 text-xs text-stone-500">{{ $order->created_at->format('d M Y, H:i') }}</div>
+                            <div class="mt-0.5 text-xs text-stone-500">{{ wib($order->created_at, 'd M Y, H:i', true) }}</div>
                         </div>
                         <span class="rounded-full px-3 py-1 text-xs font-medium {{ $statusBadge[$order->status] ?? 'bg-stone-100 text-stone-800' }}">{{ $statusLabels[$order->status] ?? $order->status }}</span>
                     </div>

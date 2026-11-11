@@ -50,7 +50,7 @@
         </td>
         <td class="right" style="vertical-align: top;">
             <div><span class="muted">No. Pesanan:</span> {{ $order->order_number }}</div>
-            <div><span class="muted">Tanggal:</span> {{ $order->created_at->format('d M Y') }}</div>
+            <div><span class="muted">Tanggal:</span> {{ wib($order->created_at, 'd M Y, H:i', true) }}</div>
             <div style="margin-top:6px;"><span class="status">{{ $paid ? 'LUNAS' : 'BELUM DIBAYAR' }}</span></div>
         </td>
     </tr>

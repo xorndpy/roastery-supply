@@ -216,6 +216,7 @@ Route::prefix('admin')
             Route::post('/{order}/complete', [AdminOrderController::class, 'complete'])->name('complete')->middleware('can:complete_orders');
             Route::post('/{order}/cancel', [AdminOrderController::class, 'cancel'])->name('cancel')->middleware('can:cancel_orders');
             Route::get('/{order}/invoice', [AdminOrderController::class, 'invoice'])->name('invoice')->middleware('can:download_invoices');
+            Route::get('/{order}/surat-jalan', [AdminOrderController::class, 'deliveryNote'])->name('delivery-note')->middleware('can:view_orders');
         });
 
         // Penjualan - Payments
