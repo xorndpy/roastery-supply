@@ -40,12 +40,9 @@
     <div class="grid min-h-screen lg:grid-cols-[1.05fr_1fr]">
 
         {{-- ============ Panel brand (desktop) ============ --}}
-        <aside x-data="{ px: 0, py: 0 }"
-               @pointermove="px = $event.clientX / $el.offsetWidth - .5; py = $event.clientY / $el.offsetHeight - .5"
-               @pointerleave="px = 0; py = 0"
-               class="relative hidden overflow-hidden bg-[#24150e] text-white lg:sticky lg:top-0 lg:block lg:h-screen">
+        <aside class="relative hidden overflow-hidden bg-[#24150e] text-white lg:sticky lg:top-0 lg:block lg:h-screen">
 
-            <div class="auth-parallax absolute -inset-6" :style="`--px:${px};--py:${py}`">
+            <div class="absolute inset-0">
                 @include('auth.partials.backdrop', ['photo' => $authPhoto])
             </div>
             {{-- Overlay menjaga kontras teks putih tetap tinggi di atas foto apa pun --}}
@@ -53,12 +50,7 @@
             <div class="absolute inset-0 bg-gradient-to-r from-[#24150e]/70 to-transparent"></div>
 
             <div class="relative z-10 flex h-full flex-col justify-between p-12 xl:p-14">
-                <a href="{{ route('home') }}" class="heading auth-rise inline-flex w-fit items-center gap-3 text-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#24150e]">
-                    {{-- Cangkir kecil dengan uap (animasi singkat 3x lalu berhenti) --}}
-                    <svg class="auth-steam h-9 w-9 text-orange-200" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path class="s" d="M13 9c-1.6-1.4 1.6-2.6 0-4.2"/><path class="s" d="M18 9c-1.6-1.4 1.6-2.6 0-4.2"/><path class="s" d="M23 9c-1.6-1.4 1.6-2.6 0-4.2"/>
-                        <path d="M8 14h18v6.5a7 7 0 0 1-7 7h-4a7 7 0 0 1-7-7V14z"/><path d="M26 16h1.5a3 3 0 0 1 0 6H25.5"/><path d="M10 31.5h14"/>
-                    </svg>
+                <a href="{{ route('home') }}" class="heading auth-rise inline-block w-fit text-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#24150e]">
                     {{ $name }}
                 </a>
 
@@ -71,8 +63,8 @@
                             ['Garansi dan servis tercatat per produk', '<path d="M12 3.5l7.5 3v5.4c0 4.4-3.1 7.6-7.5 8.6-4.4-1-7.5-4.2-7.5-8.6V6.5l7.5-3z"/><path d="M8.8 12l2.2 2.2 4.2-4.4"/>'],
                             ['Harga dan stok langsung dari distributor', '<path d="M3.5 12.4V4.5h7.9l9.1 9.1-7.9 7.9-9.1-9.1z"/><circle cx="8" cy="9" r="1.2"/>'],
                         ] as $i => [$text, $icon])
-                            <li class="auth-rise flex items-center gap-3.5 rounded-lg px-3 py-2.5 transition hover:bg-white/10" style="--d:{{ 260 + $i * 110 }}ms">
-                                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-orange-200 backdrop-blur">
+                            <li class="auth-rise flex items-center gap-3.5 py-2.5" style="--d:{{ 260 + $i * 110 }}ms">
+                                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-orange-200 ">
                                     <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $icon !!}</svg>
                                 </span>
                                 {{ $text }}

@@ -17,7 +17,7 @@
     <div class="container-x flex h-16 items-center gap-4 lg:gap-8">
         <a href="{{ route('products.index') }}" class="shrink-0 leading-none">
             @if(!empty($site['site_logo']))
-                <img src="{{ media_url($site['site_logo']) }}" alt="{{ $site['site_name'] }}" class="h-8 w-auto">
+                <img src="{{ media_url($site['site_logo']) }}" alt="{{ $site['site_name'] }}" class="h-12 w-auto">
             @else
                 <span class="heading block text-[22px] text-brand">{{ $site['site_name'] }}</span>
             @endif

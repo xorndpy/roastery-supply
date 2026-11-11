@@ -9,7 +9,7 @@
     $rowH = $compact ? 200 : 240;
     $pad = 80;
     $H = $pad * 2 + max(0, $n - 1) * $rowH;
-    $x = fn ($i) => $i % 2 === 0 ? 300 : 700;
+    $x = fn ($i) => $i % 2 === 0 ? 360 : 640;
     $y = fn ($i) => $pad + $i * $rowH;
     $d = 'M ' . $x(0) . ' 0 L ' . $x(0) . ' ' . $y(0);
     for ($i = 0; $i < $n - 1; $i++) {
@@ -33,8 +33,8 @@
                     <span class="absolute z-10 flex h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-[3px] border-orange-500 bg-white shadow-sm" style="left: {{ $x($i) / 10 }}%; top: {{ $top }}%" data-reveal>
                         <span class="h-3 w-3 rounded-full bg-orange-500"></span>
                     </span>
-                    <div class="absolute -translate-y-1/2 {{ $left ? 'text-left' : 'text-right' }}"
-                         style="top: {{ $top }}%; {{ $left ? 'left: ' . (($x($i) + 70) / 10) . '%' : 'right: ' . ((1000 - $x($i) + 70) / 10) . '%' }}; width: {{ $compact ? 40 : 46 }}%; --d: {{ 120 + $i * 80 }}ms"
+                    <div class="absolute -translate-y-1/2 {{ $left ? 'text-right' : 'text-left' }}"
+                         style="top: {{ $top }}%; {{ $left ? 'right: ' . ((1000 - $x($i) + 60) / 10) . '%' : 'left: ' . (($x($i) + 60) / 10) . '%' }}; width: 30%; --d: {{ 120 + $i * 80 }}ms"
                          data-reveal>
                         <p class="ms-year">{{ $m->year }}</p>
                         <h3 class="ms-title">{{ $m->title }}</h3>

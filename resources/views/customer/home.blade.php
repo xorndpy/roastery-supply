@@ -134,7 +134,7 @@
         <div class="mt-12">
             <x-milestones :items="$milestones->take(4)" compact />
         </div>
-        <p class="mt-6 text-center"><a href="{{ route('about') }}#perjalanan" class="text-sm font-medium text-orange-700 underline underline-offset-4 hover:decoration-2">Lihat perjalanan selengkapnya</a></p>
+        <p class="mt-12 text-center"><a href="{{ route('about') }}#perjalanan" class="btn btn-outline btn-sm">Lihat perjalanan selengkapnya</a></p>
     </section>
 @endif
 
