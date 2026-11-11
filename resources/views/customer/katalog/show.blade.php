@@ -157,33 +157,12 @@
                 </button>
             </form>
 
-            <div class="mt-3 grid {{ $wa ? 'grid-cols-2' : 'grid-cols-1' }} gap-3">
-                <button type="button" @click="quote = !quote" class="rounded-xl border border-stone-300 bg-white py-2.5 text-sm font-semibold text-slate-700 hover:bg-stone-50">Minta Penawaran</button>
-                @if($wa)
+            @if($wa)
+                <div class="mt-3">
                     <a href="https://wa.me/{{ $wa }}?text={{ urlencode('Halo, saya ingin bertanya tentang ' . $product->name) }}" target="_blank" rel="noopener noreferrer"
-                       class="rounded-xl border border-stone-300 bg-white py-2.5 text-center text-sm font-semibold text-slate-700 hover:bg-stone-50">WhatsApp</a>
-                @endif
-            </div>
-
-            <form x-show="quote" x-cloak method="POST" action="{{ route('products.quote', $product->slug) }}" class="mt-3 space-y-3 rounded-xl border border-stone-200 bg-white p-4 shadow-sm"
-                  @submit="window.track && window.track('generate_lead', { id: pid, name: pname, value: price })">
-                @csrf
-                <div class="text-sm font-bold text-slate-900">Minta penawaran</div>
-                <input type="hidden" name="variant" :value="(variants.find(v => v.id === vid) || {}).name || ''">
-                <div style="position:absolute;left:-9999px" aria-hidden="true"><input type="text" name="website" tabindex="-1" autocomplete="off"></div>
-                <input type="text" name="name" value="{{ old('name', auth()->user()->name ?? '') }}" required maxlength="100" placeholder="Nama / usaha" class="w-full rounded-lg border border-stone-300 px-3 py-2.5 text-sm">
-                <div class="grid grid-cols-2 gap-3">
-                    <input type="email" name="email" value="{{ old('email', auth()->user()->email ?? '') }}" required maxlength="255" placeholder="Email" class="rounded-lg border border-stone-300 px-3 py-2.5 text-sm">
-                    <input type="tel" name="phone" value="{{ old('phone') }}" required maxlength="20" placeholder="No. WhatsApp" class="rounded-lg border border-stone-300 px-3 py-2.5 text-sm">
+                       class="block rounded-xl border border-stone-300 bg-white py-2.5 text-center text-sm font-semibold text-slate-700 hover:bg-stone-50">WhatsApp</a>
                 </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <input type="number" name="quantity" :value="qty" min="1" max="999" required class="rounded-lg border border-stone-300 px-3 py-2.5 text-sm">
-                    <select name="payment" class="rounded-lg border border-stone-300 px-3 py-2.5 text-sm"><option value="tunai">Tunai</option><option value="cicilan">Cicilan / leasing</option></select>
-                </div>
-                <textarea name="note" rows="2" maxlength="1000" placeholder="Catatan (opsional)" class="w-full rounded-lg border border-stone-300 px-3 py-2.5 text-sm"></textarea>
-                @if($errors->any())<p class="text-[13px] text-red-600">{{ $errors->first() }}</p>@endif
-                <button type="submit" class="w-full rounded-xl bg-slate-900 py-3 text-sm font-bold text-white hover:bg-slate-800">Kirim Permintaan</button>
-            </form>
+            @endif
         </div>
     </div>
 

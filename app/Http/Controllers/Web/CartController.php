@@ -80,8 +80,9 @@ class CartController extends Controller
 
         session()->put('cart', $cart);
 
-        return redirect()->route('customer.cart.index')
-            ->with('success', 'Produk ditambahkan ke keranjang.');
+        // Tetap di halaman asal (detail produk / katalog) supaya pembeli bisa lanjut belanja; toast menawarkan "Lihat keranjang".
+        return redirect()->to(url()->previous(route('products.index')))
+            ->with('cart_added', ['name' => $cart[$product->id]['name'], 'qty' => $newQty]);
     }
 
     /**

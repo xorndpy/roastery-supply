@@ -26,6 +26,7 @@
         {{-- Menu desktop --}}
         <nav class="hidden items-center gap-1 text-sm lg:flex" aria-label="Menu toko">
             <a href="{{ route('home') }}" class="{{ $navLink }}">Beranda</a>
+            <a href="{{ route('products.index') }}" class="{{ $navLink }} {{ request()->routeIs('products.index') ? '!bg-stone-100 font-medium !text-stone-900' : '' }}">Produk</a>
 
             <div class="relative" @mouseenter="cat = true" @mouseleave="cat = false">
                 <button type="button" @click="cat = !cat" :aria-expanded="cat" class="{{ $navLink }} inline-flex items-center gap-1.5">

@@ -22,6 +22,7 @@
 
     <x-footer />
     <x-whatsapp-float />
+    <x-cart-toast />
 
     @stack('scripts')
     <x-confirm-dialog />

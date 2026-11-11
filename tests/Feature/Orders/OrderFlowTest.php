@@ -220,7 +220,7 @@ class OrderFlowTest extends TestCase
         $p = $this->product(5);
 
         $this->post(route('customer.cart.store'), ['product_id' => $p->id, 'quantity' => 2])
-            ->assertRedirect(route('customer.cart.index'));
+            ->assertRedirect(route('products.index'))->assertSessionHas('cart_added');
         $this->assertSame(2, session('cart')[$p->id]['quantity']);
 
         $this->get(route('customer.checkout.index'))->assertRedirect(route('login'));

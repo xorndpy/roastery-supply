@@ -64,7 +64,7 @@
                     <span>Total</span><span class="text-orange-500" data-cart-total>Rp {{ number_format($total, 0, ',', '.') }}</span>
                 </div>
                 <a href="{{ route('customer.checkout.index') }}" class="btn btn-primary mt-5 w-full">Lanjut ke Checkout</a>
-                <a href="{{ route('products.index') }}" class="mt-4 block text-center text-sm text-orange-600 hover:underline">Lanjut belanja</a>
+                <a href="{{ route('products.index') }}" class="btn btn-outline mt-3 w-full">Lanjut belanja</a>
             </aside>
         </div>
     @else
