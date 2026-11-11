@@ -11,14 +11,14 @@
 
     // Tiap varian menunjuk ke indeks foto galeri (atau null bila tanpa foto khusus).
     $variants = $product->variants->map(function ($v) use ($product) {
-        $idx = $product->images->search(fn ($i) => $i->id === $v->product_image_id);
-        return ['id' => $v->id, 'type' => $v->type, 'name' => $v->name, 'idx' => $idx === false ? null : $idx];
+        $idx = $v->product_image_id ? $product->images->search(fn ($i) => (int) $i->id === (int) $v->product_image_id) : false;
+        return ['id' => (int) $v->id, 'type' => $v->type, 'name' => $v->name, 'idx' => $idx === false ? null : (int) $idx];
     })->values();
 
     $state = [
         'imgs' => $imgs->all(), 'idx' => $variants->first()['idx'] ?? 0, 'qty' => 1, 'max' => max($product->stock, 1),
         'variants' => $variants, 'vid' => $variants->first()['id'] ?? null,
-        'quote' => false, 'msg' => '', 'liked' => false, 'toast' => '',
+        'quote' => false, 'msg' => '',
         'pid' => $product->id, 'pname' => $product->name, 'price' => $price,
     ];
 
@@ -61,30 +61,14 @@
             get img() { return this.imgs[this.idx] || null },
             go(d) { if (this.imgs.length) this.idx = (this.idx + d + this.imgs.length) % this.imgs.length },
             pick(v) { this.vid = v.id; if (v.idx !== null) this.idx = v.idx },
-            say(t) { this.toast = t; setTimeout(() => this.toast = '', 2000) },
-            like() { this.liked = !this.liked; try { localStorage.setItem('liked:' + this.pid, this.liked ? '1' : '') } catch (e) {} },
-            share() {
-                const d = { title: this.pname, url: location.href };
-                if (navigator.share) { navigator.share(d).catch(() => {}) }
-                else if (navigator.clipboard) { navigator.clipboard.writeText(location.href).then(() => this.say('Tautan disalin')) }
-            },
          }"
-         x-init="try { liked = !!localStorage.getItem('liked:' + pid) } catch (e) {}; window.track && window.track('view_item', { id: pid, name: pname, value: price })">
+         x-init="window.track && window.track('view_item', { id: pid, name: pname, value: price })">
 
         {{-- Galeri --}}
         <div class="md:sticky md:top-24 md:self-start">
             <div class="relative aspect-[16/11] overflow-hidden rounded-2xl bg-white shadow-md ring-1 ring-stone-100">
                 <template x-if="img"><img :src="img" alt="{{ $product->name }}" class="h-full w-full object-contain p-4"></template>
                 @if($imgs->isEmpty())<div class="flex h-full items-center justify-center text-sm text-stone-400">Foto produk</div>@endif
-
-                <div class="absolute right-3 top-3 flex gap-2">
-                    <button type="button" @click="like()" class="flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow ring-1 ring-stone-100" :class="liked ? 'text-red-500' : 'text-stone-400'" aria-label="Suka">
-                        <svg class="h-4 w-4" viewBox="0 0 24 24" :fill="liked ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.6-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.4-9.5 9-9.5 9z"/></svg>
-                    </button>
-                    <button type="button" @click="share()" class="flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-stone-400 shadow ring-1 ring-stone-100" aria-label="Bagikan">
-                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M16 6l-4-4-4 4M12 2v13"/></svg>
-                    </button>
-                </div>
 
                 @if($imgs->count() > 1)
                     <button type="button" @click="go(-1)" class="absolute left-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow ring-1 ring-stone-200 hover:bg-stone-50" aria-label="Foto sebelumnya">
@@ -94,7 +78,6 @@
                         <svg class="h-4 w-4 text-stone-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
                     </button>
                 @endif
-                <div x-show="toast" x-cloak x-text="toast" class="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-slate-900 px-3 py-1 text-xs text-white"></div>
             </div>
 
             @if($imgs->count() > 1)
