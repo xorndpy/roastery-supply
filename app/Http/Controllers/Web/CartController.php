@@ -71,7 +71,7 @@ class CartController extends Controller
             'slug' => $product->slug,
             'sku' => $product->sku,
             'weight' => (int) $product->weight,
-            'price' => $product->price + ($variant->price_adjust ?? 0),
+            'price' => $product->price,
             'variant_id' => $variant?->id,
             'quantity' => $newQty,
             'image' => $product->images->first()->image ?? null,

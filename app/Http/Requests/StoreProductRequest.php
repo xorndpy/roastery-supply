@@ -34,6 +34,7 @@ class StoreProductRequest extends FormRequest
             'variants' => 'nullable|array|max:12',
             'variants.*.name' => 'nullable|string|max:60',
             'variants.*.type' => 'nullable|string|max:30',
+            'variants.*.product_image_id' => 'nullable|integer',
             'variants.*.color_hex' => ['nullable', 'regex:/^#[0-9a-fA-F]{6}$/'],
             'variants.*.price_adjust' => 'nullable|numeric|between:-1000000000,1000000000',
         ];

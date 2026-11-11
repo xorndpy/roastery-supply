@@ -49,7 +49,7 @@ class CartService
 
             // Varian dibaca ulang dari database; bila sudah dihapus admin, kembali ke produk dasar.
             $variant = !empty($line['variant_id']) ? $product->variants->firstWhere('id', (int) $line['variant_id']) : null;
-            $unitPrice = $product->price + ($variant->price_adjust ?? 0);
+            $unitPrice = $product->price;
             $label = $variant ? "{$product->name} ({$variant->type}: {$variant->name})" : $product->name;
 
             if ((float) $line['price'] !== (float) $unitPrice) {

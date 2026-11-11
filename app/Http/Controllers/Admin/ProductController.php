@@ -286,6 +286,7 @@ class ProductController extends Controller
         DB::transaction(function () use ($product, $rows) {
             $product->variants()->delete();
             $order = 0;
+            $imageIds = $product->images()->pluck('id')->all();
             foreach ($rows as $row) {
                 $name = trim((string) ($row['name'] ?? ''));
                 if ($name === '') {
@@ -294,8 +295,8 @@ class ProductController extends Controller
                 $product->variants()->create([
                     'name' => $name,
                     'type' => trim((string) ($row['type'] ?? '')) ?: 'Varian',
-                    'color_hex' => $row['color_hex'] ?? null ?: null,
-                    'price_adjust' => (float) ($row['price_adjust'] ?? 0),
+                    'product_image_id' => in_array((int) ($row['product_image_id'] ?? 0), $imageIds, true) ? (int) $row['product_image_id'] : null,
+                    'price_adjust' => 0, // varian tidak memengaruhi harga
                     'sort_order' => $order++,
                 ]);
             }
