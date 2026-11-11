@@ -72,6 +72,12 @@ class User extends Authenticatable
         return str_starts_with($this->avatar, 'http') ? $this->avatar : media_url($this->avatar);
     }
 
+    /** URL foto sampul (latar header profil dan dashboard), atau null bila belum ada. */
+    public function getCoverUrlAttribute(): ?string
+    {
+        return $this->cover ? media_url($this->cover) : null;
+    }
+
     /** Inisial 2 huruf untuk avatar bila belum ada foto. */
     public function getInitialsAttribute(): string
     {

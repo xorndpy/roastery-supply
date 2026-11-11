@@ -18,6 +18,15 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="admin-ui bg-stone-50 font-sans antialiased">
+    @php $adminCover = auth()->user()?->cover_url; @endphp
+    @if($adminCover)
+        {{-- Foto sampul (Profil > Ganti sampul) sebagai latar seluruh panel admin, ditutup lapisan terang agar teks tetap terbaca. --}}
+        <style>
+            .admin-cover { position: fixed; inset: 0; z-index: -1; background: url('{{ $adminCover }}') center/cover no-repeat; }
+            .admin-cover::after { content: ''; position: absolute; inset: 0; background: rgb(250 250 249 / .8); }
+        </style>
+        <div class="admin-cover" aria-hidden="true"></div>
+    @endif
     <a href="#main" class="sr-only z-[60] rounded-md bg-white px-4 py-2 text-sm font-medium text-brand shadow focus:not-sr-only focus:fixed focus:left-4 focus:top-4">Lewati ke konten</a>
 
     <div x-data="{ sidebarOpen: false }" @keydown.escape.window="sidebarOpen = false" class="flex min-h-screen">

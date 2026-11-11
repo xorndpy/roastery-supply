@@ -16,6 +16,12 @@
     .pf-cover svg { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .5; }
     .pf-head { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 1rem 1.25rem; padding: 0 1.75rem 1.5rem; margin-top: -44px; position: relative; }
     .pf-ph { position: relative; flex: none; }
+    .pf-who { flex: 1; min-width: 12rem; align-self: flex-start; padding-top: 56px; }
+    .pf-cover img.pf-cover-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .pf-cover .pf-cover-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgb(0 0 0 / .05), rgb(0 0 0 / .3)); }
+    .pf-cover-btn { position: absolute; right: 12px; top: 12px; display: flex; gap: .5rem; z-index: 2; }
+    .pf-cover-btn label { cursor: pointer; padding: .35rem .75rem; border-radius: 999px; background: rgb(255 255 255 / .92); color: #3f3f46; font-size: 12.5px; font-weight: 500; box-shadow: 0 1px 3px rgb(0 0 0 / .2); }
+    .pf-cover-btn label:hover { background: #fff; }
     .pf-ph label { position: absolute; right: -2px; bottom: -2px; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 999px; background: var(--accent); color: #fff; cursor: pointer; box-shadow: 0 0 0 3px #fff; transition: background-color .15s; }
     .pf-ph label:hover { background: var(--accent-d); } .pf-ph label svg { width: 15px; height: 15px; }
     .pf-ph input:focus-visible + label { outline: 2px solid var(--accent); outline-offset: 3px; }
@@ -47,11 +53,25 @@
 
     {{-- ===== Kartu profil + foto ===== --}}
     <form method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="pf-card"
-          x-data="{ preview: null, removed: false, pick(e) { const f = e.target.files[0]; if (!f) return; this.removed = false; this.preview = URL.createObjectURL(f); } }">
+          x-data="{ preview: null, removed: false, cover: null, coverRemoved: false, pickCover(e) { const f = e.target.files[0]; if (!f) return; this.coverRemoved = false; this.cover = URL.createObjectURL(f); }, pick(e) { const f = e.target.files[0]; if (!f) return; this.removed = false; this.preview = URL.createObjectURL(f); } }">
         @csrf @method('patch')
 
-        <div class="pf-cover" aria-hidden="true">
-            <svg viewBox="0 0 800 150" preserveAspectRatio="xMidYMid slice" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="1.2"><circle cx="680" cy="30" r="40"/><circle cx="680" cy="30" r="70"/><circle cx="680" cy="30" r="100"/><circle cx="680" cy="30" r="130"/><circle cx="680" cy="30" r="160"/><circle cx="90" cy="170" r="50"/><circle cx="90" cy="170" r="90"/><circle cx="90" cy="170" r="130"/></svg>
+        <div class="pf-cover">
+            @if($user->cover_url)
+                <img src="{{ $user->cover_url }}" alt="" class="pf-cover-img" x-show="!cover && !coverRemoved">
+            @endif
+            <template x-if="cover"><img :src="cover" alt="" class="pf-cover-img"></template>
+            <div x-show="(!{{ $user->cover_url ? 'true' : 'false' }} || coverRemoved) && !cover" aria-hidden="true">
+                <svg viewBox="0 0 800 150" preserveAspectRatio="xMidYMid slice" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="1.2"><circle cx="680" cy="30" r="40"/><circle cx="680" cy="30" r="70"/><circle cx="680" cy="30" r="100"/><circle cx="680" cy="30" r="130"/><circle cx="680" cy="30" r="160"/><circle cx="90" cy="170" r="50"/><circle cx="90" cy="170" r="90"/><circle cx="90" cy="170" r="130"/></svg>
+            </div>
+            <div class="pf-cover-shade"></div>
+            <div class="pf-cover-btn">
+                <input type="file" id="cover" name="cover" accept="image/png,image/jpeg,image/webp" class="sr-only" @change="pickCover($event)">
+                <label for="cover">Ganti sampul</label>
+                @if($user->cover)
+                    <label><input type="checkbox" name="remove_cover" value="1" class="sr-only" x-model="coverRemoved" @change="if (coverRemoved) { cover = null; document.getElementById('cover').value = '' }"><span x-text="coverRemoved ? 'Batal hapus' : 'Hapus sampul'">Hapus sampul</span></label>
+                @endif
+            </div>
         </div>
 
         <div class="pf-head">
@@ -63,7 +83,7 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7H8l1.2-2h5.6L16 7h2.5A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5v-9z"/><circle cx="12" cy="13" r="3.2"/></svg>
                 </label>
             </div>
-            <div style="flex:1;min-width:12rem;padding-bottom:.6rem">
+            <div class="pf-who">
                 <p class="pf-name">{{ $user->name }}</p>
                 <p class="pf-meta"><span class="pf-badge">{{ $roleLabel }}</span><span>{{ $user->email }}</span>@if($since)<span>· Bergabung {{ $since }}</span>@endif</p>
             </div>
@@ -73,7 +93,7 @@
         </div>
 
         <div class="pf-sec" style="padding-top:0">
-            <p class="pf-hint" style="margin:0 0 .5rem">Foto JPG, PNG, atau WebP, maksimal 2 MB. Foto persegi hasilnya paling bagus.</p>
+            <p class="pf-hint" style="margin:0 0 .5rem">Foto profil: JPG, PNG, atau WebP, maks 2 MB (persegi paling bagus). Sampul: maks 4 MB, disarankan lebar 1600 x 400 px.</p>
             <div class="grid gap-x-5 sm:grid-cols-2">
                 <div class="pf-f"><label for="name">Nama</label><input id="name" name="name" type="text" value="{{ old('name', $user->name) }}" required autocomplete="name"></div>
                 <div class="pf-f"><label for="email">Email</label><input id="email" name="email" type="email" value="{{ old('email', $user->email) }}" required autocomplete="username"></div>

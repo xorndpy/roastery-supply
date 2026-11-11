@@ -15,6 +15,9 @@ class ProfileUpdateRequest extends FormRequest
             'avatar.image' => 'Foto profil harus berupa gambar.',
             'avatar.mimes' => 'Foto profil harus JPG, PNG, atau WebP.',
             'avatar.max' => 'Ukuran foto profil maksimal 2 MB.',
+            'cover.image' => 'Foto sampul harus berupa gambar.',
+            'cover.mimes' => 'Foto sampul harus JPG, PNG, atau WebP.',
+            'cover.max' => 'Ukuran foto sampul maksimal 4 MB.',
         ];
     }
 
@@ -37,6 +40,8 @@ class ProfileUpdateRequest extends FormRequest
             ],
             'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'remove_avatar' => ['nullable', 'boolean'],
+            'cover' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'remove_cover' => ['nullable', 'boolean'],
         ];
     }
 }

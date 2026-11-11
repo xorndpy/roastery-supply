@@ -50,6 +50,15 @@ class ProfileController extends Controller
             $user->avatar = null;
         }
 
+        // Foto sampul: unggah baru (ganti yang lama) atau hapus (kembali ke pola bawaan).
+        if ($request->hasFile('cover')) {
+            $this->deleteImage($user->cover);
+            $user->cover = $this->storeImage($request->file('cover'), 'covers');
+        } elseif ($request->boolean('remove_cover')) {
+            $this->deleteImage($user->cover);
+            $user->cover = null;
+        }
+
         $user->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
