@@ -103,7 +103,7 @@ class KatalogController extends Controller
     {
         $product = Product::where('slug', $slug)
             ->where('is_active', true)
-            ->with(['category', 'brand', 'images'])
+            ->with(['category', 'brand', 'images', 'variants'])
             ->firstOrFail();
 
         // Produk terkait (kategori sama)
@@ -113,6 +113,19 @@ class KatalogController extends Controller
             ->take(4)
             ->get();
 
-        return view('customer.katalog.show', compact('product', 'relatedProducts'));
+        $reviews = $product->reviews()->with('user:id,name')->limit(20)->get();
+        $reviewCount = $product->reviews()->count();
+        $reviewAvg = $reviewCount ? round((float) $product->reviews()->avg('rating'), 1) : null;
+
+        // Hanya pembeli dengan pesanan selesai yang belum pernah mengulas yang boleh menulis.
+        $canReview = false;
+        if (auth()->check()) {
+            $bought = \App\Models\Order::where('user_id', auth()->id())->where('status', 'selesai')
+                ->whereHas('items', fn ($q) => $q->where('product_id', $product->id))->exists();
+            $already = \App\Models\ProductReview::where('product_id', $product->id)->where('user_id', auth()->id())->exists();
+            $canReview = $bought && !$already;
+        }
+
+        return view('customer.katalog.show', compact('product', 'relatedProducts', 'reviews', 'reviewCount', 'reviewAvg', 'canReview'));
     }
 }

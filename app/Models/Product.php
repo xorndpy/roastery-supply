@@ -28,6 +28,7 @@ class Product extends Model
         'stock',
         'stock_threshold',
         'model_3d',
+        'specs',
         'is_active',
         'is_featured',
     ];
@@ -41,6 +42,7 @@ class Product extends Model
             'weight' => 'integer',
             'stock' => 'integer',
             'stock_threshold' => 'integer',
+            'specs' => 'array',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
         ];
@@ -60,6 +62,18 @@ class Product extends Model
     public function brand(): BelongsTo
     {
         return $this->belongsTo(Brand::class);
+    }
+
+    /** Varian (warna/ukuran/voltase). Stok tetap dihitung per produk. */
+    public function variants(): HasMany
+    {
+        return $this->hasMany(ProductVariant::class)->orderBy('sort_order')->orderBy('id');
+    }
+
+    /** Ulasan pembeli terverifikasi. */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(ProductReview::class)->where('is_approved', true)->latest();
     }
 
     /**

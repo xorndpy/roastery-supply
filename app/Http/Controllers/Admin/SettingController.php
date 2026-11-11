@@ -50,6 +50,9 @@ class SettingController extends Controller
         }
         $rules['contact_whatsapp'] = 'nullable|regex:/^[0-9]{8,16}$/';
         $rules['remove_site_logo'] = 'nullable|boolean';
+        $rules['ga4_id'] = ['nullable', 'regex:/^G-[A-Z0-9]{6,12}$/'];
+        $rules['meta_pixel_id'] = ['nullable', 'regex:/^[0-9]{8,20}$/'];
+        $rules['installment_rate'] = 'nullable|numeric|between:0,10';
 
         $data = $request->validate($rules, [
             'contact_whatsapp.regex' => 'WhatsApp hanya angka, format 628xxxxxxxxxx.',

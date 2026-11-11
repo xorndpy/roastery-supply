@@ -73,6 +73,8 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/katalog', [KatalogController::class, 'index'])->name('products.index');
 Route::get('/merek', [KatalogController::class, 'brands'])->name('products.brands');
 Route::get('/produk/{slug}', [KatalogController::class, 'show'])->name('products.show');
+Route::post('/produk/{slug}/penawaran', [\App\Http\Controllers\Web\QuoteController::class, 'store'])->middleware('throttle:5,10')->name('products.quote');
+Route::post('/produk/{slug}/ulasan', [\App\Http\Controllers\Web\ReviewController::class, 'store'])->middleware(['auth', 'throttle:10,1'])->name('products.review');
 Route::get('/tentang', [HomeController::class, 'about'])->name('about');
 Route::get('/faq', [HomeController::class, 'faq'])->name('faq');
 Route::get('/kontak', [ContactController::class, 'index'])->name('contact.index');

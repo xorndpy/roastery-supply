@@ -40,6 +40,14 @@ class UpdateProductRequest extends FormRequest
             'keep_images' => 'nullable|array',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
+            'specs' => 'nullable|array|max:30',
+            'specs.*.key' => 'nullable|string|max:40',
+            'specs.*.value' => 'nullable|string|max:120',
+            'variants' => 'nullable|array|max:12',
+            'variants.*.name' => 'nullable|string|max:60',
+            'variants.*.type' => 'nullable|string|max:30',
+            'variants.*.color_hex' => ['nullable', 'regex:/^#[0-9a-fA-F]{6}$/'],
+            'variants.*.price_adjust' => 'nullable|numeric|between:-1000000000,1000000000',
         ];
     }
 }

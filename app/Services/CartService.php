@@ -23,7 +23,7 @@ class CartService
             return ['cart' => [], 'total' => 0, 'notices' => []];
         }
 
-        $products = Product::with('images')
+        $products = Product::with(['images', 'variants'])
             ->whereIn('id', array_keys($cart))
             ->where('is_active', true)
             ->get()
@@ -47,23 +47,29 @@ class CartService
                 $qty = $product->stock;
             }
 
-            if ((float) $line['price'] !== (float) $product->price) {
+            // Varian dibaca ulang dari database; bila sudah dihapus admin, kembali ke produk dasar.
+            $variant = !empty($line['variant_id']) ? $product->variants->firstWhere('id', (int) $line['variant_id']) : null;
+            $unitPrice = $product->price + ($variant->price_adjust ?? 0);
+            $label = $variant ? "{$product->name} ({$variant->type}: {$variant->name})" : $product->name;
+
+            if ((float) $line['price'] !== (float) $unitPrice) {
                 $notices[] = "Harga \"{$product->name}\" berubah.";
             }
 
             $fresh[$product->id] = [
                 'id'       => $product->id,
-                'name'     => $product->name,
+                'name'     => $label,
                 'slug'     => $product->slug,
                 'sku'      => $product->sku,
                 'weight'   => (int) $product->weight,   // gram, untuk ongkir
-                'price'    => $product->price,
+                'price'    => $unitPrice,
+                'variant_id' => $variant?->id,
                 'quantity' => $qty,
                 'image'    => $product->images->first()->image ?? ($line['image'] ?? null),
                 'stock'    => $product->stock,
             ];
 
-            $total += $product->price * $qty;
+            $total += $unitPrice * $qty;
         }
 
         session()->put('cart', $fresh);

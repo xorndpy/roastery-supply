@@ -35,14 +35,27 @@ class CartController extends Controller
         $request->validate([
             'product_id' => 'required|integer|exists:products,id',
             'quantity' => 'required|integer|min:1|max:999',
+            'variant_id' => 'nullable|integer',
         ]);
 
-        $product = Product::with('images')
+        $product = Product::with(['images', 'variants'])
             ->where('is_active', true)
             ->find($request->product_id);
 
         if (!$product) {
             return back()->with('error', 'Produk tidak tersedia.');
+        }
+
+        // Varian: wajib milik produk ini. Bila produk punya varian tapi tidak dipilih (mis. tombol cepat
+        // di katalog), pakai varian pertama. Keranjang menyimpan satu varian per produk.
+        $variant = null;
+        if ($request->filled('variant_id')) {
+            $variant = $product->variants->firstWhere('id', (int) $request->variant_id);
+            if (!$variant) {
+                return back()->with('error', 'Varian tidak valid.');
+            }
+        } elseif ($product->variants->isNotEmpty()) {
+            $variant = $product->variants->first();
         }
 
         $cart = session()->get('cart', []);
@@ -54,11 +67,12 @@ class CartController extends Controller
 
         $cart[$product->id] = [
             'id' => $product->id,
-            'name' => $product->name,
+            'name' => $variant ? "{$product->name} ({$variant->type}: {$variant->name})" : $product->name,
             'slug' => $product->slug,
             'sku' => $product->sku,
             'weight' => (int) $product->weight,
-            'price' => $product->price,
+            'price' => $product->price + ($variant->price_adjust ?? 0),
+            'variant_id' => $variant?->id,
             'quantity' => $newQty,
             'image' => $product->images->first()->image ?? null,
             'stock' => $product->stock,

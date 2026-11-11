@@ -36,6 +36,14 @@ return [
             'free_shipping_min' => ['label' => 'Gratis ongkir untuk belanja minimal (Rp)', 'type' => 'number', 'max' => 1000000000,
                 'help' => 'Kosongkan atau 0 untuk menonaktifkan. Dihitung dari belanja setelah diskon voucher.'],
         ],
+        'Cicilan' => [
+            'installment_rate' => ['label' => 'Bunga cicilan flat per bulan (%)', 'type' => 'text', 'max' => 5, 'default' => '1.5',
+                'help' => 'Dipakai untuk estimasi "mulai Rp X/bulan" di halaman produk. Hanya perkiraan, bukan penawaran resmi leasing.'],
+        ],
+        'Analitik' => [
+            'ga4_id'        => ['label' => 'Google Analytics 4 (Measurement ID)', 'type' => 'text', 'max' => 20, 'help' => 'Format G-XXXXXXXXXX. Kosongkan untuk menonaktifkan.'],
+            'meta_pixel_id' => ['label' => 'Meta Pixel ID', 'type' => 'text', 'max' => 20, 'help' => 'Hanya angka. Kosongkan untuk menonaktifkan.'],
+        ],
         'Halaman Tentang' => [
             'about_title'    => ['label' => 'Label Halaman', 'type' => 'text', 'default' => 'Tentang Kami', 'max' => 120, 'help' => 'Teks kecil di atas judul utama, juga dipakai sebagai judul tab browser.'],
             'about_headline' => ['label' => 'Judul Utama', 'type' => 'text', 'default' => 'Mitra peralatan kopi untuk usaha yang mengutamakan kualitas.', 'max' => 140],

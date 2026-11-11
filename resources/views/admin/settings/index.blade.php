@@ -7,11 +7,11 @@
     // Tab -> [judul, keterangan, grup di config/cms.php]. Semua tab berada dalam SATU form, jadi satu tombol simpan cukup.
     $tabs = [
         'profil'   => ['Profil Usaha', 'Nama, logo, kontak, media sosial', ['Umum', 'Kontak', 'Media Sosial']],
-        'bayar'    => ['Pembayaran & Pengiriman', 'Midtrans, transfer manual, ongkir', ['Rekening Pembayaran', 'Pengiriman']],
+        'bayar'    => ['Pembayaran & Pengiriman', 'Midtrans, transfer manual, ongkir', ['Rekening Pembayaran', 'Pengiriman', 'Cicilan']],
         'tampilan' => ['Tampilan Toko', 'Kartu produk dan teks beranda', ['Tampilan Produk', 'Beranda']],
         'header'   => ['Header Halaman', 'Foto latar tiap halaman', ['Header Halaman']],
         'tentang'  => ['Halaman Tentang', 'Profil usaha dan foto', ['Halaman Tentang']],
-        'seo'      => ['SEO', 'Tampil di hasil pencarian', ['SEO']],
+        'seo'      => ['SEO', 'Tampil di hasil pencarian', ['SEO', 'Analitik']],
     ];
     $groupTitles = ['Rekening Pembayaran' => 'Transfer manual (cadangan)', 'Pengiriman' => 'Gratis ongkir'];
 

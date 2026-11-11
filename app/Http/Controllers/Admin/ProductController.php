@@ -106,6 +106,8 @@ class ProductController extends Controller
         $data['weight'] = $data['weight'] ?? 0;
         $data['is_active'] = $request->boolean('is_active', true);
         $data['is_featured'] = $request->boolean('is_featured', false);
+        $data['specs'] = $this->cleanSpecs((array) $request->input('specs', []));
+        unset($data['variants']);
 
         // Generate SKU kalau kosong
         if (empty($data['sku'])) {
@@ -138,6 +140,8 @@ class ProductController extends Controller
 
             return $product;
         });
+
+        $this->syncVariants($product, (array) $request->input('variants', []));
 
         // Upload gambar
         if ($request->hasFile('images')) {
@@ -190,6 +194,8 @@ class ProductController extends Controller
         $data['weight'] = $data['weight'] ?? 0;
         $data['is_active'] = $request->boolean('is_active', true);
         $data['is_featured'] = $request->boolean('is_featured', false);
+        $data['specs'] = $this->cleanSpecs((array) $request->input('specs', []));
+        unset($data['variants']);
 
         // Generate SKU kalau kosong
         if (empty($data['sku'])) {
@@ -208,6 +214,7 @@ class ProductController extends Controller
         }
 
         $product->update($data);
+        $this->syncVariants($product, (array) $request->input('variants', []));
 
         // Sync gambar (keep + upload baru)
         $keepImages = $request->input('keep_images', []);
@@ -256,5 +263,42 @@ class ProductController extends Controller
         $product->update(['is_featured' => !$product->is_featured]);
 
         return back()->with('success', 'Status unggulan berhasil diubah.');
+    }
+
+    /** Baris spesifikasi kosong dibuang; hasil null bila tidak ada. */
+    private function cleanSpecs(array $rows): ?array
+    {
+        $out = [];
+        foreach ($rows as $row) {
+            $k = trim((string) ($row['key'] ?? ''));
+            $v = trim((string) ($row['value'] ?? ''));
+            if ($k !== '' && $v !== '') {
+                $out[] = ['key' => $k, 'value' => $v];
+            }
+        }
+
+        return $out ?: null;
+    }
+
+    /** Ganti seluruh varian produk dengan isi form (baris tanpa nama dibuang). */
+    private function syncVariants(Product $product, array $rows): void
+    {
+        DB::transaction(function () use ($product, $rows) {
+            $product->variants()->delete();
+            $order = 0;
+            foreach ($rows as $row) {
+                $name = trim((string) ($row['name'] ?? ''));
+                if ($name === '') {
+                    continue;
+                }
+                $product->variants()->create([
+                    'name' => $name,
+                    'type' => trim((string) ($row['type'] ?? '')) ?: 'Varian',
+                    'color_hex' => $row['color_hex'] ?? null ?: null,
+                    'price_adjust' => (float) ($row['price_adjust'] ?? 0),
+                    'sort_order' => $order++,
+                ]);
+            }
+        });
     }
 }

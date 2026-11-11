@@ -261,6 +261,7 @@
             </div>
         </div>
     </div>
+@include('admin.products._extras')
 </form>
 
 @endsection
