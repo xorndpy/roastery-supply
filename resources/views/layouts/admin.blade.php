@@ -34,7 +34,7 @@
         <div class="flex min-w-0 flex-1 flex-col">
 
             {{-- Topbar --}}
-            <header class="sticky top-0 z-[45] border-b border-stone-200 bg-white/90 backdrop-blur">
+            <header style="z-index:45" class="sticky top-0 z-[45] border-b border-stone-200 bg-white/90 backdrop-blur">
                 <div class="flex h-14 items-center gap-3 px-4 sm:px-7">
                     <button @click="sidebarOpen = !sidebarOpen" class="-ml-1 flex h-9 w-9 items-center justify-center rounded-md text-stone-600 hover:bg-stone-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 lg:hidden" aria-label="Buka menu">
                         <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>

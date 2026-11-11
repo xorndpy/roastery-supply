@@ -20,6 +20,8 @@
     // Ganti gambar banner: simpan foto di public/images/dashboard-hero.jpg (atau .webp). Tanpa file, dipakai gradient + pola bawaan.
     $heroImg = collect(['jpg', 'jpeg', 'webp', 'png'])->map(fn ($e) => 'images/dashboard-hero.' . $e)->first(fn ($f) => file_exists(public_path($f)));
     $dateLabel = $now->copy()->locale('id')->translatedFormat('l, j F Y');
+    // Foto sampul dari Profil dipakai sebagai latar dashboard (lapisan terang 50%). Tanpa sampul: latar polos.
+    $coverImg = $user->cover_url;
 
     $ico = [
         'card' => '<rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M3 10h18M7 15h3"/>',
@@ -233,21 +235,24 @@
 
     /* ===== Hero banner ===== */
     .td .td-hero { position: relative; z-index: auto; align-items: center; margin-bottom: 0; padding: 0; }
-    .td-hero-bg { position: absolute; inset: 0; z-index: 0; overflow: hidden; border-radius: 20px; background: linear-gradient(115deg, #24150e 0%, #4a2f21 55%, #8f5230 130%); box-shadow: 0 10px 30px -12px rgb(36 21 14 / .55); }
-    .td-hero-bg svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .td-page-bg { position: fixed; inset: 0; z-index: -1; background-size: cover; background-position: center; background-repeat: no-repeat; }
+    .td-page-bg::after { content: ''; position: absolute; inset: 0; background: rgb(250 250 249 / .5); }
     .td-hero-who { position: relative; z-index: 2; display: flex; align-items: center; gap: 1rem; flex: 1 1 22rem; min-width: 0; } .td-hero .rp { flex: none; z-index: 30; }
     .td-hero .dash-h1 { font-size: 1.625rem; }
+    .has-page-bg .td-hero .dash-h1, .has-page-bg .td-hero .dash-lede { color: var(--ink); text-shadow: 0 1px 3px rgb(250 250 249 / .9); }
     .td-kpis ~ .dash-notice { margin: 1.25rem 0 0; }
     .td-kpis { position: relative; z-index: 1; margin-top: 1.25rem; padding: 0; }
     @media (max-width: 640px) { .td-knum { font-size: 1.3rem; } .td-kpi { padding: 1rem; } .td-hero .dash-h1 { font-size: 1.25rem; } .td-kpis { padding: 0; } }
 </style>
 
-<div class="dash td">
+<div class="dash td {{ $coverImg ? 'has-page-bg' : '' }}">
+    @if($coverImg)
+        <div class="td-page-bg" aria-hidden="true" style="background-image: url('{{ $coverImg }}');"></div>
+    @endif
 
     {{-- ============ Header + pemilih periode ============ --}}
     <header class="dash-head td-hero">
         <div class="td-hero-who">
-            <x-avatar :user="$user" :size="52" :ring="true" />
             <div>
                 <h1 class="dash-h1">{{ $greeting }}, {{ $firstName }}</h1>
                 <p class="dash-lede">{{ $dateLabel }} · {{ $lede }}</p>
