@@ -147,7 +147,7 @@ Prinsip: **uang yang sudah masuk tidak boleh hilang atau menimbulkan error**. Ka
        MIDTRANS_IS_PRODUCTION=false
 
 4. Daftarkan **Payment Notification URL** di dashboard (bagian pengaturan konfigurasi): `https://DOMAIN-ANDA/webhooks/midtrans`.
-   Midtrans harus bisa menjangkau URL itu, jadi di komputer lokal pakai tunnel (mis. ngrok/Cloudflare Tunnel) atau uji di server (Railway).
+   Midtrans harus bisa menjangkau URL itu, jadi di komputer lokal pakai tunnel (mis. ngrok/Cloudflare Tunnel) atau uji di server produksi/staging (Domainesia).
 5. Uji pembayaran dengan **Midtrans Sandbox Payment Simulator** (VA, QRIS, e-wallet, dan kartu uji tersedia di dokumentasi Midtrans: *Testing Payment on Sandbox*).
 6. Bila URL belum bisa dijangkau Midtrans, gunakan perintah simulasi di bawah. Jalurnya sama persis dengan notifikasi asli.
 

@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use App\Models\User;
 use Illuminate\Console\Command;
 
-/** Pintu darurat bila admin kehilangan HP + kode pemulihan: jalankan lewat Railway shell. */
+/** Pintu darurat bila admin kehilangan HP + kode pemulihan: jalankan lewat terminal server (SSH / Terminal cPanel). */
 class ResetTwoFactor extends Command
 {
     protected $signature = '2fa:reset {email : Email akun yang 2FA-nya dihapus}';

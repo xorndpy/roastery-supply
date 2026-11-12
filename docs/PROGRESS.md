@@ -48,3 +48,18 @@ setiap batch diverifikasi dengan tes otomatis (`php artisan test`) dan temuan bu
 - Stok berkurang saat pembayaran dikonfirmasi (bukan saat checkout); batal sesudah itu mengembalikan stok.
 - Order `menunggu_bayar` > 24 jam otomatis batal, kecuali ada bukti bayar yang sedang menunggu verifikasi.
 - Login Google: akun lokal yang emailnya belum terverifikasi dibatalkan password-nya saat digabung (anti pembajakan akun).
+
+## Batch 18 dan seterusnya (ringkasan dari riwayat migrasi dan kode)
+Bagian ini diringkas dari berkas migrasi dan kode; belum ada hitungan tes per batch. Total saat ini sekitar 290 fungsi tes
+(`tests/Feature`, `tests/Unit`, `tests/Concurrency`), dijalankan dengan `php artisan test`.
+
+| Cakupan | Keterangan |
+|---|---|
+| Pembayaran online Midtrans | Snap, webhook bertanda tangan SHA512, event dicatat UNIQUE (anti-duplikat), rekonsiliasi `payments:reconcile` tiap 5 menit; lihat `docs/ALUR_PEMBAYARAN.md` |
+| Ongkir | Tarif per wilayah (admin) dengan opsi RajaOngkir (Komerce) di `ShippingService`; resi diinput manual dari daftar kurir |
+| CMS tambahan | Artikel, milestone, hero slide, penempatan banner, banner kategori, perusahaan pada testimoni |
+| Produk | Spesifikasi, varian (dengan gambar varian), dan ulasan produk |
+| Hak akses | Role Gudang, permission `view_finance`, pemisahan permission pesanan, `ship_orders` |
+| Keamanan | 2FA TOTP untuk panel, perintah darurat `2fa:reset`, bukti bayar privat |
+| Penyimpanan media | Disk S3-compatible (Supabase/R2), perintah `media:check` dan migrasi media |
+| Deploy | Awalnya Docker + Railway; sekarang hosting Domainesia. Scheduler dijalankan lewat cron `schedule:run` tiap menit |

@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Webhooks\MidtransWebhookController;
 use App\Http\Controllers\Web\ArticleController;
 use App\Http\Controllers\Admin\ArticleController as AdminArticleController;
 use App\Http\Controllers\Admin\MilestoneController;
@@ -340,5 +339,5 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 
-// Notifikasi payment gateway (publik; keaslian dijamin tanda tangan, bukan sesi login).
-Route::post('/webhooks/midtrans', MidtransWebhookController::class)->middleware('throttle:600,1')->name('webhooks.midtrans');
+// Webhook Midtrans (POST /webhooks/midtrans) didaftarkan di bootstrap/app.php, di luar grup 'web',
+// supaya tidak kena CSRF/sesi. Jangan didaftarkan lagi di sini (nama route ganda + kena CSRF).

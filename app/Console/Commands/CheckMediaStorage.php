@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Storage;
 use Throwable;
 
 /**
- * Diagnosa penyimpanan foto (Supabase/R2). Jalankan di shell Railway: php artisan media:check
+ * Diagnosa penyimpanan foto (Supabase/R2). Jalankan di terminal server (SSH / Terminal cPanel): php artisan media:check
  * Menulis file uji kecil, membukanya lewat URL publik seperti browser, lalu menghapusnya.
  */
 class CheckMediaStorage extends Command

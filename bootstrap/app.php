@@ -14,13 +14,15 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     
         then: function () {
+            // Sengaja di luar grup 'web': webhook dari Midtrans tidak membawa token CSRF maupun sesi.
+            // Keaslian dijamin tanda tangan SHA512 di MidtransWebhookController.
             Route::middleware('throttle:600,1')
                 ->post('/webhooks/midtrans', \App\Http\Controllers\Webhooks\MidtransWebhookController::class)
                 ->name('webhooks.midtrans');
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Di belakang proxy Railway: percaya X-Forwarded-* agar IP klien & skema HTTPS terbaca benar.
+        // Di belakang proxy/CDN (Cloudflare, LiteSpeed, dll): percaya X-Forwarded-* agar IP klien & skema HTTPS terbaca benar.
         $middleware->trustProxies(at: '*');
 
         $middleware->alias([
