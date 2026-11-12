@@ -4,7 +4,13 @@
     // Validasi ulang saat render: ID dari database tidak pernah dicetak mentah ke dalam <script>.
     $ga = $ga && preg_match('/^G-[A-Z0-9]{6,12}$/', $ga) ? $ga : null;
     $px = $px && preg_match('/^[0-9]{8,20}$/', $px) ? $px : null;
+    // Cloudflare Web Analytics: token dari .env (CF_BEACON_TOKEN), divalidasi sebelum dicetak ke <script>.
+    $cf = config('services.cloudflare.beacon_token');
+    $cf = $cf && preg_match('/^[A-Za-z0-9]{16,64}$/', $cf) ? $cf : null;
 @endphp
+@if($cf)
+    <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "{{ $cf }}"}'></script>
+@endif
 @if($ga)
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ $ga }}"></script>
     <script>

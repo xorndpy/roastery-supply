@@ -34,6 +34,11 @@ return [
         'couriers' => env('RAJAONGKIR_COURIERS', 'jne:sicepat:jnt'),
     ],
 
+    // Cloudflare Web Analytics (token bersifat publik, aman). Kosongkan untuk menonaktifkan.
+    'cloudflare' => [
+        'beacon_token' => env('CF_BEACON_TOKEN', '6f32181eec184964bfb263a78065f05d'),
+    ],
+
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),

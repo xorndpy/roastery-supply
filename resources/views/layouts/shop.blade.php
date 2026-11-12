@@ -12,6 +12,9 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('head')
     <x-analytics />
+    !-- Cloudflare Web Analytics --!
+    <script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "6f32181eec184964bfb263a78065f05d"}'></script>
+    <!-- End Cloudflare Web Analytics -->
 </head>
 <body class="shop-ui shop-site min-h-screen bg-stone-50 font-sans text-stone-900 antialiased">
     <x-shop-navbar />
