@@ -33,6 +33,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <x-favicon />
 </head>
 <body class="bg-stone-50 font-sans text-stone-900 antialiased">
     <a href="#main" class="sr-only z-50 rounded-md bg-white px-4 py-2 text-sm font-medium text-brand shadow focus:not-sr-only focus:fixed focus:left-4 focus:top-4">Lewati ke formulir</a>

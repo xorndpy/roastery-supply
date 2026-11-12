@@ -5,7 +5,7 @@
 @section('content')
 @php
     $user = $user ?? auth()->user();
-    $roleLabel = ['super_admin' => 'Super Admin', 'admin' => 'Admin', 'staff' => 'Staff', 'gudang' => 'Admin Gudang'][$user->getRoleNames()->first()] ?? ucfirst((string) $user->getRoleNames()->first());
+    $roleLabel = ['super_admin' => 'Super Admin', 'admin' => 'Admin', 'staff' => 'Staff', 'gudang' => 'Admin Gudang', 'keuangan' => 'Admin Keuangan'][$user->getRoleNames()->first()] ?? ucfirst((string) $user->getRoleNames()->first());
     $since = $user->created_at?->copy()->timezone('Asia/Jakarta')->locale('id')->translatedFormat('F Y');
 @endphp
 

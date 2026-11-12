@@ -11,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <x-analytics />
+    <x-favicon />
 </head>
 <body class="shop-ui insight-site min-h-screen bg-stone-50 font-sans text-stone-900 antialiased">
     <x-insight-header :categories="$categories ?? []" :q="$search ?? ''" :current="$category ?? ($article->category ?? null)" />

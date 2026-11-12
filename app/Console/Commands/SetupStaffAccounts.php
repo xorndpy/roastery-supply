@@ -58,7 +58,7 @@ class SetupStaffAccounts extends Command
 
             $user = User::withTrashed()->where('email', $a['email'])->first();
 
-            if ($user && $user->hasRole('customer') && ! $user->hasAnyRole(['super_admin', 'admin', 'staff', 'gudang'])) {
+            if ($user && $user->hasRole('customer') && ! $user->hasAnyRole(['super_admin', 'admin', 'staff', 'gudang', 'keuangan'])) {
                 $this->warn("Dilewati: {$a['email']} sudah dipakai akun pelanggan. Pakai email lain.");
 
                 continue;

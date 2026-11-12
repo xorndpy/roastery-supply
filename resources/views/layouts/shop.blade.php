@@ -12,6 +12,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('head')
     <x-analytics />
+    <x-favicon />
 </head>
 <body class="shop-ui shop-site min-h-screen bg-stone-50 font-sans text-stone-900 antialiased">
     <x-shop-navbar />

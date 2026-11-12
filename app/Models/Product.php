@@ -24,6 +24,7 @@ class Product extends Model
         'sku',
         'description',
         'price',
+        'cost_price',
         'weight',
         'stock',
         'stock_threshold',
@@ -39,6 +40,7 @@ class Product extends Model
             'category_id' => 'integer',
             'brand_id' => 'integer',
             'price' => 'decimal:2',
+            'cost_price' => 'decimal:2',
             'weight' => 'integer',
             'stock' => 'integer',
             'stock_threshold' => 'integer',
@@ -155,7 +157,7 @@ class Product extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['name', 'sku', 'price', 'stock_threshold', 'is_active', 'is_featured', 'category_id', 'brand_id'])
+            ->logOnly(['name', 'sku', 'price', 'cost_price', 'stock_threshold', 'is_active', 'is_featured', 'category_id', 'brand_id'])
             ->logOnlyDirty()
             ->dontLogEmptyChanges()
             ->useLogName('produk')

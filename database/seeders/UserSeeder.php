@@ -47,6 +47,7 @@ class UserSeeder extends Seeder
         $make('admin@roastery.com', 'Store Administrator', '08110000002', 'admin');
         $make('staff@roastery.com', 'Operations Staff', '08110000003', 'staff');
         $make('gudang@roastery.com', 'Admin Gudang', '08110000004', 'gudang');
+        $make('keuangan@roastery.com', 'Admin Keuangan', '08110000005', 'keuangan');
         $customerUser = $make('customer@roastery.com', 'Budi Santoso', '081234567890', 'customer');
 
         Customer::updateOrCreate(['user_id' => $customerUser->id], [

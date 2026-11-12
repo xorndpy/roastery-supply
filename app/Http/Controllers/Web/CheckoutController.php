@@ -266,6 +266,9 @@ class CheckoutController extends Controller
             'shipping_postal_code' => $data['postal_code'],
         ]);
 
+        // HPP saat ini disalin ke item pesanan (NULL = belum diisi) agar laba rugi lama tidak berubah bila HPP diperbarui.
+        $costs = \App\Models\Product::whereIn('id', collect($cart)->pluck('id')->all())->pluck('cost_price', 'id');
+
         foreach ($cart as $item) {
             OrderItem::create([
                 'order_id' => $order->id,
@@ -273,6 +276,7 @@ class CheckoutController extends Controller
                 'product_name' => $item['name'],
                 'product_sku' => $item['sku'],
                 'price' => $item['price'],
+                'cost_price' => $costs[$item['id']] ?? null,
                 'quantity' => $item['quantity'],
                 'subtotal' => $item['price'] * $item['quantity'],
             ]);

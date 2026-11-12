@@ -16,6 +16,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     {{-- Dipakai halaman Laporan. Dashboard memakai grafik SVG sendiri. --}}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <x-favicon />
 </head>
 <body class="admin-ui bg-stone-50 font-sans antialiased">
     <a href="#main" class="sr-only z-[60] rounded-md bg-white px-4 py-2 text-sm font-medium text-brand shadow focus:not-sr-only focus:fixed focus:left-4 focus:top-4">Lewati ke konten</a>

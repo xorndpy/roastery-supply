@@ -52,6 +52,15 @@ class PermissionSeeder extends Seeder
                 'download_invoices',
                 'view_finance',
             ],
+            'keuangan' => [
+                'view_profit',
+                'view_costs',
+                'manage_costs',
+                'view_expenses',
+                'create_expenses',
+                'edit_expenses',
+                'delete_expenses',
+            ],
             'pelanggan' => [
                 'view_customers',
                 'edit_customers',

@@ -20,6 +20,10 @@ return [
             'verify_payments', 'reject_payments', 'manage_shipments', 'ship_orders', 'view_shipping_rates', 'manage_shipping_rates',
             'view_returns', 'approve_returns', 'reject_returns',
         ],
+        'Keuangan' => [
+            'view_profit', 'view_costs', 'manage_costs',
+            'view_expenses', 'create_expenses', 'edit_expenses', 'delete_expenses',
+        ],
         'Pelanggan' => ['view_customers', 'edit_customers', 'export_customers'],
         'Pemasaran' => [
             'view_vouchers', 'create_vouchers', 'edit_vouchers', 'delete_vouchers',

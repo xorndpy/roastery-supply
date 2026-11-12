@@ -16,10 +16,10 @@
         x-effect="document.body.classList.toggle('overflow-hidden', open)"
         @keydown.escape.window="open = false"
         class="sticky top-0 z-40 border-b border-stone-200 bg-white">
-    <div class="container-x flex h-16 items-center gap-8">
+    <div class="container-x flex h-16 items-center gap-8 lg:h-20">
         <a href="{{ route('home') }}" class="heading shrink-0 text-[22px] leading-none text-brand">
             @if(!empty($site['site_logo']))
-                <img src="{{ media_url($site['site_logo']) }}" alt="{{ $site['site_name'] }}" class="h-12 w-auto">
+                <img src="{{ media_url($site['site_logo']) }}" alt="{{ $site['site_name'] }}" class="h-14 w-auto lg:h-16">
             @else
                 {{ $site['site_name'] }}
             @endif

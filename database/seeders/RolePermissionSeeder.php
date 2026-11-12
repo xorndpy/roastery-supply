@@ -76,6 +76,17 @@ class RolePermissionSeeder extends Seeder
             ]);
         }
 
+        // 3c. Keuangan: laba rugi, HPP, biaya operasional, dan angka penjualan (tanpa mengubah pesanan/stok)
+        $keuanganRole = Role::where('name', 'keuangan')->first();
+        if ($keuanganRole) {
+            $keuanganRole->syncPermissions([
+                'view_finance', 'view_profit', 'view_costs', 'manage_costs',
+                'view_expenses', 'create_expenses', 'edit_expenses', 'delete_expenses',
+                'view_orders', 'download_invoices', 'view_returns',
+                'view_reports', 'export_reports',
+            ]);
+        }
+
         // 4. Customer: Customer portal access
         $customerRole = Role::where('name', 'customer')->first();
         if ($customerRole) {

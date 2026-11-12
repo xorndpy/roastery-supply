@@ -63,3 +63,7 @@ Bagian ini diringkas dari berkas migrasi dan kode; belum ada hitungan tes per ba
 | Keamanan | 2FA TOTP untuk panel, perintah darurat `2fa:reset`, bukti bayar privat |
 | Penyimpanan media | Disk S3-compatible (Supabase/R2), perintah `media:check` dan migrasi media |
 | Deploy | Awalnya Docker + Railway; sekarang hosting Domainesia. Scheduler dijalankan lewat cron `schedule:run` tiap menit |
+| Keuangan | Role `keuangan`; laporan laba rugi per periode (WIB) + ekspor CSV; HPP per produk (disalin ke `order_items.cost_price` saat checkout supaya laba lama tidak berubah); biaya operasional (CRUD + audit log). Kode: `ProfitLossService`, `FinanceController`, `ExpenseController` |
+| Invoice kustom | Invoice PDF memakai logo, tagline, kontak, pesan penutup, dan slogan dari Pengaturan (grup Invoice (PDF)); logo tertanam sebagai data URI (`pdf_image_data_uri`, WEBP dikonversi ke PNG) |
+| Merek | Favicon bawaan (SVG/ICO/PNG) + opsi unggah di Pengaturan; logo navbar diperbesar |
+| Perbaikan | Webhook Midtrans terdaftar dua kali (nama route ganda; yang di grup `web` kena CSRF) -> satu pendaftaran di luar grup `web` |

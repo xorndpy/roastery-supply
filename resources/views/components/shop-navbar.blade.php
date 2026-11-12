@@ -14,10 +14,10 @@
 @endphp
 
 <header x-data="{ open: false, cat: false }" @keydown.escape.window="open = false; cat = false" class="sticky top-0 z-40 border-b border-stone-200 bg-white">
-    <div class="container-x flex h-16 items-center gap-4 lg:gap-8">
+    <div class="container-x flex h-16 items-center gap-4 lg:h-20 lg:gap-8">
         <a href="{{ route('products.index') }}" class="shrink-0 leading-none">
             @if(!empty($site['site_logo']))
-                <img src="{{ media_url($site['site_logo']) }}" alt="{{ $site['site_name'] }}" class="h-12 w-auto">
+                <img src="{{ media_url($site['site_logo']) }}" alt="{{ $site['site_name'] }}" class="h-14 w-auto lg:h-16">
             @else
                 <span class="heading block text-[22px] text-brand">{{ $site['site_name'] }}</span>
             @endif
@@ -81,7 +81,7 @@
                             <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
                         </button>
                         <div x-show="menu" x-cloak @click.outside="menu = false" x-transition.opacity class="absolute right-0 mt-3 w-52 overflow-hidden rounded-lg border border-stone-200 bg-white py-1 shadow-lg shadow-stone-900/5">
-                            @if(auth()->user()->hasAnyRole(['super_admin', 'admin', 'staff', 'gudang']))
+                            @if(auth()->user()->hasAnyRole(['super_admin', 'admin', 'staff', 'gudang', 'keuangan']))
                                 <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-sm font-medium text-orange-600 hover:bg-stone-50">Panel Admin</a>
                             @endif
                             <a href="{{ route('customer.dashboard') }}" class="block px-4 py-2 text-sm hover:bg-stone-50">Dashboard</a>

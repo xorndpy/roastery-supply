@@ -17,7 +17,7 @@ class RequireTwoFactor
         }
 
         if (!$user->hasTwoFactor()) {
-            if (config('twofactor.enforced') && $user->hasAnyRole(['super_admin', 'admin', 'staff', 'gudang'])) {
+            if (config('twofactor.enforced') && $user->hasAnyRole(['super_admin', 'admin', 'staff', 'gudang', 'keuangan'])) {
                 return redirect()->guest(route('two-factor.setup'));
             }
 

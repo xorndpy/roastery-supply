@@ -17,6 +17,7 @@ class OrderItem extends Model
         'product_name',
         'product_sku',
         'price',
+        'cost_price',
         'quantity',
         'subtotal',
     ];
@@ -27,6 +28,7 @@ class OrderItem extends Model
             'order_id' => 'integer',
             'product_id' => 'integer',
             'price' => 'decimal:2',
+            'cost_price' => 'decimal:2',
             'quantity' => 'integer',
             'subtotal' => 'decimal:2',
         ];

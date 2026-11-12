@@ -43,3 +43,61 @@ if (! function_exists('wib')) {
         return $d->copy()->timezone('Asia/Jakarta')->locale('id')->translatedFormat($format) . ($suffix ? ' WIB' : '');
     }
 }
+
+if (! function_exists('pdf_image_data_uri')) {
+    /**
+     * Gambar dari disk 'public' (lokal/R2/Supabase) -> data URI untuk DomPDF.
+     * DomPDF tidak bisa memuat URL jarak jauh (remote dimatikan demi keamanan) dan tidak mendukung WEBP,
+     * jadi WEBP dikonversi ke PNG dan gambar besar dikecilkan agar PDF tetap ringan. null = tidak ada/tidak terbaca.
+     */
+    function pdf_image_data_uri(?string $path, int $maxWidth = 600): ?string
+    {
+        if (! $path) {
+            return null;
+        }
+
+        try {
+            $disk = Storage::disk('public');
+            $path = ltrim($path, '/');
+            if (! $disk->exists($path)) {
+                return null;
+            }
+
+            $bytes = $disk->get($path);
+            $info = @getimagesizefromstring($bytes);
+            if (! $info) {
+                return null;
+            }
+
+            $mime = $info['mime'];
+            $needsConvert = $mime === 'image/webp' || ($info[0] > $maxWidth && in_array($mime, ['image/png', 'image/jpeg', 'image/gif', 'image/webp'], true));
+
+            if ($needsConvert) {
+                $img = function_exists('imagecreatefromstring') ? @imagecreatefromstring($bytes) : false;
+                if ($img === false) {
+                    return $mime === 'image/webp' ? null : 'data:'.$mime.';base64,'.base64_encode($bytes);
+                }
+                if ($info[0] > $maxWidth) {
+                    $scaled = imagescale($img, $maxWidth);
+                    if ($scaled !== false) {
+                        $img = $scaled;
+                    }
+                }
+                imagealphablending($img, false);
+                imagesavealpha($img, true);
+                ob_start();
+                imagepng($img);
+                $bytes = (string) ob_get_clean();
+                $mime = 'image/png';
+            } elseif (! in_array($mime, ['image/png', 'image/jpeg', 'image/gif'], true)) {
+                return null;
+            }
+
+            return 'data:'.$mime.';base64,'.base64_encode($bytes);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return null;
+        }
+    }
+}

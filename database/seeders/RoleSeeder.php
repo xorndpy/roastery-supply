@@ -21,6 +21,7 @@ class RoleSeeder extends Seeder
             'admin',
             'staff',
             'gudang',
+            'keuangan',
             'customer',
             'guest',
         ];

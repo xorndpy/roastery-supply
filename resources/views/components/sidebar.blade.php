@@ -10,6 +10,11 @@
             ['label' => 'Pengiriman', 'route' => 'admin.shipments.index', 'icon' => 'truck'],
             ['label' => 'Retur', 'route' => 'admin.returns.index', 'icon' => 'undo'],
         ]],
+        ['group' => 'Keuangan', 'items' => [
+            ['label' => 'Laba Rugi', 'route' => 'admin.finance.profit', 'icon' => 'chart'],
+            ['label' => 'Biaya Operasional', 'route' => 'admin.expenses.index', 'icon' => 'coins'],
+            ['label' => 'HPP Produk', 'route' => 'admin.finance.costs', 'icon' => 'tag'],
+        ]],
         ['group' => 'Katalog', 'items' => [
             ['label' => 'Produk', 'route' => 'admin.products.index', 'icon' => 'box'],
             ['label' => 'Kategori', 'route' => 'admin.categories.index', 'icon' => 'tag'],
@@ -54,6 +59,7 @@
         'admin.faqs.index' => 'view_faqs', 'admin.partners.index' => 'view_partners',
         'admin.branches.index' => 'view_branches', 'admin.messages.index' => 'view_contact_messages',
         'admin.settings.index' => 'view_settings', 'admin.hero.index' => 'view_settings', 'admin.reports.index' => 'view_reports',
+        'admin.finance.profit' => 'view_profit', 'admin.expenses.index' => 'view_expenses', 'admin.finance.costs' => 'view_costs',
         'admin.users.index' => 'view_users', 'admin.roles.index' => 'view_roles',
         'admin.logs.index' => 'view_activity_logs',
     ];

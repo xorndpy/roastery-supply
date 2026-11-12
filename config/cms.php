@@ -11,6 +11,7 @@ return [
             'site_name' => ['label' => 'Nama Usaha', 'type' => 'text', 'default' => 'Roastery Supply', 'max' => 100],
             'tagline'   => ['label' => 'Tagline', 'type' => 'text', 'default' => 'Mesin kopi profesional untuk kedai kopi serius.', 'max' => 160],
             'site_logo' => ['label' => 'Logo', 'type' => 'image', 'ratio' => '1/1', 'help' => 'PNG/JPG/WEBP, maks 2 MB.'],
+            'site_favicon' => ['label' => 'Favicon (ikon tab browser)', 'type' => 'image', 'ratio' => '1/1', 'help' => 'Kotak (1:1), PNG disarankan, minimal 128 x 128 px. Kosongkan untuk memakai ikon bawaan.'],
         ],
         'Kontak' => [
             'contact_email'   => ['label' => 'Email', 'type' => 'email'],
@@ -31,6 +32,11 @@ return [
             'bank_account_number' => ['label' => 'Nomor Rekening', 'type' => 'text', 'max' => 40],
             'bank_account_name'   => ['label' => 'Atas Nama', 'type' => 'text', 'max' => 100],
             'payment_note'        => ['label' => 'Catatan Pembayaran', 'type' => 'textarea', 'max' => 500, 'help' => 'Tampil di halaman pesanan customer.'],
+        ],
+        'Invoice (PDF)' => [
+            'invoice_logo'   => ['label' => 'Logo Invoice', 'type' => 'image', 'ratio' => '3/1', 'help' => 'Opsional. Kosongkan untuk memakai Logo utama. Disarankan logo mendatar dengan latar putih/transparan.'],
+            'invoice_thanks' => ['label' => 'Pesan Penutup', 'type' => 'textarea', 'max' => 300, 'default' => 'Kami selalu berkomitmen memberikan layanan terbaik untuk Anda.', 'help' => 'Tampil di bawah ucapan terima kasih pada invoice.'],
+            'invoice_slogan' => ['label' => 'Slogan Footer', 'type' => 'text', 'max' => 60, 'help' => 'Teks kecil di kanan bawah invoice, mis. BREW BETTER. LIVE BETTER. Kosongkan untuk menyembunyikan.'],
         ],
         'Pengiriman' => [
             'free_shipping_min' => ['label' => 'Gratis ongkir untuk belanja minimal (Rp)', 'type' => 'number', 'max' => 1000000000,

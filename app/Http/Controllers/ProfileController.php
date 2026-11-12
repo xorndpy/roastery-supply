@@ -20,7 +20,7 @@ class ProfileController extends Controller
     public function edit(Request $request): View|RedirectResponse
     {
         // Halaman ini memakai tampilan panel admin; pelanggan punya halaman profil sendiri.
-        if (! $request->user()->hasAnyRole(['super_admin', 'admin', 'staff', 'gudang'])) {
+        if (! $request->user()->hasAnyRole(['super_admin', 'admin', 'staff', 'gudang', 'keuangan'])) {
             return Redirect::route('customer.profile.edit');
         }
 

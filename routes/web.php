@@ -3,6 +3,8 @@
 use App\Http\Controllers\Web\ArticleController;
 use App\Http\Controllers\Admin\ArticleController as AdminArticleController;
 use App\Http\Controllers\Admin\MilestoneController;
+use App\Http\Controllers\Admin\FinanceController;
+use App\Http\Controllers\Admin\ExpenseController;
 use App\Http\Controllers\Admin\HeroSlideController;
 use App\Http\Controllers\Web\OnlinePaymentController;
 use Illuminate\Support\Facades\Route;
@@ -168,7 +170,7 @@ Route::prefix('customer')
 // =========================================================================
 Route::prefix('admin')
     ->as('admin.')
-    ->middleware(['auth', 'role:staff|admin|super_admin|gudang'])
+    ->middleware(['auth', 'role:staff|admin|super_admin|gudang|keuangan'])
     ->group(function () {
 
         // Resource dengan izin terpisah per aksi. create harus terdaftar sebelum {param}.
@@ -264,6 +266,15 @@ Route::prefix('admin')
             Route::get('/export', [CustomerController::class, 'export'])->name('export')->middleware('can:export_customers');
             Route::get('/{customer}', [CustomerController::class, 'show'])->name('show')->middleware('can:view_customers');
         });
+
+        // Keuangan (laba rugi, HPP, biaya operasional)
+        Route::prefix('keuangan')->as('finance.')->group(function () {
+            Route::get('/laba-rugi', [FinanceController::class, 'profit'])->name('profit')->middleware('can:view_profit');
+            Route::get('/laba-rugi/export', [FinanceController::class, 'profitExport'])->name('profit.export')->middleware(['can:view_profit', 'can:export_reports']);
+            Route::get('/hpp', [FinanceController::class, 'costs'])->name('costs')->middleware('can:view_costs');
+            Route::put('/hpp', [FinanceController::class, 'updateCosts'])->name('costs.update')->middleware('can:manage_costs');
+        });
+        $crud('expenses', ExpenseController::class, 'expenses', ['show']);
 
         // Pemasaran
         $crud('vouchers', VoucherController::class, 'vouchers', ['show']);

@@ -32,7 +32,7 @@ class UserController extends Controller
 
         $stats = [
             'total' => User::count(),
-            'staff' => User::role(['super_admin', 'admin', 'staff', 'gudang'])->count(),
+            'staff' => User::role(['super_admin', 'admin', 'staff', 'gudang', 'keuangan'])->count(),
             'customer' => User::role('customer')->count(),
         ];
 
@@ -144,7 +144,7 @@ class UserController extends Controller
 
     private function assignableRoles()
     {
-        return Role::whereIn('name', ['super_admin', 'admin', 'staff', 'gudang', 'customer'])->orderBy('id')->get(['id', 'name']);
+        return Role::whereIn('name', ['super_admin', 'admin', 'staff', 'gudang', 'keuangan', 'customer'])->orderBy('id')->get(['id', 'name']);
     }
 
     private function isLastSuperAdmin(User $user): bool
