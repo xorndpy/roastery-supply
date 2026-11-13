@@ -175,6 +175,8 @@ class CheckoutController extends Controller
 
                 session()->forget(['cart', 'checkout_key', 'checkout_voucher']);
 
+                app(\App\Services\OrderService::class)->notifyPlaced($order); // email pembeli + toko (tidak menggagalkan checkout)
+
                 return $this->toOrder($order, 'Pesanan berhasil dibuat. Silakan lakukan pembayaran sebelum ' . wib($order->payment_deadline, 'd M Y, H:i', true) . '.');
             } catch (ShippingUnavailable $e) {
                 return back()->withInput()->with('error', $e->getMessage());

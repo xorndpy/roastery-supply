@@ -89,7 +89,7 @@ Route::get('/cabang', [HomeController::class, 'branches'])->name('branches.index
 Route::get('/dashboard', function () {
     $user = auth()->user();
 
-    if ($user && $user->hasAnyRole(['super_admin', 'admin', 'staff', 'gudang'])) {
+    if ($user && $user->hasAnyRole(['super_admin', 'admin', 'staff', 'gudang', 'keuangan'])) {
         return redirect()->route('admin.dashboard');
     }
 

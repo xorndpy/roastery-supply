@@ -34,7 +34,7 @@ Perilaku akun:
 
 ## B. Email (SMTP)
 
-Dipakai untuk: reset password dan notifikasi status pesanan.
+Dipakai untuk: reset password, email **pesanan baru** (ke pembeli dan ke toko), dan notifikasi status pesanan.
 
 **Opsi 1 - Gmail**
 1. Akun Google → Security → aktifkan **2-Step Verification**.
@@ -54,11 +54,35 @@ Dipakai untuk: reset password dan notifikasi status pesanan.
 **Opsi 2 - Mailtrap (aman untuk uji coba, email tidak benar-benar terkirim)**
 Daftar di mailtrap.io → Email Testing → salin kredensial SMTP ke `.env`.
 
+**Opsi 3 - Email hosting Domainesia (cPanel), terlihat profesional: no-reply@domainmu**
+1. cPanel → **Email Accounts** → Create, mis. `no-reply@koffline.my.id`.
+2. Di baris akun itu klik **Connect Devices** → catat *Outgoing Server* dan port SSL.
+3. `.env` di server:
+   ```
+   MAIL_MAILER=smtp
+   MAIL_HOST=mail.koffline.my.id
+   MAIL_PORT=465
+   MAIL_SCHEME=smtps
+   MAIL_USERNAME=no-reply@koffline.my.id
+   MAIL_PASSWORD=password-akun-email-itu
+   MAIL_FROM_ADDRESS=no-reply@koffline.my.id
+   MAIL_FROM_NAME="KOFFLINE"
+   ```
+4. cPanel → **Email Deliverability**: pastikan SPF dan DKIM berstatus valid, kalau tidak email mudah masuk spam.
+5. Password email hanya ditaruh di `.env` server, jangan di chat atau di git.
+
 Tes:
 ```
 php artisan config:clear
 php artisan mail:test emailmu@gmail.com
 ```
+
+### Email pesanan baru (tidak bergantung pada Midtrans)
+- Saat checkout berhasil, **pembeli** menerima "Pesanan diterima" dan **toko** menerima "[Pesanan baru]", walaupun belum dibayar (jadi tetap jalan saat Midtrans masih sandbox).
+- Saat pembayaran terkonfirmasi (manual maupun Midtrans), toko menerima "[Pembayaran masuk]" dan pembeli menerima "Pembayaran dikonfirmasi".
+- Penerima toko diatur di **Pengaturan > Kontak > Email Notifikasi Pesanan** (pisahkan dengan koma). Kosong = toko tidak menerima email. Sengaja tidak memakai email kontak publik sebagai cadangan.
+- Email tidak memakai queue, jadi tidak perlu `queue:work`. Kalau pengiriman gagal, checkout tetap berhasil dan error dicatat di `storage/logs`.
+- Pembayaran Midtrans sandbox hanya terkonfirmasi kalau URL notifikasi `https://DOMAIN/webhooks/midtrans` diisi di dashboard Midtrans (Settings > Configuration), atau lewat cron `payments:reconcile`.
 
 ## C. Bukti bayar privat
 

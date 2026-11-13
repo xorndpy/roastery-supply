@@ -8,6 +8,10 @@ use App\Models\Product;
 use App\Models\Shipment;
 use App\Models\StockMovement;
 use App\Notifications\OrderStatusChanged;
+use App\Models\Setting;
+use App\Notifications\NewOrderAlert;
+use App\Notifications\OrderPlaced;
+use Illuminate\Support\Facades\Notification;
 use App\Services\Payments\MidtransService;
 use DomainException;
 use Illuminate\Support\Facades\DB;
@@ -505,6 +509,11 @@ class OrderService
 
     private function notify(?Order $order, string $event, ?string $extra = null): void
     {
+        // Toko ikut diberi tahu saat pembayaran terkonfirmasi (jalur manual maupun Midtrans).
+        if ($order && $event === 'dikonfirmasi') {
+            $this->alertStore($order, 'dibayar');
+        }
+
         $user = $order?->user;
         if (!$user) {
             return;
@@ -515,5 +524,50 @@ class OrderService
         } catch (Throwable $e) {
             report($e); // email gagal tidak boleh membatalkan perubahan status
         }
+    }
+
+    /**
+     * Email saat pesanan baru dibuat: ke pembeli dan ke toko. Tidak bergantung pada status pembayaran
+     * (jadi tetap jalan walau Midtrans masih sandbox). Gagal kirim tidak boleh menggagalkan checkout.
+     */
+    public function notifyPlaced(Order $order): void
+    {
+        $this->alertStore($order, 'baru');
+
+        if ($user = $order->user) {
+            try {
+                $user->notify(new OrderPlaced($order));
+            } catch (Throwable $e) {
+                report($e);
+            }
+        }
+    }
+
+    private function alertStore(Order $order, string $event): void
+    {
+        $to = $this->storeRecipients();
+        if ($to === []) {
+            return;
+        }
+
+        try {
+            Notification::route('mail', $to)->notify(new NewOrderAlert($order, $event));
+        } catch (Throwable $e) {
+            report($e);
+        }
+    }
+
+    /**
+     * Penerima email toko HANYA dari Pengaturan "Email Notifikasi Pesanan" (pisahkan dengan koma).
+     * Sengaja tanpa fallback ke email kontak publik: data pesanan tidak boleh terkirim ke alamat yang belum dipastikan milik toko.
+     */
+    private function storeRecipients(): array
+    {
+        $raw = (string) Setting::get('order_notify_email');
+
+        return array_values(array_unique(array_filter(
+            array_map('trim', preg_split('/[,;\s]+/', $raw) ?: []),
+            fn ($e) => $e !== '' && filter_var($e, FILTER_VALIDATE_EMAIL)
+        )));
     }
 }

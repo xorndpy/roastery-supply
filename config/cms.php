@@ -16,6 +16,7 @@ return [
         'Kontak' => [
             'contact_email'   => ['label' => 'Email', 'type' => 'email'],
             'contact_phone'   => ['label' => 'Telepon', 'type' => 'text', 'max' => 30],
+            'order_notify_email' => ['label' => 'Email Notifikasi Pesanan', 'type' => 'text', 'max' => 200, 'help' => 'Penerima email "pesanan baru" dan "pembayaran masuk". Pisahkan dengan koma untuk beberapa alamat. Kosong = toko tidak menerima email pesanan.'],
             'contact_whatsapp' => ['label' => 'WhatsApp', 'type' => 'text', 'max' => 20, 'help' => 'Format 628xxxxxxxxxx (tanpa + dan spasi).'],
             'contact_address' => ['label' => 'Alamat', 'type' => 'textarea', 'max' => 500],
             'contact_hours' => ['label' => 'Jam Operasional', 'type' => 'text', 'default' => 'Senin – Sabtu, 08.00 – 17.00 WIB', 'max' => 100],
