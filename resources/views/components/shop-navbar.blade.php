@@ -86,6 +86,7 @@
                             @endif
                             <a href="{{ route('customer.dashboard') }}" class="block px-4 py-2 text-sm hover:bg-stone-50">Dashboard</a>
                             <a href="{{ route('customer.orders.index') }}" class="block px-4 py-2 text-sm hover:bg-stone-50">Pesanan Saya</a>
+                            <a href="{{ route('customer.service.index') }}" class="block px-4 py-2 text-sm hover:bg-stone-50">Garansi & Servis</a>
                             <a href="{{ route('customer.returns.index') }}" class="block px-4 py-2 text-sm hover:bg-stone-50">Retur Saya</a>
                             <a href="{{ route('customer.profile.edit') }}" class="block px-4 py-2 text-sm hover:bg-stone-50">Profil</a>
                             <form method="POST" action="{{ route('logout') }}" class="border-t border-stone-100">@csrf
@@ -146,6 +147,7 @@
                 @auth
                     <div class="grid grid-cols-2 gap-3">
                         <a href="{{ route('customer.orders.index') }}" class="rounded-xl bg-stone-100 px-4 py-3 text-center">Pesanan Saya</a>
+                        <a href="{{ route('customer.service.index') }}" class="rounded-xl bg-stone-100 px-4 py-3 text-center">Garansi & Servis</a>
                         <a href="{{ route('customer.dashboard') }}" class="rounded-xl bg-stone-100 px-4 py-3 text-center">Akun Saya</a>
                     </div>
                     <form method="POST" action="{{ route('logout') }}" class="mt-3">@csrf

@@ -61,6 +61,10 @@ class RolePermissionSeeder extends Seeder
                 'view_customers',
                 'view_contact_messages',
                 'reply_contact_messages',
+                'view_service',
+                'manage_service',
+                'view_warranties',
+                'manage_warranties',
             ];
             $staffRole->syncPermissions($staffPermissions);
         }
@@ -81,7 +85,7 @@ class RolePermissionSeeder extends Seeder
         if ($keuanganRole) {
             $keuanganRole->syncPermissions([
                 'view_finance', 'view_profit', 'view_costs', 'manage_costs',
-                'view_expenses', 'create_expenses', 'edit_expenses', 'delete_expenses',
+                'view_expenses', 'create_expenses', 'edit_expenses', 'delete_expenses', 'close_finance',
                 'view_orders', 'download_invoices', 'view_returns',
                 'view_reports', 'export_reports',
             ]);

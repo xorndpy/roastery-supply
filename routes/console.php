@@ -15,3 +15,6 @@ Schedule::command('orders:cancel-expired')->hourly()->withoutOverlapping();
 
 // Jaring pengaman pembayaran gateway: webhook bisa hilang, dan Midtrans tidak mengirim webhook saat sesi Snap kedaluwarsa.
 Schedule::command('payments:reconcile')->everyFiveMinutes()->withoutOverlapping();
+
+// Lacak resi otomatis; pesanan yang sudah diterima kurir otomatis jadi selesai.
+Schedule::command('tracking:sync')->everyThirtyMinutes()->withoutOverlapping();

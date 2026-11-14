@@ -19,6 +19,8 @@
     $paid = $order->payment && $order->payment->status === 'verified';
     $rp = fn ($n) => 'Rp ' . number_format($n, 0, ',', '.');
     $phone = $order->shipping_phone ?: ($order->customer->phone ?? '');
+    $taxRate = (string) $s('tax_enabled') === '1' ? ((float) $s('tax_rate') ?: (float) config('finance.default_tax_rate', 11)) : null;
+    $ppnIncluded = $taxRate ? round($order->subtotal - $order->discount) * $taxRate / (100 + $taxRate) : 0;
 @endphp
 <style>
     /* dompdf: tanpa flex/grid, pakai tabel. Footer tetap di tiap halaman lewat position: fixed di area margin bawah. */
@@ -136,6 +138,9 @@
                 @endif
                 <tr><td>Ongkir{{ $order->shipping_method ? ' (' . $order->shipping_method . ($order->shipping_etd ? ', ' . $order->shipping_etd : '') . ')' : '' }}</td><td class="right">{{ $rp($order->shipping_cost) }}</td></tr>
                 <tr class="grand"><td>Total</td><td class="right">{{ $rp($order->total) }}</td></tr>
+                @if($taxRate)
+                    <tr><td class="muted" style="font-size:9.5px;">Sudah termasuk PPN {{ rtrim(rtrim(number_format($taxRate, 2, ',', ''), '0'), ',') }}%</td><td class="right muted" style="font-size:9.5px;">{{ $rp($ppnIncluded) }}</td></tr>
+                @endif
             </table>
         </td>
     </tr>

@@ -44,6 +44,7 @@
             ['receipt', 'Pesanan Saya', route('customer.orders.index')],
             ['user', 'Edit Profil', route('customer.profile.edit')],
             ['store', 'Belanja Lagi', route('products.index')],
+            ['chat', 'Garansi & Servis', route('customer.service.index')],
             ['chat', 'Hubungi Kami', route('contact.index')],
         ] as [$icon, $label, $url])
             <a href="{{ $url }}" class="group flex items-center gap-3 rounded-xl border border-stone-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-orange-500 hover:shadow-md">

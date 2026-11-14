@@ -204,6 +204,8 @@ class OrderService
 
         $this->notify($order, 'dikirim', "Kurir {$data['courier']}, resi {$data['tracking_number']}.");
 
+        $this->whatsapp($order->shipping_phone, "Pesanan {$order->order_number} sudah dikirim via {$data['courier']}, resi {$data['tracking_number']}. Pantau perjalanan paket di " . route('customer.orders.show', $order->order_number));
+
         return $order;
     }
 
@@ -220,6 +222,13 @@ class OrderService
         });
 
         $this->notify($order, 'selesai');
+
+        // Garansi per unit mulai berlaku saat pesanan selesai. Gagal menerbitkan tidak boleh menggagalkan penyelesaian.
+        try {
+            app(WarrantyService::class)->issueFor($order);
+        } catch (Throwable $e) {
+            report($e);
+        }
 
         return $order;
     }
@@ -533,6 +542,7 @@ class OrderService
     public function notifyPlaced(Order $order): void
     {
         $this->alertStore($order, 'baru');
+        $this->whatsapp($order->shipping_phone, "Terima kasih! Pesanan {$order->order_number} (Rp " . number_format($order->total, 0, ',', '.') . ") sudah kami terima. Detail & pembayaran: " . route('customer.orders.show', $order->order_number));
 
         if ($user = $order->user) {
             try {
@@ -545,6 +555,9 @@ class OrderService
 
     private function alertStore(Order $order, string $event): void
     {
+        $total = 'Rp ' . number_format($order->total, 0, ',', '.');
+        app(WhatsAppService::class)->toStore(($event === 'dibayar' ? "Pembayaran masuk {$order->order_number} {$total}." : "Pesanan baru {$order->order_number} {$total} dari " . ($order->shipping_name ?: '-') . '.') . ' ' . route('admin.orders.show', $order->id));
+
         $to = $this->storeRecipients();
         if ($to === []) {
             return;
@@ -569,5 +582,15 @@ class OrderService
             array_map('trim', preg_split('/[,;\s]+/', $raw) ?: []),
             fn ($e) => $e !== '' && filter_var($e, FILTER_VALIDATE_EMAIL)
         )));
+    }
+
+    /** WhatsApp ke nomor tertentu; tidak pernah melempar error (pemberitahuan tambahan). */
+    private function whatsapp(?string $to, string $message): void
+    {
+        try {
+            app(WhatsAppService::class)->send($to, $message);
+        } catch (Throwable $e) {
+            report($e);
+        }
     }
 }

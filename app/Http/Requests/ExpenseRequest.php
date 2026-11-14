@@ -21,6 +21,8 @@ class ExpenseRequest extends FormRequest
             'description' => ['required', 'string', 'max:255'],
             'amount' => ['required', 'numeric', 'min:1', 'max:99999999999'],
             'note' => ['nullable', 'string', 'max:1000'],
+            'attachment' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:3072'],
+            'is_recurring' => ['nullable', 'boolean'],
         ];
     }
 
@@ -33,6 +35,8 @@ class ExpenseRequest extends FormRequest
             'description.required' => 'Keterangan wajib diisi.',
             'amount.required' => 'Jumlah wajib diisi.',
             'amount.min' => 'Jumlah minimal Rp 1.',
+            'attachment.mimes' => 'Lampiran harus berupa JPG, PNG, atau PDF.',
+            'attachment.max' => 'Lampiran maksimal 3 MB.',
         ];
     }
 }

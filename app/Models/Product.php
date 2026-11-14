@@ -25,6 +25,7 @@ class Product extends Model
         'description',
         'price',
         'cost_price',
+        'warranty_months',
         'weight',
         'stock',
         'stock_threshold',

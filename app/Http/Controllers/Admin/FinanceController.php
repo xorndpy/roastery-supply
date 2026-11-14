@@ -43,8 +43,10 @@ class FinanceController extends Controller
     {
         [$from, $to] = $this->period($request);
         $report = $this->service->report($from, $to);
+        $trend = $this->service->trend($to, 6);
+        $lockedUntil = app(\App\Services\FinanceClosingService::class)->lockedUntil();
 
-        return view('admin.finance.profit', compact('report', 'from', 'to'));
+        return view('admin.finance.profit', compact('report', 'from', 'to', 'trend', 'lockedUntil'));
     }
 
     public function profitExport(Request $request): StreamedResponse
@@ -69,6 +71,12 @@ class FinanceController extends Controller
             $put(['Diskon voucher', $idr(-$r['discount'])]);
             $put(['Penjualan neto', $idr($r['net_sales'])]);
             $put(['Retur / refund disetujui', $idr(-$r['refund'])]);
+            if ($r['service_revenue'] > 0) {
+                $put(['Jasa servis (berbayar)', $idr($r['service_revenue'])]);
+            }
+            if ($r['tax_rate']) {
+                $put(["PPN keluaran ({$r['tax_rate']}%, termasuk dalam harga)", $idr(-$r['ppn'])]);
+            }
             $put(['Pendapatan bersih', $idr($r['revenue'])]);
             $put(['HPP', $idr(-$r['cogs'])]);
             $put(['Laba kotor', $idr($r['gross_profit']), 'Margin %', $pct($r['gross_margin'])]);
@@ -76,6 +84,7 @@ class FinanceController extends Controller
                 $put(['Biaya: '.(Expense::CATEGORIES[$cat] ?? $cat), $idr(-$total)]);
             }
             $put(['Total biaya operasional', $idr(-$r['expenses_total'])]);
+            $put(["Biaya payment gateway ({$r['gateway_count']} transaksi)", $idr(-$r['gateway_fees'])]);
             $put(['Laba bersih', $idr($r['net_profit']), 'Margin %', $pct($r['net_margin'])]);
             $put([]);
             $put(['Per produk']);

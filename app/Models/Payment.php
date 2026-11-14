@@ -12,10 +12,21 @@ class Payment extends Model
 {
     use HasFactory, LogsActivity;
 
+    protected static function booted(): void
+    {
+        // Snapshot perkiraan biaya payment gateway saat pembayaran gateway terverifikasi (config/finance.php).
+        static::saving(function (Payment $p) {
+            if ($p->status === 'verified' && $p->provider && $p->gateway_fee === null) {
+                $p->gateway_fee = \App\Support\GatewayFee::for($p->payment_type, (float) $p->amount);
+            }
+        });
+    }
+
     protected $fillable = [
         'order_id',
         'method',
         'amount',
+        'gateway_fee',
         'proof_image',
         'status',
         'verified_by',

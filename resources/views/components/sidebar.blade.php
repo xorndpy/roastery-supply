@@ -10,10 +10,15 @@
             ['label' => 'Pengiriman', 'route' => 'admin.shipments.index', 'icon' => 'truck'],
             ['label' => 'Retur', 'route' => 'admin.returns.index', 'icon' => 'undo'],
         ]],
+        ['group' => 'Purna Jual', 'items' => [
+            ['label' => 'Tiket Servis', 'route' => 'admin.service.index', 'icon' => 'undo'],
+            ['label' => 'Garansi', 'route' => 'admin.warranties.index', 'icon' => 'shield'],
+        ]],
         ['group' => 'Keuangan', 'items' => [
             ['label' => 'Laba Rugi', 'route' => 'admin.finance.profit', 'icon' => 'chart'],
             ['label' => 'Biaya Operasional', 'route' => 'admin.expenses.index', 'icon' => 'coins'],
             ['label' => 'HPP Produk', 'route' => 'admin.finance.costs', 'icon' => 'tag'],
+            ['label' => 'Tutup Buku', 'route' => 'admin.finance.closings', 'icon' => 'archive'],
         ]],
         ['group' => 'Katalog', 'items' => [
             ['label' => 'Produk', 'route' => 'admin.products.index', 'icon' => 'box'],
@@ -59,7 +64,7 @@
         'admin.faqs.index' => 'view_faqs', 'admin.partners.index' => 'view_partners',
         'admin.branches.index' => 'view_branches', 'admin.messages.index' => 'view_contact_messages',
         'admin.settings.index' => 'view_settings', 'admin.hero.index' => 'view_settings', 'admin.reports.index' => 'view_reports',
-        'admin.finance.profit' => 'view_profit', 'admin.expenses.index' => 'view_expenses', 'admin.finance.costs' => 'view_costs',
+        'admin.finance.profit' => 'view_profit', 'admin.expenses.index' => 'view_expenses', 'admin.finance.costs' => 'view_costs', 'admin.finance.closings' => 'view_profit', 'admin.service.index' => 'view_service', 'admin.warranties.index' => 'view_warranties',
         'admin.users.index' => 'view_users', 'admin.roles.index' => 'view_roles',
         'admin.logs.index' => 'view_activity_logs',
     ];

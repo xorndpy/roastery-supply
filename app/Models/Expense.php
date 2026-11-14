@@ -24,13 +24,14 @@ class Expense extends Model
         'lainnya' => 'Lainnya',
     ];
 
-    protected $fillable = ['expense_date', 'category', 'description', 'amount', 'note', 'created_by'];
+    protected $fillable = ['expense_date', 'category', 'description', 'amount', 'note', 'attachment', 'is_recurring', 'created_by'];
 
     protected function casts(): array
     {
         return [
             'expense_date' => 'date',
             'amount' => 'decimal:2',
+            'is_recurring' => 'boolean',
         ];
     }
 

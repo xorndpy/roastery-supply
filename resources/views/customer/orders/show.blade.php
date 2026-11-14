@@ -243,6 +243,8 @@
     @endif
 
     {{-- Info Pengiriman --}}
+    <x-order-timeline :order="$order" />
+
     @if($order->shipment && $order->shipment->tracking_number && $order->shipment->status !== 'pending')
         <div class="bg-white rounded-lg border border-stone-200 p-6 mb-6">
             <h2 class="font-bold mb-4">Info Pengiriman</h2>

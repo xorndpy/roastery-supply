@@ -146,6 +146,15 @@
                                class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-orange-500 focus:border-orange-500">
                         <p class="text-xs text-stone-500 mt-1">Notifikasi muncul jika stok ≤ nilai ini.</p>
                     </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-1.5">Masa Garansi (bulan)</label>
+                        <input type="number" name="warranty_months" value="{{ old('warranty_months', $product->warranty_months) }}"
+                               min="0" max="120" placeholder="ikut bawaan"
+                               class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-orange-500 focus:border-orange-500">
+                        <p class="text-xs text-stone-500 mt-1">Kosong = pakai masa garansi bawaan (Pengaturan &gt; Servis &amp; Garansi). Isi 0 bila tanpa garansi.</p>
+                        @error('warranty_months') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
                 </div>
             </div>
         </div>

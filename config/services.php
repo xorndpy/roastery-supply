@@ -32,6 +32,13 @@ return [
         'key'      => env('RAJAONGKIR_API_KEY'),
         'origin'   => env('RAJAONGKIR_ORIGIN_ID'),
         'couriers' => env('RAJAONGKIR_COURIERS', 'jne:sicepat:jnt'),
+        'track_url' => env('RAJAONGKIR_TRACK_URL', 'https://rajaongkir.komerce.id/api/v1/track/waybill'),
+    ],
+
+    // WhatsApp via Fonnte (https://docs.fonnte.com). Token HANYA di .env; kosong = WhatsApp nonaktif.
+    'whatsapp' => [
+        'token' => env('WHATSAPP_TOKEN'),
+        'url' => env('WHATSAPP_API_URL', 'https://api.fonnte.com/send'),
     ],
 
     // Cloudflare Web Analytics (token bersifat publik, aman). Kosongkan untuk menonaktifkan.

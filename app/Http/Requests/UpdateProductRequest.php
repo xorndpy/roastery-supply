@@ -31,6 +31,7 @@ class UpdateProductRequest extends FormRequest
             'sku' => 'nullable|string|max:50|unique:products,sku,' . $productId,
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
+            'warranty_months' => 'nullable|integer|min:0|max:120',
             'weight' => 'nullable|integer|min:0',
             'stock' => 'nullable|integer|min:0', // diabaikan: stok diubah lewat menu Stok
             'stock_threshold' => 'required|integer|min:0',

@@ -314,6 +314,7 @@
                         </span>
                     @endif
                     <span>{{ $k['delta'] === null && in_array($k['icon'], ['coins', 'receipt'], true) ? 'Belum ada periode pembanding' : $k['sub'] }}</span>
+                    @if($k['icon'] === 'coins' && ($refundPeriod ?? 0) > 0)<span>· setelah refund Rp {{ number_format($refundPeriod, 0, ',', '.') }}</span>@endif
                 </p>
             </div>
         @endforeach

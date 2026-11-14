@@ -90,6 +90,11 @@ class DashboardController extends Controller
         // ---- Periode terpilih vs periode sebelumnya ----
         $revenue = (float) Order::whereIn('status', self::PAID)->where('created_at', '>=', $start)->where('created_at', '<=', $end)->sum('total');
         $revenuePrev = (float) Order::whereIn('status', self::PAID)->where('created_at', '>=', $prevStart)->where('created_at', '<', $start)->sum('total');
+        // Pendapatan = transaksi terbayar dikurangi refund retur yang disetujui pada periode yang sama (sama dengan Laporan).
+        $refundIn = fn ($a, $b) => (float) ReturnOrder::where('status', 'approved')->whereRaw('COALESCE(approved_at, updated_at) >= ? AND COALESCE(approved_at, updated_at) <= ?', [$a->format('Y-m-d H:i:s'), $b->format('Y-m-d H:i:s')])->sum('refund_amount');
+        $refundPeriod = $refundIn($start, $end);
+        $revenue -= $refundPeriod;
+        $revenuePrev -= $refundIn($prevStart, $start->copy()->subSecond());
         $orders = Order::where('status', '!=', 'batal')->where('created_at', '>=', $start)->where('created_at', '<=', $end)->count();
         $ordersPrev = Order::where('status', '!=', 'batal')->where('created_at', '>=', $prevStart)->where('created_at', '<', $start)->count();
         $revenueDelta = $revenuePrev > 0 ? (int) round(($revenue - $revenuePrev) / $revenuePrev * 100) : null;
@@ -203,7 +208,7 @@ class DashboardController extends Controller
             'days', 'rangeLabel', 'periodText', 'preset', 'fromStr', 'toStr', 'revenue', 'revenueDelta', 'orders', 'ordersDelta',
             'chartLabels', 'chartDates', 'chartData', 'chartOrders', 'todayStr', 'paidOrders', 'aov', 'aovDelta', 'buyers', 'newBuyers', 'repeatPct', 'categorySales', 'statusChart', 'topProducts', 'ordersToProcess', 'ordersToShip', 'lateToProcess', 'lateToShip', 'followUps', 'followUpTotal', 'autoPaymentsWeek', 'recentGatewayPayments',
             'unreadMessages', 'pendingTestimonials', 'pendingReturns', 'shippingConfigured',
-            'totalRefund', 'totalRevenue', 'totalOrders', 'pendingOrders', 'totalProducts',
+            'totalRefund', 'refundPeriod', 'totalRevenue', 'totalOrders', 'pendingOrders', 'totalProducts',
             'totalCustomers', 'lowStockProducts', 'pendingPayments', 'recentOrders', 'lowStockList'
         ));
     }

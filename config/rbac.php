@@ -22,8 +22,9 @@ return [
         ],
         'Keuangan' => [
             'view_profit', 'view_costs', 'manage_costs',
-            'view_expenses', 'create_expenses', 'edit_expenses', 'delete_expenses',
+            'view_expenses', 'create_expenses', 'edit_expenses', 'delete_expenses', 'close_finance',
         ],
+        'Purna Jual' => ['view_service', 'manage_service', 'view_warranties', 'manage_warranties'],
         'Pelanggan' => ['view_customers', 'edit_customers', 'export_customers'],
         'Pemasaran' => [
             'view_vouchers', 'create_vouchers', 'edit_vouchers', 'delete_vouchers',

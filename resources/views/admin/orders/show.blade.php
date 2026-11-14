@@ -140,6 +140,8 @@
             </div>
         @endif
 
+        <x-order-timeline :order="$order" :admin="true" />
+
         {{-- Shipment Info --}}
         @if($order->shipment && $order->shipment->tracking_number)
             <div class="bg-white p-6 rounded-lg border border-stone-200">

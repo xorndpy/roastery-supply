@@ -23,6 +23,9 @@ class Shipment extends Model
         'status',
         'shipped_at',
         'delivered_at',
+        'tracking_status',
+        'tracking_events',
+        'tracking_checked_at',
     ];
 
     protected function casts(): array
@@ -32,6 +35,8 @@ class Shipment extends Model
             'cost' => 'decimal:2',
             'shipped_at' => 'datetime',
             'delivered_at' => 'datetime',
+            'tracking_events' => 'array',
+            'tracking_checked_at' => 'datetime',
         ];
     }
 

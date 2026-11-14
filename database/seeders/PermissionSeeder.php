@@ -60,6 +60,13 @@ class PermissionSeeder extends Seeder
                 'create_expenses',
                 'edit_expenses',
                 'delete_expenses',
+                'close_finance',
+            ],
+            'purna_jual' => [
+                'view_service',
+                'manage_service',
+                'view_warranties',
+                'manage_warranties',
             ],
             'pelanggan' => [
                 'view_customers',

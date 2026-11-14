@@ -34,6 +34,17 @@ return [
             'bank_account_name'   => ['label' => 'Atas Nama', 'type' => 'text', 'max' => 100],
             'payment_note'        => ['label' => 'Catatan Pembayaran', 'type' => 'textarea', 'max' => 500, 'help' => 'Tampil di halaman pesanan customer.'],
         ],
+        'Keuangan' => [
+            'tax_enabled' => ['label' => 'PPN', 'type' => 'select', 'options' => ['0' => 'Tidak dipakai', '1' => 'Harga sudah termasuk PPN'], 'default' => '0', 'help' => 'Bila aktif, laba rugi memisahkan PPN keluaran dari pendapatan dan invoice menampilkan bagian PPN. Total pesanan tidak berubah.'],
+            'tax_rate' => ['label' => 'Tarif PPN (%)', 'type' => 'number', 'default' => '11', 'help' => 'Dipakai bila PPN aktif. Perkiraan biaya payment gateway diatur di config/finance.php.'],
+        ],
+        'Servis & Garansi' => [
+            'warranty_default_months' => ['label' => 'Masa garansi bawaan (bulan)', 'type' => 'number', 'default' => '12', 'max' => 120, 'help' => 'Dipakai untuk produk yang masa garansinya tidak diisi. Isi 0 di produk bila tanpa garansi.'],
+        ],
+        'WhatsApp' => [
+            'wa_enabled' => ['label' => 'Notifikasi WhatsApp', 'type' => 'select', 'options' => ['0' => 'Nonaktif', '1' => 'Aktif'], 'default' => '0', 'help' => 'Butuh WHATSAPP_TOKEN (Fonnte) di .env server. Tanpa token, pengaturan ini tidak berpengaruh.'],
+            'wa_store_number' => ['label' => 'Nomor WhatsApp toko', 'type' => 'text', 'max' => 20, 'help' => 'Penerima notifikasi pesanan baru, pembayaran masuk, dan tiket servis. Format 08xx atau 628xx.'],
+        ],
         'Invoice (PDF)' => [
             'invoice_logo'   => ['label' => 'Logo Invoice', 'type' => 'image', 'ratio' => '3/1', 'help' => 'Opsional. Kosongkan untuk memakai Logo utama. Disarankan logo mendatar dengan latar putih/transparan.'],
             'invoice_thanks' => ['label' => 'Pesan Penutup', 'type' => 'textarea', 'max' => 300, 'default' => 'Kami selalu berkomitmen memberikan layanan terbaik untuk Anda.', 'help' => 'Tampil di bawah ucapan terima kasih pada invoice.'],

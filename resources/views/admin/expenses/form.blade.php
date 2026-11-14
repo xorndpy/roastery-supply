@@ -11,7 +11,7 @@
     <div class="mb-4 p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg text-sm"><ul class="list-disc list-inside">@foreach ($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul></div>
 @endif
 
-<form method="POST" action="{{ $isEdit ? route('admin.expenses.update', $expense->id) : route('admin.expenses.store') }}" class="max-w-2xl bg-white p-6 rounded-lg border border-stone-200 space-y-5">
+<form method="POST" action="{{ $isEdit ? route('admin.expenses.update', $expense->id) : route('admin.expenses.store') }}" enctype="multipart/form-data" class="max-w-2xl bg-white p-6 rounded-lg border border-stone-200 space-y-5">
     @csrf @if($isEdit) @method('PUT') @endif
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -43,6 +43,21 @@
         <label class="block text-sm font-medium mb-1.5">Catatan</label>
         <textarea name="note" rows="3" maxlength="1000" class="w-full border border-stone-300 rounded-lg px-3 py-2">{{ old('note', $isEdit ? $expense->note : '') }}</textarea>
     </div>
+
+    <div>
+        <label class="block text-sm font-medium mb-1.5">Lampiran nota / bukti (JPG, PNG, PDF, maks. 3 MB)</label>
+        <input type="file" name="attachment" accept=".jpg,.jpeg,.png,.pdf" class="w-full text-sm">
+        @if($isEdit && $expense->attachment)
+            <p class="text-xs text-stone-600 mt-1">Lampiran saat ini: <a href="{{ route('admin.expenses.attachment', $expense->id) }}" target="_blank" rel="noopener" class="underline">buka</a>
+                <label class="ml-3"><input type="checkbox" name="remove_attachment" value="1"> hapus lampiran</label></p>
+        @endif
+    </div>
+
+    <label class="flex items-center gap-2 text-sm text-stone-700">
+        <input type="hidden" name="is_recurring" value="0">
+        <input type="checkbox" name="is_recurring" value="1" @checked(old('is_recurring', $isEdit ? $expense->is_recurring : false)) class="rounded border-stone-300">
+        Biaya berulang tiap bulan (sewa, internet, gaji tetap)
+    </label>
 
     <div class="flex gap-3">
         <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg font-medium">{{ $isEdit ? 'Simpan perubahan' : 'Simpan biaya' }}</button>
