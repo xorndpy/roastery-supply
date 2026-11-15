@@ -164,6 +164,8 @@
             @endforeach
         </x-rail>
     </section>
+
+    <x-flash-sale />
 @else
     @php
         $curSlug = request('category');

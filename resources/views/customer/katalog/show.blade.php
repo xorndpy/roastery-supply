@@ -7,7 +7,8 @@
     $soldOut = $product->stock <= 0;
     $wa = !empty($site['contact_whatsapp']) ? preg_replace('/\D/', '', $site['contact_whatsapp']) : null;
     $banner = !empty($site['header_bg_katalog']) ? media_url($site['header_bg_katalog']) : null;
-    $price = (float) $product->price;
+    $fi = $product->flashItem();
+    $price = $product->currentPrice();
 
     // Tiap varian menunjuk ke indeks foto galeri (atau null bila tanpa foto khusus).
     $variants = $product->variants->map(function ($v) use ($product) {
@@ -104,7 +105,8 @@
             @endif
 
             <div class="mt-3 rounded-xl border border-orange-100 bg-gradient-to-r from-white to-orange-50 px-4 py-3 shadow-sm">
-                <div class="text-2xl font-extrabold text-slate-900 sm:text-3xl">Rp {{ number_format($price, 0, ',', '.') }}</div>
+                <div class="text-2xl font-extrabold {{ $fi ? 'text-orange-700' : 'text-slate-900' }} sm:text-3xl">Rp {{ number_format($price, 0, ',', '.') }}</div>
+                @if($fi)<div class="mt-1 flex items-center gap-2 text-sm"><span class="text-slate-400 line-through">Rp {{ number_format($product->price, 0, ',', '.') }}</span><span class="rounded-full bg-orange-500 px-2 py-0.5 text-xs font-bold text-white">-{{ $fi->discountPercent() }}% Flash Sale</span><span class="text-xs text-slate-500">sisa {{ $fi->remaining }}{{ $fi->max_per_order ? ', maks ' . $fi->max_per_order . '/pesanan' : '' }}</span></div>@endif
                 <div class="mt-0.5 text-[12px] {{ $soldOut ? 'text-red-700' : 'text-stone-400' }}">
                     {{ $soldOut ? 'Stok habis' : 'Stok tersedia (' . $product->stock . ')' }}@if($product->sku) · SKU {{ $product->sku }}@endif
                 </div>

@@ -2,6 +2,7 @@
 @php
     $image = $product->images->first();
     $soldOut = ($product->stock ?? 0) <= 0;
+    $fi = $product->flashItem();
     $low = !$soldOut && $product->stock <= ($product->stock_threshold ?? 5);
 
     // Tampilan foto diatur dari Admin > Pengaturan > Tampilan (berlaku global).
@@ -18,6 +19,7 @@
         @else
             <div class="flex h-full w-full items-center justify-center bg-stone-100 text-xs text-stone-400">Foto produk</div>
         @endif
+        @if($fi)<span class="absolute right-3 top-3 rounded-full bg-orange-500 px-2 py-0.5 text-[11px] font-bold text-white">-{{ $fi->discountPercent() }}%</span>@endif
         @if($product->is_featured)
             <span class="absolute left-3 top-3 rounded-sm bg-brand px-2 py-0.5 text-[11px] font-medium text-white">Unggulan</span>
         @endif
@@ -29,7 +31,11 @@
         @endif
         <a href="{{ route('products.show', $product->slug) }}" class="mt-1 line-clamp-2 text-[15px] font-medium leading-snug text-stone-900 transition hover:text-brand">{{ $product->name }}</a>
 
+        @if($fi)
+            <div class="mt-3 flex flex-wrap items-baseline gap-x-2"><span class="font-semibold text-orange-700">Rp {{ number_format($fi->sale_price, 0, ',', '.') }}</span><span class="text-xs text-stone-400 line-through">Rp {{ number_format($product->price, 0, ',', '.') }}</span></div>
+        @else
         <div class="mt-3 font-semibold text-stone-900">Rp {{ number_format($product->price, 0, ',', '.') }}</div>
+        @endif
         <p class="mt-1 flex items-center gap-1.5 text-xs {{ $soldOut ? 'text-red-700' : ($low ? 'text-amber-700' : 'text-stone-500') }}">
             <span class="h-1.5 w-1.5 rounded-full {{ $soldOut ? 'bg-red-600' : ($low ? 'bg-amber-600' : 'bg-emerald-700') }}" aria-hidden="true"></span>
             {{ $soldOut ? 'Stok habis' : ($low ? 'Sisa ' . $product->stock : 'Stok tersedia') }}

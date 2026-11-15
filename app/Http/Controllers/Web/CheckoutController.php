@@ -54,6 +54,9 @@ class CheckoutController extends Controller
             try {
                 $voucher = $this->vouchers->validate($code, $total, auth()->user());
                 $discount = $this->vouchers->discount($voucher, $total);
+            } catch (\App\Exceptions\FlashSaleChanged $e) {
+                // Promo berakhir / kuota habis di tengah jalan: transaksi sudah di-rollback; keranjang dihitung ulang.
+                return redirect()->route('customer.cart.index')->with('warning', $e->getMessage());
             } catch (DomainException $e) {
                 session()->forget('checkout_voucher');
                 session()->flash('warning', 'Voucher dilepas: ' . $e->getMessage());
@@ -223,6 +226,9 @@ class CheckoutController extends Controller
             ]
         );
 
+        // Kuota & harga promo diverifikasi ulang dengan baris item promo terkunci (aman dari checkout bersamaan).
+        app(\App\Services\FlashSaleService::class)->reserve($cart);
+
         $subtotal = collect($cart)->sum(fn ($i) => $i['price'] * $i['quantity']);
 
         $voucher = null;
@@ -279,6 +285,7 @@ class CheckoutController extends Controller
                 'product_sku' => $item['sku'],
                 'price' => $item['price'],
                 'cost_price' => $costs[$item['id']] ?? null,
+                'flash_sale_item_id' => $item['flash_item_id'] ?? null,
                 'quantity' => $item['quantity'],
                 'subtotal' => $item['price'] * $item['quantity'],
             ]);

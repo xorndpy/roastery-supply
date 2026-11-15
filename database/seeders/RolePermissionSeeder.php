@@ -65,6 +65,7 @@ class RolePermissionSeeder extends Seeder
                 'manage_service',
                 'view_warranties',
                 'manage_warranties',
+                'view_flash_sales',
             ];
             $staffRole->syncPermissions($staffPermissions);
         }

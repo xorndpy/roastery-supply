@@ -33,6 +33,7 @@
         ]],
         ['group' => 'Pemasaran', 'items' => [
             ['label' => 'Voucher', 'route' => 'admin.vouchers.index', 'icon' => 'ticket'],
+            ['label' => 'Flash Sale', 'route' => 'admin.flash-sales.index', 'icon' => 'flag'],
             ['label' => 'Banner Katalog', 'route' => 'admin.banners.index', 'icon' => 'image'],
             ['label' => 'Hero Beranda', 'route' => 'admin.hero.index', 'icon' => 'monitor'],
         ]],
@@ -58,7 +59,7 @@
         'admin.brands.index' => 'view_brands', 'admin.stock.index' => 'view_stock',
         'admin.orders.index' => 'view_orders', 'admin.payments.index' => 'verify_payments',
         'admin.shipments.index' => 'manage_shipments', 'admin.shipping.index' => 'view_shipping_rates', 'admin.returns.index' => 'view_returns',
-        'admin.customers.index' => 'view_customers', 'admin.vouchers.index' => 'view_vouchers',
+        'admin.customers.index' => 'view_customers', 'admin.vouchers.index' => 'view_vouchers', 'admin.flash-sales.index' => 'view_flash_sales',
         'admin.articles.index' => 'view_articles', 'admin.milestones.index' => 'view_milestones',
         'admin.banners.index' => 'view_banners', 'admin.testimonials.index' => 'view_testimonials',
         'admin.faqs.index' => 'view_faqs', 'admin.partners.index' => 'view_partners',

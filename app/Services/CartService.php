@@ -31,6 +31,7 @@ class CartService
 
         $fresh = [];
         $total = 0;
+        $flash = app(FlashSaleService::class);
 
         foreach ($cart as $id => $line) {
             $product = $products->get((int) $id);
@@ -41,19 +42,25 @@ class CartService
                 continue;
             }
 
+            // Harga promo flash sale (bila berjalan dan kuota ada) dibaca dari database, bukan dari isi session.
+            $promo = $flash->itemFor($product->id);
+            $maxQty = $promo ? min($product->stock, $flash->maxQty($promo)) : $product->stock;
+
             $qty = max(1, (int) $line['quantity']);
-            if ($qty > $product->stock) {
-                $notices[] = "Jumlah \"{$product->name}\" disesuaikan menjadi {$product->stock} (stok tersisa).";
-                $qty = $product->stock;
+            if ($qty > $maxQty) {
+                $notices[] = $promo && $maxQty < $product->stock
+                    ? "Jumlah \"{$product->name}\" disesuaikan menjadi {$maxQty} (batas/kuota promo)."
+                    : "Jumlah \"{$product->name}\" disesuaikan menjadi {$product->stock} (stok tersisa).";
+                $qty = $maxQty;
             }
 
             // Varian dibaca ulang dari database; bila sudah dihapus admin, kembali ke produk dasar.
             $variant = !empty($line['variant_id']) ? $product->variants->firstWhere('id', (int) $line['variant_id']) : null;
-            $unitPrice = $product->price;
+            $unitPrice = $promo ? (float) $promo->sale_price : $product->price;
             $label = $variant ? "{$product->name} ({$variant->type}: {$variant->name})" : $product->name;
 
             if ((float) $line['price'] !== (float) $unitPrice) {
-                $notices[] = "Harga \"{$product->name}\" berubah.";
+                $notices[] = $promo ? "Harga promo \"{$product->name}\" berlaku." : "Harga \"{$product->name}\" berubah.";
             }
 
             $fresh[$product->id] = [
@@ -63,6 +70,8 @@ class CartService
                 'sku'      => $product->sku,
                 'weight'   => (int) $product->weight,   // gram, untuk ongkir
                 'price'    => $unitPrice,
+                'original_price' => $promo ? (float) $product->price : null,
+                'flash_item_id'  => $promo?->id,
                 'variant_id' => $variant?->id,
                 'quantity' => $qty,
                 'image'    => $product->images->first()->image ?? ($line['image'] ?? null),

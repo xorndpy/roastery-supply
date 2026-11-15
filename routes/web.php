@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\MilestoneController;
 use App\Http\Controllers\Admin\FinanceController;
 use App\Http\Controllers\Admin\ExpenseController;
 use App\Http\Controllers\Admin\FinanceClosingController;
+use App\Http\Controllers\Admin\FlashSaleController;
 use App\Http\Controllers\Admin\ServiceTicketController;
 use App\Http\Controllers\Admin\TrackingController;
 use App\Http\Controllers\Admin\WarrantyController;
@@ -314,6 +315,7 @@ Route::prefix('admin')
 
         // Pemasaran
         $crud('vouchers', VoucherController::class, 'vouchers', ['show']);
+        $crud('flash-sales', FlashSaleController::class, 'flash_sales', ['show']);
         $crud('banners', BannerController::class, 'banners', ['show']);
         Route::post('banners/reorder', [BannerController::class, 'reorder'])->name('banners.reorder')->middleware('can:edit_banners');
         Route::prefix('testimonials')->as('testimonials.')->group(function () {

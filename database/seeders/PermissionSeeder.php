@@ -62,6 +62,12 @@ class PermissionSeeder extends Seeder
                 'delete_expenses',
                 'close_finance',
             ],
+            'flash_sale' => [
+                'view_flash_sales',
+                'create_flash_sales',
+                'edit_flash_sales',
+                'delete_flash_sales',
+            ],
             'purna_jual' => [
                 'view_service',
                 'manage_service',

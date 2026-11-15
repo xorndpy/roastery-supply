@@ -19,6 +19,7 @@
 | Laba rugi, biaya operasional, HPP produk (modul Keuangan) | ✔ | ✔ | – | – | ✔ |
 | Tutup buku (kunci periode keuangan) | ✔ | ✔ | – | – | ✔ |
 | Tiket servis & garansi (lihat, proses, isi nomor seri) | ✔ | ✔ | ✔ | – | – |
+| Flash sale (staff hanya melihat) | ✔ | ✔ | lihat | – | – |
 | Pesan kontak: lihat & balas | ✔ | ✔ | ✔ | – | – |
 
 Prinsip: Gudang hanya mengerjakan barang fisik (kemas, kirim, stok) dan tidak melihat uang.

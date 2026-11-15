@@ -40,6 +40,10 @@ class KatalogController extends Controller
                 ->orWhere('description', 'like', "%{$s}%"));
         }
 
+        // Hanya produk yang sedang flash sale (tautan "Lihat semua" di etalase).
+        if ($request->boolean('flash')) {
+            $query->whereIn('id', app(\App\Services\FlashSaleService::class)->items()->keys()->all());
+        }
         // Harga & stok
         if ($request->filled('min_price')) $query->where('price', '>=', (int) $request->min_price);
         if ($request->filled('max_price')) $query->where('price', '<=', (int) $request->max_price);

@@ -24,6 +24,7 @@ return [
             'view_profit', 'view_costs', 'manage_costs',
             'view_expenses', 'create_expenses', 'edit_expenses', 'delete_expenses', 'close_finance',
         ],
+        'Flash Sale' => ['view_flash_sales', 'create_flash_sales', 'edit_flash_sales', 'delete_flash_sales'],
         'Purna Jual' => ['view_service', 'manage_service', 'view_warranties', 'manage_warranties'],
         'Pelanggan' => ['view_customers', 'edit_customers', 'export_customers'],
         'Pemasaran' => [

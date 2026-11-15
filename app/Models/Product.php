@@ -164,4 +164,18 @@ class Product extends Model
             ->useLogName('produk')
             ->setDescriptionForEvent(fn (string $event) => "Produk {$event}");
     }
+
+    /** Item flash sale yang sedang berjalan untuk produk ini (kuota masih ada), atau null. */
+    public function flashItem(): ?FlashSaleItem
+    {
+        return app(\App\Services\FlashSaleService::class)->itemFor($this->id);
+    }
+
+    /** Harga yang berlaku sekarang: harga promo bila flash sale berjalan, selain itu harga normal. */
+    public function currentPrice(): float
+    {
+        $i = $this->flashItem();
+
+        return $i ? (float) $i->sale_price : (float) $this->price;
+    }
 }

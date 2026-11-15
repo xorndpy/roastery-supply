@@ -18,6 +18,7 @@ class OrderItem extends Model
         'product_sku',
         'price',
         'cost_price',
+        'flash_sale_item_id',
         'quantity',
         'subtotal',
     ];

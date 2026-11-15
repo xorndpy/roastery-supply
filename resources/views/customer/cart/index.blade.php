@@ -24,7 +24,7 @@
 
                         <div class="min-w-0 flex-1">
                             <a href="{{ route('products.show', $item['slug']) }}" class="font-medium hover:text-orange-600">{{ $item['name'] }}</a>
-                            <div class="mt-0.5 text-sm text-stone-500">Rp {{ number_format($item['price'], 0, ',', '.') }}</div>
+                            <div class="mt-0.5 text-sm text-stone-500">Rp {{ number_format($item['price'], 0, ',', '.') }}@if(!empty($item['original_price'])) <span class="text-xs text-stone-400 line-through">Rp {{ number_format($item['original_price'], 0, ',', '.') }}</span> <span class="rounded bg-orange-100 px-1.5 text-xs text-orange-800">Flash Sale</span>@endif</div>
 
                             <div class="mt-3 flex flex-wrap items-center gap-4">
                                 {{-- Gaya marketplace: ubah jumlah langsung tersimpan (tanpa tombol "Perbarui"). --}}
