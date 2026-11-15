@@ -13,6 +13,13 @@ class ExpenseRequest extends FormRequest
         return true; // izin dijaga middleware can:*_expenses di route
     }
 
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('amount')) {
+            $this->merge(['amount' => \App\Support\Rupiah::clean($this->input('amount'))]);
+        }
+    }
+
     public function rules(): array
     {
         return [

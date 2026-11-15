@@ -1,23 +1,17 @@
 @php
-    // Etalase flash sale: kampanye berjalan yang paling cepat berakhir. Hilang sendiri bila tidak ada promo aktif.
+    // Etalase flash sale: semua promo yang sedang berjalan (dari semua kampanye). Hilang sendiri bila tidak ada.
     $svc = app(\App\Services\FlashSaleService::class);
-    $campaign = $svc->activeCampaign();
-    $items = collect();
+    $show = $svc->showcase(12);
+    $items = $show['items'] ?? collect();
     $sold = [];
-    if ($campaign) {
-        $items = $campaign->items()->with(['product.images', 'product.brand'])->get()->filter(fn ($i) => $i->product && $i->product->is_active);
-        $sold = $svc->soldFor($items->pluck('id')->all());
-        $items = $items->take(8);
-    }
 @endphp
 
-@if($campaign && $items->isNotEmpty())
-<section class="container-x pb-4 pt-10" aria-labelledby="flash-title" x-data="flashTimer({{ $campaign->ends_at->timestamp * 1000 }}, {{ now()->timestamp * 1000 }})" x-init="start()">
+@if($show)
+<section class="container-x pb-4 pt-10" aria-labelledby="flash-title" x-data="flashTimer({{ $show['ends_at']->timestamp * 1000 }}, {{ now()->timestamp * 1000 }})" x-init="start()">
     <div class="rounded-3xl bg-[#2b1c14] p-5 text-white sm:p-7">
         <div class="mb-5 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
             <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
-                <h2 id="flash-title" class="flex items-center gap-2 text-xl font-bold sm:text-2xl">
-                    <svg class="h-6 w-6 text-orange-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg>
+                <h2 id="flash-title" class="text-xl font-bold sm:text-2xl">
                     Flash Sale
                 </h2>
                 <div class="flex items-center gap-2" role="timer" aria-label="Sisa waktu promo">
@@ -30,18 +24,18 @@
                     </span>
                 </div>
             </div>
-            <a href="{{ route('products.index', ['flash' => 1]) }}" class="rounded-full border border-orange-200/40 px-4 py-1.5 text-sm text-orange-100 transition hover:bg-white/10">Lihat semua →</a>
+            <a href="{{ route('products.index', ['flash' => 1]) }}" class="rounded-full border border-orange-200/40 px-4 py-1.5 text-sm text-orange-100 transition hover:bg-white/10">Lihat semua</a>
         </div>
 
-        <p class="mb-4 text-sm text-orange-100/80">{{ $campaign->name }}</p>
+        @if($show['name'])<p class="mb-4 text-sm text-orange-100/80">{{ $show['name'] }}</p>@endif
 
         <div class="-mx-1 flex snap-x gap-4 overflow-x-auto px-1 pb-2">
             @foreach($items as $item)
                 @php
                     $p = $item->product;
                     $img = $p->images->first();
-                    $soldN = $sold[$item->id] ?? 0;
-                    $left = max(0, $item->quota - $soldN);
+                    $soldN = (int) $item->sold;
+                    $left = (int) $item->remaining;
                     $bar = $item->quota > 0 ? min(100, (int) round($soldN / $item->quota * 100)) : 0;
                     $out = $left <= 0 || $p->stock <= 0;
                 @endphp

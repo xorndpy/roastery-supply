@@ -275,6 +275,68 @@ class FlashSaleTest extends TestCase
         $res->assertSee('Flash Sale')->assertSee('Promo Uji')->assertSee('-25%')->assertSee('750.000')->assertSee('Terjual 4 dari 10')->assertSee('Berakhir dalam')
             ->assertSee('flashTimer('.($s->ends_at->timestamp * 1000), false);
         $res->assertSee(route('products.index', ['flash' => 1]), false);
+        $res->assertSee('Lihat semua')->assertDontSee('Lihat semua →')->assertDontSee('M13 2 4 14h6l-1 8 9-12h-6l1-8z', false);   // tanpa panah dan tanpa ikon petir
+    }
+
+    public function test_showcase_lists_every_running_promo_across_campaigns_like_the_see_all_page(): void
+    {
+        $products = [$a = $this->product(), $b = $this->product(), $c = $this->product(), $d = $this->product()];
+        $this->sale($a, 750000, 5, null, '-1 hour', '+5 hours');                          // kampanye 1
+        $this->sale($b, 800000, 5, null, '-1 hour', '+2 hours');                          // kampanye 2 (berakhir lebih cepat)
+        $this->sale($c, 850000, 5, null, '-1 hour', '+9 hours');                          // kampanye 3
+        $this->sale($d, 900000, 5, null, '+1 hour', '+3 hours');                          // belum mulai: tidak tampil
+
+        $showcase = app(FlashSaleService::class)->showcase();
+        $this->assertCount(3, $showcase['items']);
+        $this->assertSame(3, $showcase['campaigns']);
+        $this->assertNull($showcase['name']);                                              // beberapa kampanye: tanpa nama tunggal
+        $this->assertSame($b->id, $showcase['items']->first()->product_id);               // yang paling cepat berakhir dulu
+        $this->assertSame($showcase['items']->min(fn ($i) => $i->sale->ends_at->timestamp), $showcase['ends_at']->timestamp);
+
+        $res = $this->get(route('products.index'))->assertOk();
+        foreach ([$a, $b, $c] as $p) {
+            $res->assertSee($p->name);
+        }
+        $res->assertDontSee('Promo Uji');
+        // sama persis dengan halaman "Lihat semua"
+        $all = $this->get(route('products.index', ['flash' => 1]))->assertOk();
+        foreach ([$a, $b, $c] as $p) {
+            $all->assertSee($p->name);
+        }
+        $all->assertDontSee($d->name);
+    }
+
+    public function test_showcase_puts_sold_out_last_hides_inactive_products_and_caps_at_twelve(): void
+    {
+        $out = $this->product();
+        [, $oi] = $this->sale($out, 750000, 1, null, '-1 hour', '+1 hour');               // paling cepat berakhir tapi habis
+        $this->boughtOrder($oi, $out, 1);
+        $ok = $this->product();
+        $this->sale($ok, 750000, 5, null, '-1 hour', '+8 hours');
+        $hidden = $this->product();
+        $this->sale($hidden, 750000, 5);
+        $hidden->update(['is_active' => false]);
+        app(FlashSaleService::class)->flush();
+
+        $items = app(FlashSaleService::class)->showcase()['items'];
+        $this->assertSame([$ok->id, $out->id], $items->pluck('product_id')->all());
+
+        foreach (range(1, 14) as $n) {
+            $this->sale($this->product(), 750000, 5);
+        }
+        $this->assertCount(12, app(FlashSaleService::class)->showcase(12)['items']);
+    }
+
+    public function test_single_campaign_keeps_its_name_and_the_timer_uses_the_earliest_end(): void
+    {
+        [$s1] = $this->sale($a = $this->product(), 750000, 5, null, '-1 hour', '+6 hours');
+        $this->sale($b = $this->product(), 750000, 5, null, '-1 hour', '+2 hours');
+        FlashSale::where('id', $s1->id)->update(['name' => 'Akhir bulan']);
+        $earliest = FlashSale::where('id', '!=', $s1->id)->first()->ends_at;
+        app(FlashSaleService::class)->flush();
+
+        $res = $this->get(route('products.index'))->assertOk()->assertSee('flashTimer('.($earliest->timestamp * 1000), false);
+        $res->assertDontSee('Akhir bulan');                                               // dua kampanye: nama disembunyikan
     }
 
     public function test_storefront_hides_the_section_without_a_live_campaign(): void
@@ -332,6 +394,51 @@ class FlashSaleTest extends TestCase
         $this->assertSame(2, $s->items->first()->max_per_order);
         $this->actingAs($admin)->get(route('admin.flash-sales.index'))->assertOk()->assertSee('Promo Akhir Pekan')->assertSee('Terjadwal');
         $this->actingAs($admin)->get(route('admin.flash-sales.edit', $s->id))->assertOk()->assertSee('2026-12-12T10:00', false);
+    }
+
+    public function test_money_inputs_in_admin_forms_format_thousands(): void
+    {
+        $admin = $this->userAs('admin');
+        $p = $this->product();
+
+        $this->actingAs($admin)->get(route('admin.flash-sales.create'))->assertOk()->assertSee('data-rupiah', false)->assertSee('fmt(', false);
+        $this->actingAs($admin)->get(route('admin.expenses.create'))->assertOk()->assertSee('data-rupiah', false);
+        $this->actingAs($admin)->get(route('admin.finance.costs'))->assertOk()->assertSee('data-rupiah', false);
+    }
+
+    public function test_prices_with_indonesian_thousand_separators_are_read_correctly_on_the_server(): void
+    {
+        // Jaga-jaga bila JavaScript halaman gagal: "285.000" harus menjadi 285000, bukan 285.
+        $admin = $this->userAs('admin');
+        $p = $this->product(1000000);
+        $items = fn ($price) => [['product_id' => $p->id, 'sale_price' => $price, 'quota' => 5]];
+
+        $this->actingAs($admin)->post(route('admin.flash-sales.store'), $this->payload($p, ['items' => $items('285.000')]))->assertSessionHasNoErrors();
+        $this->assertEquals(285000, FlashSale::firstOrFail()->items->first()->sale_price);
+
+        $this->actingAs($admin)->post(route('admin.flash-sales.store'), $this->payload($p, ['name' => 'Lain', 'starts_at' => now('Asia/Jakarta')->addDays(3)->format('Y-m-d\TH:i'), 'ends_at' => now('Asia/Jakarta')->addDays(3)->addHours(2)->format('Y-m-d\TH:i'), 'items' => $items('abc')]))->assertSessionHasErrors('items.0.sale_price');
+        $this->assertSame(1, FlashSale::count());
+    }
+
+    public function test_rupiah_cleaner(): void
+    {
+        foreach ([['285.000', '285000'], ['1.250.000', '1250000'], ['1.250.000,50', '1250000.50'], ['285000', '285000'], ['12.5', '12.5'], ['abc', 'abc'], ['1.00', '1.00']] as [$in, $out]) {
+            $this->assertSame($out, \App\Support\Rupiah::clean($in), $in);
+        }
+        $this->assertSame(5, \App\Support\Rupiah::clean(5));
+        $this->assertNull(\App\Support\Rupiah::clean(null));
+    }
+
+    public function test_other_money_forms_also_accept_formatted_numbers(): void
+    {
+        $keu = $this->userAs('keuangan');
+        $p = $this->product();
+
+        $this->actingAs($keu)->post(route('admin.expenses.store'), ['expense_date' => '2026-11-05', 'category' => 'sewa', 'description' => 'Sewa', 'amount' => '3.500.000'])->assertSessionHasNoErrors();
+        $this->assertEquals(3500000, \App\Models\Expense::firstOrFail()->amount);
+
+        $this->actingAs($keu)->put(route('admin.finance.costs.update'), ['costs' => [$p->id => '650.000']])->assertSessionHasNoErrors();
+        $this->assertEquals(650000, $p->fresh()->cost_price);
     }
 
     public function test_admin_validation_rules(): void

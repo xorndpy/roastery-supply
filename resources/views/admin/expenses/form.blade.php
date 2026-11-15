@@ -36,7 +36,7 @@
 
     <div>
         <label class="block text-sm font-medium mb-1.5">Jumlah (Rp) *</label>
-        <input type="number" name="amount" value="{{ old('amount', $isEdit ? (int) $expense->amount : '') }}" required min="1" step="1" class="w-full border border-stone-300 rounded-lg px-3 py-2">
+        <input type="text" inputmode="numeric" data-rupiah name="amount" value="{{ old('amount', $isEdit ? (int) $expense->amount : '') }}" required class="w-full border border-stone-300 rounded-lg px-3 py-2">
     </div>
 
     <div>

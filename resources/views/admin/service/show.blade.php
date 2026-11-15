@@ -54,8 +54,8 @@
             </div>
             <div><label class="mb-1 block text-xs text-stone-500">Catatan untuk pelanggan</label><textarea name="note" rows="2" maxlength="1000" class="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm"></textarea></div>
             @unless($ticket->in_warranty)
-                <div><label class="mb-1 block text-xs text-stone-500">Estimasi biaya (Rp), untuk "Menunggu persetujuan"</label><input type="number" name="estimate_cost" min="0" step="1" value="{{ old('estimate_cost', $ticket->estimate_cost ? (int) $ticket->estimate_cost : '') }}" class="w-full rounded-lg border border-stone-300 px-3 py-2"></div>
-                <div><label class="mb-1 block text-xs text-stone-500">Biaya akhir (Rp), untuk "Selesai"</label><input type="number" name="final_cost" min="0" step="1" value="{{ old('final_cost', (float) $ticket->final_cost ? (int) $ticket->final_cost : '') }}" class="w-full rounded-lg border border-stone-300 px-3 py-2"></div>
+                <div><label class="mb-1 block text-xs text-stone-500">Estimasi biaya (Rp), untuk "Menunggu persetujuan"</label><input type="text" inputmode="numeric" data-rupiah name="estimate_cost" value=""{{ old('estimate_cost', $ticket->estimate_cost ? (int) $ticket->estimate_cost : '') }}" class="w-full rounded-lg border border-stone-300 px-3 py-2"></div>
+                <div><label class="mb-1 block text-xs text-stone-500">Biaya akhir (Rp), untuk "Selesai"</label><input type="text" inputmode="numeric" data-rupiah name="final_cost" value=""{{ old('final_cost', (float) $ticket->final_cost ? (int) $ticket->final_cost : '') }}" class="w-full rounded-lg border border-stone-300 px-3 py-2"></div>
             @endunless
             <div><label class="mb-1 block text-xs text-stone-500">Catatan internal (tidak terlihat pelanggan)</label><textarea name="admin_note" rows="2" maxlength="2000" class="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm">{{ old('admin_note', $ticket->admin_note) }}</textarea></div>
             <button class="w-full rounded-lg bg-orange-500 py-2.5 font-medium text-white hover:bg-orange-600">Simpan</button>

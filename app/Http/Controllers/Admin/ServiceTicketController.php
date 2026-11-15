@@ -45,6 +45,8 @@ class ServiceTicketController extends Controller
 
     public function update(Request $request, ServiceTicket $ticket)
     {
+        $request->merge(array_map([\App\Support\Rupiah::class, 'clean'], $request->only(['estimate_cost', 'final_cost'])));
+
         $data = $request->validate([
             'status' => ['required', 'in:'.implode(',', array_keys(ServiceTicket::STATUSES))],
             'note' => ['nullable', 'string', 'max:1000'],

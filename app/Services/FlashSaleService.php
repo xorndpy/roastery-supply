@@ -80,7 +80,47 @@ class FlashSaleService
         return $item->max_per_order ? min($item->remaining, (int) $item->max_per_order) : $item->remaining;
     }
 
-    /** Kampanye berjalan yang paling cepat berakhir (untuk ditampilkan di etalase). */
+    /**
+     * Isi etalase: semua item promo dari SEMUA kampanye yang sedang berjalan (sama dengan halaman "Lihat semua"),
+     * yang masih tersedia lebih dulu, lalu yang paling cepat berakhir. null bila tidak ada promo berjalan.
+     *
+     * @return array{items:Collection,ends_at:\Illuminate\Support\Carbon,campaigns:int,name:?string}|null
+     */
+    public function showcase(int $limit = 12): ?array
+    {
+        $running = $this->items();
+        if ($running->isEmpty()) {
+            return null;
+        }
+
+        $items = FlashSaleItem::whereIn('id', $running->pluck('id'))->with(['sale', 'product.images', 'product.brand'])->get()
+            ->filter(fn ($i) => $i->product && $i->product->is_active)
+            ->each(function ($i) use ($running) {
+                $r = $running->get($i->product_id);
+                $i->sold = $r->sold ?? 0;
+                $i->remaining = $r->remaining ?? 0;
+            })
+            ->sortBy([
+                [fn ($i) => $i->remaining > 0 && $i->product->stock > 0 ? 0 : 1, 'asc'],
+                [fn ($i) => $i->sale->ends_at->timestamp, 'asc'],
+                ['id', 'asc'],
+            ])->values()->take($limit);
+
+        if ($items->isEmpty()) {
+            return null;
+        }
+
+        $campaigns = $items->pluck('flash_sale_id')->unique();
+
+        return [
+            'items' => $items,
+            'ends_at' => $items->min(fn ($i) => $i->sale->ends_at),
+            'campaigns' => $campaigns->count(),
+            'name' => $campaigns->count() === 1 ? $items->first()->sale->name : null,
+        ];
+    }
+
+    /** Kampanye berjalan yang paling cepat berakhir. */
     public function activeCampaign(): ?FlashSale
     {
         return FlashSale::running()->whereHas('items')->orderBy('ends_at')->first();

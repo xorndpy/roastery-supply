@@ -15,6 +15,19 @@ class FlashSaleRequest extends FormRequest
         return true; // izin dijaga middleware can:*_flash_sales
     }
 
+    protected function prepareForValidation(): void
+    {
+        $items = $this->input('items');
+        if (is_array($items)) {
+            foreach ($items as $i => $row) {
+                if (is_array($row) && array_key_exists('sale_price', $row)) {
+                    $items[$i]['sale_price'] = \App\Support\Rupiah::clean($row['sale_price']);
+                }
+            }
+            $this->merge(['items' => $items]);
+        }
+    }
+
     public function rules(): array
     {
         return [

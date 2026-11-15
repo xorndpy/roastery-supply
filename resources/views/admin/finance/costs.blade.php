@@ -45,7 +45,7 @@
                     <td class="px-4 py-2.5"><div class="font-medium">{{ $p->name }}</div><div class="text-xs text-stone-500">{{ $p->sku }}</div></td>
                     <td class="px-4 py-2.5 text-right">{{ $rp($p->price) }}</td>
                     <td class="px-4 py-2.5">
-                        <input type="number" name="costs[{{ $p->id }}]" value="{{ old('costs.' . $p->id, $p->cost_price !== null ? (float) $p->cost_price : '') }}" min="0" step="1" placeholder="belum diisi"
+                        <input type="text" inputmode="numeric" data-rupiah name="costs[{{ $p->id }}]" value="{{ old('costs.' . $p->id, $p->cost_price !== null ? (float) $p->cost_price : '') }}" placeholder="belum diisi"
                                @cannot('manage_costs') readonly @endcannot class="w-40 border border-stone-300 rounded-lg px-3 py-1.5">
                     </td>
                     <td class="px-4 py-2.5 text-right {{ $margin !== null && $margin < 0 ? 'text-red-600' : '' }}">{{ $margin === null ? '-' : number_format($margin, 1, ',', '.') . '%' }}</td>

@@ -121,6 +121,8 @@ class FinanceController extends Controller
 
     public function updateCosts(Request $request)
     {
+        $request->merge(['costs' => array_map([\App\Support\Rupiah::class, 'clean'], (array) $request->input('costs', []))]);
+
         $data = $request->validate([
             'costs' => ['required', 'array', 'max:200'],
             'costs.*' => ['nullable', 'numeric', 'min:0', 'max:99999999999'],
