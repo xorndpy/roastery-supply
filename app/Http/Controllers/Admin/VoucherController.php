@@ -31,7 +31,7 @@ class VoucherController extends Controller
 
     public function create()
     {
-        return view('admin.vouchers.form', ['voucher' => new Voucher(['type' => 'percentage', 'is_active' => true, 'per_user_limit' => 1, 'quota' => 0, 'min_purchase' => 0])]);
+        return view('admin.vouchers.form', ['voucher' => new Voucher(['type' => 'percentage', 'is_active' => true, 'per_user_limit' => 1, 'quota' => 0, 'min_purchase' => 0, 'audience' => Voucher::AUDIENCE_ALL, 'is_public' => true])]);
     }
 
     public function store(Request $request)
@@ -83,6 +83,7 @@ class VoucherController extends Controller
             'code'           => ['required', 'string', 'max:50', 'regex:/^[A-Z0-9_-]+$/', Rule::unique('vouchers', 'code')->ignore($voucher?->id)],
             'description'    => 'nullable|string|max:255',
             'type'           => ['required', Rule::in(['percentage', 'fixed'])],
+            'audience'       => ['nullable', Rule::in(array_keys(Voucher::AUDIENCES))],
             'value'          => $type === 'percentage' ? 'required|numeric|min:1|max:100' : 'required|numeric|min:1|max:1000000000',
             'min_purchase'   => 'nullable|numeric|min:0|max:1000000000',
             'max_discount'   => 'nullable|numeric|min:0|max:1000000000',
@@ -101,6 +102,8 @@ class VoucherController extends Controller
         // Batas diskon hanya bermakna untuk tipe persen.
         $data['max_discount'] = $data['type'] === 'percentage' && ($data['max_discount'] ?? 0) > 0 ? $data['max_discount'] : null;
         $data['is_active'] = $request->boolean('is_active');
+        $data['audience'] = $data['audience'] ?? Voucher::AUDIENCE_ALL;
+        $data['is_public'] = $request->boolean('is_public');
 
         return $data;
     }

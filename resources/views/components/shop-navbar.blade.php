@@ -73,7 +73,8 @@
             <div class="hidden items-center gap-3 text-sm lg:flex">
                 @auth
                     <div x-data="{ menu: false }" class="relative">
-                        <button @click="menu = !menu" class="flex items-center gap-1.5 text-stone-800 hover:text-copper-600" :aria-expanded="menu">
+                        <button @click="menu = !menu" class="flex items-center gap-2 text-stone-800 hover:text-copper-600" :aria-expanded="menu">
+                            <x-avatar :user="auth()->user()" :size="28" />
                             {{ \Illuminate\Support\Str::words(auth()->user()->name, 1, '') }}
                             <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
                         </button>

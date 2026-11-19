@@ -2,7 +2,6 @@
     <x-slot:headline>Selamat datang kembali. Pesanan dan garansi Anda menunggu.</x-slot:headline>
 
     @php
-        $googleOn = true; //  demo TA
         $loginError = $errors->first('email') ?: $errors->first('password');
     @endphp
 
@@ -19,12 +18,7 @@
         @if ($loginError)
             <div class="auth-alert mb-5" role="alert">
                 <svg class="mt-0.5 h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5M12 16v.1"/></svg>
-                <div>
-                    <p class="font-medium">{{ $loginError }}</p>
-                    @if ($googleOn && str_contains($loginError, 'password salah'))
-                        <p class="mt-0.5">Dulu mendaftar dengan Google? Pakai tombol “Lanjutkan dengan Google” di bawah.</p>
-                    @endif
-                </div>
+                <p class="font-medium">{{ $loginError }}</p>
             </div>
         @endif
 

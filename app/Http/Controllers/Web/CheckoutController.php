@@ -67,7 +67,11 @@ class CheckoutController extends Controller
         $shippingConfigured = $this->shipping->configured();
         $afterDiscount = $total - $discount;
 
-        return view('customer.checkout.index', compact('cart', 'total', 'customer', 'idempotencyKey', 'voucher', 'discount', 'grandTotal', 'shippingConfigured', 'afterDiscount'));
+        // Voucher yang bisa dipilih pelanggan (yang sedang terpasang tidak perlu ditawarkan lagi).
+        $availableVouchers = $this->vouchers->availableFor(auth()->user(), $total, 4)
+            ->reject(fn ($v) => $voucher && $v['code'] === $voucher->code)->values();
+
+        return view('customer.checkout.index', compact('cart', 'total', 'customer', 'idempotencyKey', 'voucher', 'discount', 'grandTotal', 'shippingConfigured', 'afterDiscount', 'availableVouchers'));
     }
 
     /**

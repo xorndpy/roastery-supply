@@ -1,0 +1,22 @@
+CARA PASANG
+===========
+Timpa isi folder roastery_supply/ ini ke project (struktur folder sudah sama), lalu jalankan PERSIS berurutan:
+
+  php artisan migrate          # menambah kolom voucher: audience & is_public
+  npm run build                # WAJIB. View memakai kelas copper-*; tanpa build, badge diskon/harga/progress bar hilang
+  php artisan view:clear
+  php artisan cache:clear      # menu kategori navbar kini memakai View Composer
+  php artisan storage:link     # hanya jika belum pernah; dibutuhkan agar foto profil terlihat
+  php artisan test             # 430 lulus; 19 gagal adalah test lama yang sudah usang (ada sebelum perubahan ini)
+
+Lalu hard refresh browser (Ctrl+Shift+R).
+
+SETELAH MIGRASI: atur voucher di Admin > Voucher
+---------------------------------------------------
+- Voucher LAMA otomatis disembunyikan dari pelanggan (is_public = tidak) supaya kode internal/rahasia tidak bocor.
+- Untuk memajang sebuah voucher: edit voucher > centang "Tampilkan ke pelanggan".
+- Voucher member baru: buat voucher baru > "Untuk siapa" = "Member baru (pesanan pertama)".
+  Contoh: NEWBIE10, Diskon 10%, maks Rp50.000, min belanja Rp500.000, kuota 0 (tanpa batas), batas per user 1.
+- Pelanggan melihatnya di: Akun Saya (blok "Voucher untuk kamu") dan halaman Checkout (tombol "Pakai").
+
+Catatan: file ini TIDAK menyertakan .env, vendor, node_modules, atau database.

@@ -176,6 +176,32 @@
                             @if(session('voucher_error'))<p class="text-red-600 text-xs mt-1.5">{{ session('voucher_error') }}</p>@endif
                             @error('code')<p class="text-red-600 text-xs mt-1.5">{{ $message }}</p>@enderror
                         @endif
+
+                        @if($availableVouchers->isNotEmpty())
+                            <div class="mt-4">
+                                <p class="text-sm font-medium mb-2" id="voucher-list-title">Voucher untuk kamu</p>
+                                <ul class="space-y-2" aria-labelledby="voucher-list-title">
+                                    @foreach($availableVouchers as $v)
+                                        <li class="flex items-center justify-between gap-3 rounded-lg border {{ $v['state'] === 'ready' ? 'border-stone-300' : 'border-stone-200 bg-stone-50' }} px-3 py-2.5">
+                                            <div class="min-w-0 text-sm">
+                                                <div class="font-medium">{{ $v['benefit'] }}@if($v['is_new_member']) <span class="ml-1 rounded bg-stone-100 px-1.5 py-0.5 text-xs font-normal text-stone-700">Member baru</span>@endif</div>
+                                                <div class="text-xs text-stone-600">{{ implode(' · ', $v['terms']) }}</div>
+                                                @if($v['state'] === 'min_purchase')
+                                                    <div class="mt-0.5 text-xs font-medium text-stone-800">Belanja Rp {{ number_format($v['gap'], 0, ',', '.') }} lagi untuk memakai voucher ini.</div>
+                                                @elseif($v['valid_until'])
+                                                    <div class="text-xs text-stone-600">Berlaku sampai {{ $v['valid_until']->translatedFormat('d M Y') }}</div>
+                                                @endif
+                                            </div>
+                                            @if($v['state'] === 'ready')
+                                                <button type="submit" form="voucher-pick-form" name="code" value="{{ $v['code'] }}"
+                                                        class="shrink-0 min-h-11 rounded-lg border border-stone-300 px-4 text-sm font-medium hover:bg-stone-50"
+                                                        aria-label="Pakai voucher {{ $v['benefit'] }}, kode {{ $v['code'] }}">Pakai</button>
+                                            @endif
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
                     </div>
 
                     <div class="border-t border-stone-200 pt-4 mb-6 space-y-2 text-sm">
@@ -203,6 +229,7 @@
     </form>
 
     <form id="voucher-form" method="POST" action="{{ route('customer.checkout.voucher') }}">@csrf</form>
+    <form id="voucher-pick-form" method="POST" action="{{ route('customer.checkout.voucher') }}">@csrf</form>
     <form id="voucher-remove-form" method="POST" action="{{ route('customer.checkout.voucher.remove') }}">@csrf @method('DELETE')</form>
 </div>
 <script>

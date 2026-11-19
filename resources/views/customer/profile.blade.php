@@ -29,9 +29,46 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('customer.profile.update') }}" class="space-y-6">
+    <form method="POST" action="{{ route('customer.profile.update') }}" enctype="multipart/form-data" class="space-y-6">
         @csrf
         @method('PATCH')
+
+        {{-- Foto (opsional) --}}
+        @php $me = auth()->user(); @endphp
+        <div class="bg-white p-6 rounded-lg border border-stone-200" x-data="{ avatar: null, cover: null }">
+            <h2 class="font-bold mb-1">Foto</h2>
+            <p class="text-sm text-stone-600 mb-5">Opsional. Foto profil tampil di akun Anda, foto sampul menjadi latar header halaman Akun Saya.</p>
+
+            <div class="flex items-center gap-4">
+                <template x-if="avatar"><img :src="avatar" alt="Pratinjau foto profil" class="h-20 w-20 shrink-0 rounded-full object-cover"></template>
+                <div x-show="!avatar" class="shrink-0"><x-avatar :user="$me" :size="80" /></div>
+                <div class="min-w-0 flex-1">
+                    <label for="avatar" class="block text-sm font-medium mb-1.5">Foto profil</label>
+                    <input id="avatar" type="file" name="avatar" accept="image/jpeg,image/png,image/webp" aria-describedby="avatar-help"
+                           @change="avatar = $event.target.files[0] ? URL.createObjectURL($event.target.files[0]) : null"
+                           class="block w-full text-sm file:mr-3 file:rounded-lg file:border file:border-stone-300 file:bg-white file:px-4 file:py-2 file:text-sm file:font-medium hover:file:bg-stone-50">
+                    <p id="avatar-help" class="mt-1 text-xs text-stone-600">JPG, PNG, atau WebP. Maksimal 2 MB.</p>
+                    @if($me->avatar)
+                        <label class="mt-2 flex items-center gap-2 text-sm"><input type="checkbox" name="remove_avatar" value="1"> Hapus foto profil</label>
+                    @endif
+                </div>
+            </div>
+
+            <div class="mt-6 border-t border-stone-100 pt-5">
+                <label for="cover" class="block text-sm font-medium mb-1.5">Foto sampul</label>
+                @if($me->cover_url)
+                    <img src="{{ $me->cover_url }}" alt="Foto sampul saat ini" x-show="!cover" class="mb-3 h-24 w-full rounded-lg object-cover">
+                @endif
+                <img x-show="cover" x-cloak :src="cover" alt="Pratinjau foto sampul" class="mb-3 h-24 w-full rounded-lg object-cover">
+                <input id="cover" type="file" name="cover" accept="image/jpeg,image/png,image/webp" aria-describedby="cover-help"
+                       @change="cover = $event.target.files[0] ? URL.createObjectURL($event.target.files[0]) : null"
+                       class="block w-full text-sm file:mr-3 file:rounded-lg file:border file:border-stone-300 file:bg-white file:px-4 file:py-2 file:text-sm file:font-medium hover:file:bg-stone-50">
+                <p id="cover-help" class="mt-1 text-xs text-stone-600">JPG, PNG, atau WebP. Maksimal 4 MB. Foto lebar (mis. 1600 x 500) paling pas.</p>
+                @if($me->cover)
+                    <label class="mt-2 flex items-center gap-2 text-sm"><input type="checkbox" name="remove_cover" value="1"> Hapus foto sampul</label>
+                @endif
+            </div>
+        </div>
 
         {{-- Account --}}
         <div class="bg-white p-6 rounded-lg border border-stone-200">

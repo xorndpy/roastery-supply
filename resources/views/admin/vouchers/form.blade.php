@@ -89,7 +89,23 @@
         </div>
     </div>
 
-    <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="is_active" value="1" @checked(old('is_active', $voucher->is_active))> Aktif</label>
+    <div>
+        <label class="block text-sm font-medium mb-1.5" for="audience">Untuk siapa</label>
+        <select id="audience" name="audience" class="w-full md:w-1/2 border border-stone-300 rounded-lg px-3 py-2">
+            @foreach(\App\Models\Voucher::AUDIENCES as $key => $label)
+                <option value="{{ $key }}" @selected(old('audience', $voucher->audience ?? 'all') === $key)>{{ $label }}</option>
+            @endforeach
+        </select>
+        <p class="text-xs text-stone-500 mt-1">Voucher member baru hanya bisa dipakai pelanggan yang belum punya pesanan (pesanan batal tidak dihitung).</p>
+        @error('audience')<p class="text-red-600 text-xs mt-1">{{ $message }}</p>@enderror
+    </div>
+
+    <div class="space-y-2">
+        <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="is_active" value="1" @checked(old('is_active', $voucher->is_active))> Aktif</label>
+        <label class="flex items-start gap-2 text-sm"><input type="checkbox" name="is_public" value="1" class="mt-0.5" @checked(old('is_public', $voucher->is_public ?? true))>
+            <span>Tampilkan ke pelanggan<span class="block text-xs text-stone-500">Muncul di halaman Akun Saya dan checkout. Matikan untuk kode rahasia (mis. untuk influencer): tetap bisa dipakai kalau kodenya diketahui.</span></span>
+        </label>
+    </div>
 
     <button class="bg-copper-500 hover:bg-copper-600 text-white px-6 py-2.5 rounded-lg font-medium">{{ $isEdit ? 'Simpan' : 'Buat Voucher' }}</button>
 </form>

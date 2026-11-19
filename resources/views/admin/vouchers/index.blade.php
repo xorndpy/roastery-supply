@@ -40,6 +40,8 @@
             <tr>
                 <td class="px-4 py-3">
                     <div class="font-mono font-bold">{{ $v->code }}</div>
+                    @if($v->is_new_member_only)<span class="mr-1 inline-block rounded bg-stone-100 px-1.5 py-0.5 text-[11px] text-stone-700">Member baru</span>@endif
+                    @unless($v->is_public)<span class="inline-block rounded bg-stone-100 px-1.5 py-0.5 text-[11px] text-stone-700">Rahasia</span>@endunless
                     @if($v->description)<div class="text-xs text-stone-500">{{ $v->description }}</div>@endif
                 </td>
                 <td class="px-4 py-3">

@@ -12,10 +12,21 @@ class Voucher extends Model
 {
     use HasFactory, SoftDeletes;
 
+    public const AUDIENCE_ALL = 'all';
+    public const AUDIENCE_NEW_MEMBER = 'new_member';
+
+    /** Siapa yang boleh memakai voucher (label untuk admin). */
+    public const AUDIENCES = [
+        self::AUDIENCE_ALL => 'Semua pelanggan',
+        self::AUDIENCE_NEW_MEMBER => 'Member baru (pesanan pertama)',
+    ];
+
     protected $fillable = [
         'code',
         'description',
         'type',
+        'audience',
+        'is_public',
         'value',
         'min_purchase',
         'max_discount',
@@ -39,6 +50,7 @@ class Voucher extends Model
             'start_at' => 'datetime',
             'end_at' => 'datetime',
             'is_active' => 'boolean',
+            'is_public' => 'boolean',
         ];
     }
 
@@ -56,6 +68,19 @@ class Voucher extends Model
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
+    }
+
+    public function getIsNewMemberOnlyAttribute(): bool
+    {
+        return $this->audience === self::AUDIENCE_NEW_MEMBER;
+    }
+
+    /** Manfaat dalam bahasa awam: "Diskon 10%" atau "Potongan Rp 100.000". */
+    public function getBenefitAttribute(): string
+    {
+        return $this->type === 'percentage'
+            ? 'Diskon ' . rtrim(rtrim(number_format((float) $this->value, 2, ',', ''), '0'), ',') . '%'
+            : 'Potongan Rp ' . number_format((float) $this->value, 0, ',', '.');
     }
 
     /** Status tampilan untuk admin: nonaktif / terjadwal / berakhir / habis / aktif. */
