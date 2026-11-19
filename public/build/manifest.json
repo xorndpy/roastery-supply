@@ -1,6 +1,6 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-Cl2-uaoP.css",
+    "file": "assets/app-zGHVhjnX.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -8,10 +8,19 @@
       "app.css"
     ]
   },
+  "resources/js/admin/dashboard.js": {
+    "file": "assets/dashboard-D7gqwd65.js",
+    "name": "dashboard",
+    "src": "resources/js/admin/dashboard.js",
+    "isDynamicEntry": true
+  },
   "resources/js/app.js": {
-    "file": "assets/app-sIxRmLfg.js",
+    "file": "assets/app-COLsYIZO.js",
     "name": "app",
     "src": "resources/js/app.js",
-    "isEntry": true
+    "isEntry": true,
+    "dynamicImports": [
+      "resources/js/admin/dashboard.js"
+    ]
   }
 }

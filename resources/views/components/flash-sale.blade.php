@@ -36,9 +36,10 @@
                     $out = $left <= 0 || $p->stock <= 0;
                 @endphp
                 <a href="{{ route('products.show', $p->slug) }}" class="group relative {{ $loop->index >= 4 ? 'max-sm:hidden' : '' }} flex min-w-0 flex-col overflow-hidden rounded-xl bg-white text-stone-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-300 sm:w-[calc(25%-12px)] sm:shrink-0 sm:snap-start sm:rounded-2xl {{ $out ? 'opacity-60' : '' }}">
-                    <div class="relative aspect-square bg-stone-50">
+                    {{-- overflow-hidden + img absolute: tanpa ini foto tinggi memelarkan kotak persegi dan badge ikut bergeser. --}}
+                    <div class="relative aspect-square overflow-hidden bg-stone-50">
                         @if($img)
-                            <img src="{{ thumb_url($img->image) }}" alt="{{ $p->name }}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='{{ media_url($img->image) }}'" class="h-full w-full object-contain p-3 transition group-hover:scale-[1.03]">
+                            <img src="{{ thumb_url($img->image) }}" alt="{{ $p->name }}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='{{ media_url($img->image) }}'" class="absolute inset-0 h-full w-full object-contain p-3 transition group-hover:scale-[1.03]">
                         @endif
                         <span class="absolute left-2 top-2 rounded-full bg-copper-500 px-2 py-0.5 text-[11px] font-bold text-white sm:left-3 sm:top-3 sm:px-2.5 sm:py-1 sm:text-xs">-{{ $item->discountPercent() }}%</span>
                         @if($out)
