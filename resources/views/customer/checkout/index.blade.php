@@ -33,7 +33,7 @@
                             <label class="block text-sm font-medium mb-2">Nama Lengkap *</label>
                             <input type="text" name="name" 
                                    value="{{ old('name', $customer->name ?? auth()->user()->name) }}" required
-                                   class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-orange-500 focus:border-orange-500">
+                                   class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-copper-500 focus:border-copper-500">
                             @error('name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
 
@@ -41,7 +41,7 @@
                             <label class="block text-sm font-medium mb-2">No. Telepon *</label>
                             <input type="text" name="phone" 
                                    value="{{ old('phone', $customer->phone ?? '') }}" required
-                                   class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-orange-500 focus:border-orange-500">
+                                   class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-copper-500 focus:border-copper-500">
                             @error('phone') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
                     </div>
@@ -49,7 +49,7 @@
                     <div class="mt-4">
                         <label class="block text-sm font-medium mb-2">Alamat Lengkap *</label>
                         <textarea name="address" rows="3" required
-                                  class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-orange-500 focus:border-orange-500">{{ old('address', $customer->address ?? '') }}</textarea>
+                                  class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-copper-500 focus:border-copper-500">{{ old('address', $customer->address ?? '') }}</textarea>
                         @error('address') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
 
@@ -61,14 +61,14 @@
                         <label class="block text-sm font-medium mb-2">Kode Pos *</label>
                         <input type="text" name="postal_code" @input="onPostal($event.target.value)" inputmode="numeric" maxlength="5" pattern="[0-9]{5}"
                                value="{{ old('postal_code', $customer->postal_code ?? '') }}" required
-                               class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-orange-500 focus:border-orange-500">
+                               class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-copper-500 focus:border-copper-500">
                         @error('postal_code') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     <div class="mt-4">
                         <label class="block text-sm font-medium mb-2">Catatan (opsional)</label>
                         <textarea name="note" rows="2"
-                                  class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-orange-500 focus:border-orange-500">{{ old('note') }}</textarea>
+                                  class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-copper-500 focus:border-copper-500">{{ old('note') }}</textarea>
                     </div>
                 </div>
 
@@ -98,7 +98,7 @@
                                         <div class="space-y-2" role="radiogroup" :aria-label="g.label" style="max-height: 19rem; overflow-y: auto; padding-right: .25rem;">
                                             <template x-for="m in g.items" :key="m.id">
                                                 <label class="flex items-start gap-3 border rounded-lg p-3 cursor-pointer"
-                                                       :class="String(methodId) === String(m.id) ? 'border-orange-500 bg-orange-50' : 'border-stone-200'">
+                                                       :class="String(methodId) === String(m.id) ? 'border-copper-500 bg-copper-50' : 'border-stone-200'">
                                                     <input type="radio" name="shipping_method_id" :value="m.id" x-model="methodId" class="mt-1">
                                                     <span class="flex-1">
                                                         <span class="font-medium" x-text="m.name"></span>
@@ -120,17 +120,17 @@
                 <div class="bg-white p-6 rounded-lg border border-stone-200">
                     <h2 class="text-xl font-bold mb-4">Metode Pembayaran</h2>
                     @if(app(\App\Services\Payments\MidtransService::class)->configured())
-                        <div class="bg-orange-50 border border-orange-200 p-4 rounded-lg">
-                            <div class="font-medium text-orange-900">Pembayaran Online</div>
-                            <p class="text-sm text-orange-700 mt-1">
+                        <div class="bg-copper-50 border border-copper-200 p-4 rounded-lg">
+                            <div class="font-medium text-copper-900">Pembayaran Online</div>
+                            <p class="text-sm text-copper-700 mt-1">
                                 Setelah pesanan dibuat, klik Bayar Sekarang untuk memilih Virtual Account bank, QRIS, e-wallet, atau kartu.
                                 Status pesanan diperbarui otomatis setelah pembayaran berhasil.
                             </p>
                         </div>
                     @else
-                    <div class="bg-orange-50 border border-orange-200 p-4 rounded-lg">
-                        <div class="font-medium text-orange-900">Transfer Manual</div>
-                        <p class="text-sm text-orange-700 mt-1">
+                    <div class="bg-copper-50 border border-copper-200 p-4 rounded-lg">
+                        <div class="font-medium text-copper-900">Transfer Manual</div>
+                        <p class="text-sm text-copper-700 mt-1">
                             Setelah pesanan dibuat, kamu akan menerima instruksi transfer. 
                             Upload bukti bayar di halaman pesanan.
                         </p>
@@ -189,12 +189,12 @@
                         </div>
                         <div class="flex justify-between text-base pt-2">
                             <span class="font-bold">Total</span>
-                            <span class="font-bold text-orange-500" x-text="rp(total)">Rp {{ number_format($grandTotal, 0, ',', '.') }}</span>
+                            <span class="font-bold text-copper-500" x-text="rp(total)">Rp {{ number_format($grandTotal, 0, ',', '.') }}</span>
                         </div>
                     </div>
 
                     <button type="submit"
-                            class="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-medium transition">
+                            class="w-full bg-copper-500 hover:bg-copper-600 text-white py-3 rounded-lg font-medium transition">
                         Buat Pesanan
                     </button>
                 </div>

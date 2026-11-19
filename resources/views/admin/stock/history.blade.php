@@ -52,7 +52,7 @@
                 <td class="px-4 py-3 text-right font-bold {{ $color }}">{{ $sign }}{{ abs($m->quantity) }}</td>
                 <td class="px-4 py-3">
                     @if(in_array($m->reference_type, ['order', 'order_cancel']) && isset($orderRefs[$m->reference_id]))
-                        <a href="{{ route('admin.orders.show', $m->reference_id) }}" class="text-orange-600 hover:underline">{{ $orderRefs[$m->reference_id] }}</a>
+                        <a href="{{ route('admin.orders.show', $m->reference_id) }}" class="text-copper-600 hover:underline">{{ $orderRefs[$m->reference_id] }}</a>
                     @else
                         <span class="text-stone-500">{{ ['manual' => 'Manual', 'initial' => 'Stok awal'][$m->reference_type] ?? '-' }}</span>
                     @endif

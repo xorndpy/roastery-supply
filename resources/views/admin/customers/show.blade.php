@@ -36,7 +36,7 @@
             <tbody class="divide-y divide-stone-100">
             @forelse($orders as $o)
                 <tr>
-                    <td class="px-4 py-3">@can('view_orders')<a href="{{ route('admin.orders.show', $o->id) }}" class="font-mono text-orange-600 hover:underline">{{ $o->order_number }}</a>@else<span class="font-mono">{{ $o->order_number }}</span>@endcan</td>
+                    <td class="px-4 py-3">@can('view_orders')<a href="{{ route('admin.orders.show', $o->id) }}" class="font-mono text-copper-600 hover:underline">{{ $o->order_number }}</a>@else<span class="font-mono">{{ $o->order_number }}</span>@endcan</td>
                     <td class="px-4 py-3 text-stone-500">{{ $o->created_at->format('d M Y') }}</td>
                     <td class="px-4 py-3 capitalize">{{ str_replace('_', ' ', $o->status) }}</td>
                     <td class="px-4 py-3 text-right">Rp {{ number_format($o->total, 0, ',', '.') }}</td>

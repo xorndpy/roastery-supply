@@ -11,8 +11,8 @@
         <img src="{{ media_url($img) }}" alt="" class="absolute inset-0 h-full w-full object-cover">
         <div class="absolute inset-0 bg-gradient-to-r from-[#24150e]/90 via-[#24150e]/65 to-[#24150e]/25"></div>
     @else
-        <div class="pointer-events-none absolute -right-20 -top-28 h-80 w-80 rounded-full bg-orange-200/50 blur-3xl"></div>
-        <div class="pointer-events-none absolute -bottom-32 left-1/3 h-64 w-64 rounded-full bg-orange-100/70 blur-3xl"></div>
+        <div class="pointer-events-none absolute -right-20 -top-28 h-80 w-80 rounded-full bg-copper-200/50 blur-3xl"></div>
+        <div class="pointer-events-none absolute -bottom-32 left-1/3 h-64 w-64 rounded-full bg-copper-100/70 blur-3xl"></div>
     @endif
 
     <div class="container-x relative {{ $img ? 'py-20 sm:py-28 lg:py-36' : 'py-10 sm:py-12' }} {{ $img ? 'text-white' : 'text-stone-900' }}">
@@ -29,7 +29,7 @@
             </nav>
         @endif
 
-        @if($eyebrow)<div class="eyebrow {{ $img ? '!text-orange-300' : '' }}">{{ $eyebrow }}</div>@endif
+        @if($eyebrow)<div class="eyebrow {{ $img ? '!text-copper-300' : '' }}">{{ $eyebrow }}</div>@endif
         <h1 class="heading mt-1 text-4xl sm:text-5xl">{{ $title }}</h1>
         @if($subtitle)<p class="mt-3 max-w-xl {{ $img ? 'text-white/80' : 'text-stone-600' }}">{{ $subtitle }}</p>@endif
     </div>

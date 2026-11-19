@@ -24,7 +24,7 @@
                 <div class="flex justify-between items-center mb-3">
                     <legend class="font-bold">{{ $group }}</legend>
                     @unless($locked)
-                        <button type="button" class="text-xs text-orange-600 hover:underline" data-toggle-group>Pilih semua</button>
+                        <button type="button" class="text-xs text-copper-600 hover:underline" data-toggle-group>Pilih semua</button>
                     @endunless
                 </div>
                 <div class="space-y-2">
@@ -47,7 +47,7 @@
 
     @unless($locked)
         <div class="mt-6">
-            <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg font-medium">Simpan Hak Akses</button>
+            <button class="bg-copper-500 hover:bg-copper-600 text-white px-6 py-2.5 rounded-lg font-medium">Simpan Hak Akses</button>
         </div>
     @endunless
 </form>

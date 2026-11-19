@@ -16,7 +16,7 @@
 <div class="flex flex-wrap gap-2 mb-4 border-b border-stone-200">
     @foreach($tabs as $key => $label)
         <a href="{{ route('admin.returns.index', ['tab' => $key]) }}"
-           class="px-4 py-2 -mb-px border-b-2 {{ $tab === $key ? 'border-orange-500 text-stone-900 font-medium' : 'border-transparent text-stone-500 hover:text-stone-700' }}">
+           class="px-4 py-2 -mb-px border-b-2 {{ $tab === $key ? 'border-copper-500 text-stone-900 font-medium' : 'border-transparent text-stone-500 hover:text-stone-700' }}">
             {{ $label }} <span class="text-xs text-stone-400">({{ $counts[$key] }})</span>
         </a>
     @endforeach
@@ -39,7 +39,7 @@
                 $color = ['pending' => 'bg-yellow-100 text-yellow-800', 'approved' => 'bg-blue-100 text-blue-800', 'refunded' => 'bg-green-100 text-green-800', 'rejected' => 'bg-red-100 text-red-800'][$stage];
             @endphp
             <tr>
-                <td class="px-4 py-3"><a href="{{ route('admin.returns.show', $r->id) }}" class="font-mono font-medium text-orange-600 hover:underline">{{ $r->order->order_number }}</a></td>
+                <td class="px-4 py-3"><a href="{{ route('admin.returns.show', $r->id) }}" class="font-mono font-medium text-copper-600 hover:underline">{{ $r->order->order_number }}</a></td>
                 <td class="px-4 py-3">{{ $r->order->shipping_name ?: ($r->order->customer->name ?? '-') }}</td>
                 <td class="px-4 py-3 text-stone-600">{{ $r->reason_label }}</td>
 @can('view_finance')

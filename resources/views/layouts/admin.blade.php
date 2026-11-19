@@ -37,7 +37,7 @@
             {{-- Topbar --}}
             <header style="z-index:45" class="sticky top-0 z-[45] border-b border-stone-200 bg-white/90 backdrop-blur">
                 <div class="flex h-14 items-center gap-3 px-4 sm:px-7">
-                    <button @click="sidebarOpen = !sidebarOpen" class="-ml-1 flex h-9 w-9 items-center justify-center rounded-md text-stone-600 hover:bg-stone-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 lg:hidden" aria-label="Buka menu">
+                    <button @click="sidebarOpen = !sidebarOpen" class="-ml-1 flex h-9 w-9 items-center justify-center rounded-md text-stone-600 hover:bg-stone-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-500 lg:hidden" aria-label="Buka menu">
                         <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
                     </button>
 
@@ -46,25 +46,25 @@
 
                     {{-- Pencarian menu (Ctrl+K) --}}
                     <button type="button" @click="$dispatch('open-palette')"
-                            class="group hidden h-9 w-full max-w-sm items-center gap-2.5 rounded-md border border-stone-200 bg-stone-50 px-3 text-left text-sm text-stone-500 transition hover:border-stone-300 hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 lg:flex">
+                            class="group hidden h-9 w-full max-w-sm items-center gap-2.5 rounded-md border border-stone-200 bg-stone-50 px-3 text-left text-sm text-stone-500 transition hover:border-stone-300 hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-500 lg:flex">
                         <svg class="h-4 w-4 shrink-0 text-stone-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg>
                         <span class="flex-1">Cari menu atau halaman…</span>
                         <span class="flex items-center gap-1"><kbd class="rounded border border-stone-300 bg-white px-1.5 py-0.5 font-sans text-[10px] text-stone-600">Ctrl</kbd><kbd class="rounded border border-stone-300 bg-white px-1.5 py-0.5 font-sans text-[10px] text-stone-600">K</kbd></span>
                     </button>
 
                     <div class="ml-auto flex items-center gap-1.5 sm:gap-3">
-                        <button type="button" @click="$dispatch('open-palette')" class="flex h-9 w-9 items-center justify-center rounded-md text-stone-600 hover:bg-stone-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 lg:hidden" aria-label="Cari menu">
+                        <button type="button" @click="$dispatch('open-palette')" class="flex h-9 w-9 items-center justify-center rounded-md text-stone-600 hover:bg-stone-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-500 lg:hidden" aria-label="Cari menu">
                             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg>
                         </button>
 
-                        <a href="{{ route('home') }}" class="hidden items-center gap-1 rounded-md px-2.5 py-1.5 text-sm text-stone-600 transition hover:bg-stone-100 hover:text-stone-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 sm:inline-flex">
+                        <a href="{{ route('home') }}" class="hidden items-center gap-1 rounded-md px-2.5 py-1.5 text-sm text-stone-600 transition hover:bg-stone-100 hover:text-stone-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-500 sm:inline-flex">
                             Lihat toko
                             <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg>
                         </a>
 
                         <div x-data="{ open: false }" @keydown.escape="open = false" class="relative">
                             <button @click="open = !open" :aria-expanded="open.toString()" aria-haspopup="menu"
-                                    class="flex items-center gap-2.5 rounded-full py-1 pl-1 pr-2.5 text-sm text-stone-700 transition hover:bg-stone-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500">
+                                    class="flex items-center gap-2.5 rounded-full py-1 pl-1 pr-2.5 text-sm text-stone-700 transition hover:bg-stone-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-500">
                                 <x-avatar :user="auth()->user()" :size="32" />
                                 <span class="hidden max-w-[10rem] truncate sm:block">{{ $userName }}</span>
                                 <svg class="h-3.5 w-3.5 text-stone-500 transition-transform duration-200" :class="open && 'rotate-180'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>

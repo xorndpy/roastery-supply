@@ -110,7 +110,7 @@
                 </div>
                 <div class="flex justify-between font-bold text-lg pt-2 border-t">
                     <span>Total</span>
-                    <span class="text-orange-500">Rp {{ number_format($order->total, 0, ',', '.') }}</span>
+                    <span class="text-copper-500">Rp {{ number_format($order->total, 0, ',', '.') }}</span>
                 </div>
             </div>
             @endcan

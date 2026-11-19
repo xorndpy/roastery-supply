@@ -60,7 +60,7 @@
     </label>
 
     <div class="flex gap-3">
-        <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg font-medium">{{ $isEdit ? 'Simpan perubahan' : 'Simpan biaya' }}</button>
+        <button class="bg-copper-500 hover:bg-copper-600 text-white px-6 py-2.5 rounded-lg font-medium">{{ $isEdit ? 'Simpan perubahan' : 'Simpan biaya' }}</button>
         <a href="{{ route('admin.expenses.index') }}" class="px-6 py-2.5 rounded-lg border border-stone-300 text-stone-700">Batal</a>
     </div>
 </form>

@@ -15,7 +15,7 @@
         <div id="qr" class="h-48 w-48" role="img" aria-label="QR code untuk aplikasi authenticator"></div>
         <p class="text-xs text-stone-500">Atau masukkan kunci ini manual:</p>
         <code class="select-all break-all rounded bg-stone-100 px-2 py-1 text-sm tracking-wider">{{ trim(chunk_split($secret, 4, ' ')) }}</code>
-        <a href="{{ $uri }}" class="text-xs text-orange-700 hover:underline">Buka di aplikasi authenticator (di HP)</a>
+        <a href="{{ $uri }}" class="text-xs text-copper-700 hover:underline">Buka di aplikasi authenticator (di HP)</a>
     </div>
 
     <form method="POST" action="{{ route('two-factor.confirm') }}" class="mt-6 space-y-5">

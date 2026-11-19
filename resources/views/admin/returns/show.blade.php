@@ -98,7 +98,7 @@
             <ul class="pt-2 border-t border-stone-100 space-y-1">
                 @foreach($order->items as $item)<li class="flex justify-between gap-3"><span>{{ $item->product_name }} × {{ $item->quantity }}</span></li>@endforeach
             </ul>
-            @can('view_orders')<a href="{{ route('admin.orders.show', $order->id) }}" class="inline-block pt-2 text-orange-600 underline underline-offset-4 hover:decoration-2">Buka pesanan</a>@endcan
+            @can('view_orders')<a href="{{ route('admin.orders.show', $order->id) }}" class="inline-block pt-2 text-copper-600 underline underline-offset-4 hover:decoration-2">Buka pesanan</a>@endcan
         </div>
 
         @can('view_finance')

@@ -11,7 +11,7 @@
         <span class="h-px flex-1 bg-stone-200"></span>
     </div>
     <a href="{{ route('auth.google.redirect') }}"
-       class="auth-google group w-full flex items-center justify-center gap-3 rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm font-medium text-stone-700 hover:bg-stone-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 transition">
+       class="auth-google group w-full flex items-center justify-center gap-3 rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm font-medium text-stone-700 hover:bg-stone-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-500 transition">
         
         <svg class="h-5 w-5 transition-transform duration-200 group-hover:scale-110" viewBox="0 0 48 48" aria-hidden="true">
             <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/>

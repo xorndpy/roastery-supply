@@ -14,7 +14,7 @@
                     <details class="group py-4 first:pt-0">
                         <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-medium [&::-webkit-details-marker]:hidden">
                             {{ $faq->question }}
-                            <span class="text-xl leading-none text-orange-500 transition group-open:rotate-45" aria-hidden="true">+</span>
+                            <span class="text-xl leading-none text-copper-500 transition group-open:rotate-45" aria-hidden="true">+</span>
                         </summary>
                         <p class="mt-3 max-w-2xl text-sm leading-relaxed text-stone-600">{!! nl2br(e($faq->answer)) !!}</p>
                     </details>
@@ -30,7 +30,7 @@
             <h2 class="heading text-2xl">Belum menemukan jawaban?</h2>
             <p class="mt-1 text-sm text-white/75">Tim kami siap membantu lewat form kontak atau WhatsApp.</p>
         </div>
-        <a href="{{ route('contact.index') }}" class="btn bg-white text-brand hover:bg-orange-100">Hubungi Kami</a>
+        <a href="{{ route('contact.index') }}" class="btn bg-white text-brand hover:bg-copper-100">Hubungi Kami</a>
     </div>
 </div>
 @endsection

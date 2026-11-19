@@ -72,7 +72,7 @@
 
             <p class="mt-8 text-center text-sm text-stone-600">
                 Sudah punya akun?
-                <a href="{{ route('login') }}" class="rounded font-medium text-orange-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500">Masuk</a>
+                <a href="{{ route('login') }}" class="rounded font-medium text-copper-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-500">Masuk</a>
             </p>
         </div>
     </div>

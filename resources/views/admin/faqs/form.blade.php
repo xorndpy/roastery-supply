@@ -34,6 +34,6 @@
         <textarea name="answer" rows="6" required maxlength="5000" class="w-full border border-stone-300 rounded-lg px-3 py-2">{{ old('answer', $faq->answer) }}</textarea>
     </div>
     <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="is_active" value="1" @checked(old('is_active', $faq->is_active))> Tampilkan di website</label>
-    <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg font-medium">{{ $isEdit ? 'Simpan' : 'Tambah' }}</button>
+    <button class="bg-copper-500 hover:bg-copper-600 text-white px-6 py-2.5 rounded-lg font-medium">{{ $isEdit ? 'Simpan' : 'Tambah' }}</button>
 </form>
 @endsection

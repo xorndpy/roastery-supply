@@ -43,7 +43,7 @@
             @endphp
             <tr>
                 <td class="px-4 py-3">
-                    <a href="{{ route('admin.customers.show', $c->id) }}" class="font-medium text-orange-600 hover:underline">{{ $c->name }}</a>
+                    <a href="{{ route('admin.customers.show', $c->id) }}" class="font-medium text-copper-600 hover:underline">{{ $c->name }}</a>
                     <div class="text-xs text-stone-500">{{ $c->email }}{{ $c->phone ? ' · ' . $c->phone : '' }}</div>
                 </td>
                 <td class="px-4 py-3 text-stone-600">{{ $c->city ?: '-' }}</td>

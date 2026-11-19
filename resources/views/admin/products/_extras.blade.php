@@ -20,7 +20,7 @@
                 <button type="button" @click="specs.splice(i, 1)" class="px-2 text-stone-400 hover:text-red-600" aria-label="Hapus">✕</button>
             </div>
         </template>
-        <button type="button" @click="specs.length < 30 && specs.push({ key: '', value: '' })" class="text-sm font-medium text-orange-600">+ Tambah spesifikasi</button>
+        <button type="button" @click="specs.length < 30 && specs.push({ key: '', value: '' })" class="text-sm font-medium text-copper-600">+ Tambah spesifikasi</button>
     </div>
 
     <div class="rounded-lg border border-stone-200 bg-white p-6">
@@ -41,6 +41,6 @@
                 <button type="button" @click="variants.splice(i, 1)" class="px-1 text-stone-400 hover:text-red-600" aria-label="Hapus">✕</button>
             </div>
         </template>
-        <button type="button" @click="variants.length < 12 && variants.push({ type: variants[0]?.type || 'Warna', name: '', product_image_id: '' })" class="text-sm font-medium text-orange-600">+ Tambah varian</button>
+        <button type="button" @click="variants.length < 12 && variants.push({ type: variants[0]?.type || 'Warna', name: '', product_image_id: '' })" class="text-sm font-medium text-copper-600">+ Tambah varian</button>
     </div>
 </div>

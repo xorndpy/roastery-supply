@@ -68,7 +68,24 @@ Alpine.data('filterDrawer', () => ({
     },
 }));
 
-Alpine.start();
+// Form Flash Sale (admin): baris produk, harga berformat titik, dan persen diskon otomatis.
+Alpine.data('flashSaleForm', (products, rows, sold) => ({
+    products,
+    rows,
+    sold,
+    fmt(v) { return String(v ?? '').replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.'); },
+    num(v) { return Number(String(v ?? '').replace(/\D/g, '')); },
+    init() { this.rows.forEach((r) => { r.sale_price = this.fmt(r.sale_price); }); },
+    add() { if (this.rows.length < 12) this.rows.push({ product_id: '', sale_price: '', quota: '', max_per_order: '' }); },
+    price(id) { const p = this.products.find((x) => x.id == id); return p ? p.price : 0; },
+    pct(r) { const p = this.price(r.product_id), v = this.num(r.sale_price); return p && v ? Math.round((1 - v / p) * 100) : null; },
+}));
+
+// Dashboard admin punya JS sendiri; dimuat hanya di halamannya, lalu Alpine dijalankan.
+const needsDashboard = document.getElementById('tdChart') || document.querySelector('[x-data^="tdRange"]');
+(needsDashboard ? import('./admin/dashboard.js').then((m) => m.registerDashboard(Alpine)) : Promise.resolve())
+    .catch((e) => console.error('Gagal memuat JS dashboard', e))
+    .finally(() => Alpine.start());
 
 // Efek muncul saat di-scroll untuk elemen [data-reveal]. Tanpa JS atau dengan prefers-reduced-motion, konten langsung tampil.
 (function () {

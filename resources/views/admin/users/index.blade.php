@@ -10,7 +10,7 @@
         <p class="text-sm text-stone-500 mt-1">Akun staf, admin, dan customer.</p>
     </div>
     <a href="{{ route('admin.users.create') }}"
-       class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-lg font-medium transition">+ Tambah User</a>
+       class="bg-copper-500 hover:bg-copper-600 text-white px-5 py-2.5 rounded-lg font-medium transition">+ Tambah User</a>
 </div>
 
 <div class="grid grid-cols-3 gap-3 mb-6">
@@ -50,7 +50,7 @@
                 </td>
                 <td class="px-4 py-3 text-stone-500">{{ $u->created_at->format('d M Y') }}</td>
                 <td class="px-4 py-3 text-right whitespace-nowrap">
-                    <a href="{{ route('admin.users.edit', $u->id) }}" class="text-orange-600 hover:underline mr-3">Edit</a>
+                    <a href="{{ route('admin.users.edit', $u->id) }}" class="text-copper-600 hover:underline mr-3">Edit</a>
                     @if($u->id !== auth()->id())
                     <form method="POST" action="{{ route('admin.users.destroy', $u->id) }}" class="inline"
                           data-confirm-title="Hapus user {{ $u->name }}?" data-confirm-text="Akun ini tidak akan bisa masuk ke sistem lagi." data-confirm-ok="Ya, hapus user" data-confirm-tone="danger">

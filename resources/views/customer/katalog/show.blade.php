@@ -85,7 +85,7 @@
                 <div class="mt-3 flex flex-wrap gap-2">
                     @foreach($imgs as $n => $src)
                         <button type="button" @click="idx = {{ $n }}" class="h-12 w-12 overflow-hidden rounded-lg border-2 bg-white transition"
-                                :class="idx === {{ $n }} ? 'border-orange-500' : 'border-stone-200 hover:border-stone-300'">
+                                :class="idx === {{ $n }} ? 'border-copper-500' : 'border-stone-200 hover:border-stone-300'">
                             <img src="{{ $src }}" alt="" class="h-full w-full object-contain p-0.5">
                         </button>
                     @endforeach
@@ -104,9 +104,9 @@
                 </a>
             @endif
 
-            <div class="mt-3 rounded-xl border border-orange-100 bg-gradient-to-r from-white to-orange-50 px-4 py-3 shadow-sm">
-                <div class="text-2xl font-extrabold {{ $fi ? 'text-orange-700' : 'text-slate-900' }} sm:text-3xl">Rp {{ number_format($price, 0, ',', '.') }}</div>
-                @if($fi)<div class="mt-1 flex items-center gap-2 text-sm"><span class="text-slate-400 line-through">Rp {{ number_format($product->price, 0, ',', '.') }}</span><span class="rounded-full bg-orange-500 px-2 py-0.5 text-xs font-bold text-white">-{{ $fi->discountPercent() }}% Flash Sale</span><span class="text-xs text-slate-500">sisa {{ $fi->remaining }}{{ $fi->max_per_order ? ', maks ' . $fi->max_per_order . '/pesanan' : '' }}</span></div>@endif
+            <div class="mt-3 rounded-xl border border-copper-100 bg-gradient-to-r from-white to-copper-50 px-4 py-3 shadow-sm">
+                <div class="text-2xl font-extrabold {{ $fi ? 'text-copper-700' : 'text-slate-900' }} sm:text-3xl">Rp {{ number_format($price, 0, ',', '.') }}</div>
+                @if($fi)<div class="mt-1 flex items-center gap-2 text-sm"><span class="text-slate-400 line-through">Rp {{ number_format($product->price, 0, ',', '.') }}</span><span class="rounded-full bg-copper-500 px-2 py-0.5 text-xs font-bold text-white">-{{ $fi->discountPercent() }}% Flash Sale</span><span class="text-xs text-slate-500">sisa {{ $fi->remaining }}{{ $fi->max_per_order ? ', maks ' . $fi->max_per_order . '/pesanan' : '' }}</span></div>@endif
                 <div class="mt-0.5 text-[12px] {{ $soldOut ? 'text-red-700' : 'text-stone-400' }}">
                     {{ $soldOut ? 'Stok habis' : 'Stok tersedia (' . $product->stock . ')' }}@if($product->sku) · SKU {{ $product->sku }}@endif
                 </div>
@@ -137,7 +137,7 @@
                             <div class="flex flex-wrap gap-2">
                                 <template x-for="v in variants" :key="v.id">
                                     <button type="button" @click="pick(v)" class="rounded-full border px-4 py-1 text-xs transition"
-                                            :class="vid === v.id ? 'border-orange-500 bg-orange-500 text-white' : 'border-stone-300 bg-white text-slate-700 hover:border-stone-400'" x-text="v.name"></button>
+                                            :class="vid === v.id ? 'border-copper-500 bg-copper-500 text-white' : 'border-stone-300 bg-white text-slate-700 hover:border-stone-400'" x-text="v.name"></button>
                                 </template>
                             </div>
                         </div>
@@ -145,11 +145,11 @@
 
                     <div class="text-xs font-bold text-slate-900">Quantity</div>
                     <div class="mt-2 flex items-center gap-2">
-                        <button type="button" @click="qty = Math.max(1, qty - 1); msg = ''" class="flex h-8 w-8 items-center justify-center rounded-full border border-stone-200 bg-white shadow hover:text-orange-500" aria-label="Kurangi">−</button>
+                        <button type="button" @click="qty = Math.max(1, qty - 1); msg = ''" class="flex h-8 w-8 items-center justify-center rounded-full border border-stone-200 bg-white shadow hover:text-copper-500" aria-label="Kurangi">−</button>
                         <input type="text" inputmode="numeric" autocomplete="off" :value="qty" aria-label="Jumlah"
                                @change="let v = parseInt($event.target.value.replace(/\D/g, ''), 10); if (isNaN(v) || v < 1) v = 1; if (v > max) { v = max; msg = 'Stok tersedia hanya ' + max + ' unit.' } else { msg = '' } qty = v; $event.target.value = v"
-                               class="h-8 w-24 rounded border border-stone-300 bg-white p-0 text-center text-xs focus:border-orange-400 focus:ring-0">
-                        <button type="button" @click="if (qty >= max) { msg = 'Stok tersedia hanya ' + max + ' unit.' } else { qty++; msg = '' }" class="flex h-8 w-8 items-center justify-center rounded-full border border-stone-200 bg-white shadow hover:text-orange-500" aria-label="Tambah">+</button>
+                               class="h-8 w-24 rounded border border-stone-300 bg-white p-0 text-center text-xs focus:border-copper-400 focus:ring-0">
+                        <button type="button" @click="if (qty >= max) { msg = 'Stok tersedia hanya ' + max + ' unit.' } else { qty++; msg = '' }" class="flex h-8 w-8 items-center justify-center rounded-full border border-stone-200 bg-white shadow hover:text-copper-500" aria-label="Tambah">+</button>
                     </div>
                     <p x-show="msg" x-cloak x-text="msg" role="status" class="mt-2 text-[13px] text-red-600"></p>
                 </div>

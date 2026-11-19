@@ -17,18 +17,19 @@
                      x-init="play()" @mouseenter="stop()" @mouseleave="stop(); play()"
                  @endif>
             <h1 class="sr-only">Katalog produk {{ $site['site_name'] }}</h1>
-            <div class="relative aspect-[16/10] max-h-[720px] sm:aspect-[2/1] lg:aspect-[8/3]">
+            {{-- HP & tablet: tinggi mengikuti rasio asli banner (teks di banner tidak terpotong). Desktop: rasio tetap 8:3. --}}
+            <div class="grid lg:aspect-[8/3] lg:max-h-[720px] lg:overflow-hidden">
                 @foreach($promos as $k => $promo)
                     @php
-                        $promoImg = '<img src="' . e(media_url($promo->image)) . '" alt="' . e($promo->title) . '" class="h-full w-full object-cover"' . ($k === 0 ? ' fetchpriority="high"' : ' loading="lazy"') . '>';
+                        $promoImg = '<img src="' . e(media_url($promo->image)) . '" alt="' . e($promo->title) . '" class="block h-auto w-full lg:h-full lg:object-cover"' . ($k === 0 ? ' fetchpriority="high"' : ' loading="lazy"') . '>';
                     @endphp
-                    <div class="absolute inset-0 transition-opacity duration-700 {{ $k === 0 ? '' : 'pointer-events-none opacity-0' }}"
+                    <div class="col-start-1 row-start-1 transition-opacity duration-700 {{ $k === 0 ? '' : 'pointer-events-none opacity-0' }}"
                          @if($multiPromo)
                              @if($k === 0) :class="{ 'pointer-events-none opacity-0': i !== 0 }" @else :class="{ 'pointer-events-auto opacity-100': i === {{ $k }} }" @endif
                              :aria-hidden="i !== {{ $k }}"
                          @endif>
                         @if($promo->link)
-                            <a href="{{ $promo->link }}" class="block h-full w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-500" @if($multiPromo) :tabindex="i === {{ $k }} ? 0 : -1" @endif>{!! $promoImg !!}</a>
+                            <a href="{{ $promo->link }}" class="block h-full w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-copper-500" @if($multiPromo) :tabindex="i === {{ $k }} ? 0 : -1" @endif>{!! $promoImg !!}</a>
                         @else
                             {!! $promoImg !!}
                         @endif
@@ -46,7 +47,7 @@
             @endif
 
             @if($multiPromo)
-                <div class="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full bg-black/30 px-3 py-2 backdrop-blur-sm" role="group" aria-label="Pilih promo">
+                <div class="absolute bottom-2 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full bg-black/30 px-2.5 py-1.5 backdrop-blur-sm sm:bottom-4 sm:px-3 sm:py-2" role="group" aria-label="Pilih promo">
                     @foreach($promos as $k => $promo)
                         <button type="button" @click="i = {{ $k }}" class="h-1.5 rounded-full transition-all duration-300"
                                 :class="i === {{ $k }} ? 'w-6 bg-white' : 'w-1.5 bg-white/60 hover:bg-white'"
@@ -57,11 +58,11 @@
         </section>
     @else
         <section class="relative isolate overflow-hidden bg-[#26180f] text-white">
-            <div class="pointer-events-none absolute -right-24 -top-24 -z-10 h-96 w-96 rounded-full bg-orange-500/25 blur-3xl"></div>
+            <div class="pointer-events-none absolute -right-24 -top-24 -z-10 h-96 w-96 rounded-full bg-copper-500/25 blur-3xl"></div>
             <div class="container-x relative flex min-h-[300px] flex-col justify-center py-14 sm:min-h-[380px] lg:min-h-[440px]">
-                <p class="eyebrow !text-orange-300">Toko {{ $site['site_name'] }}</p>
+                <p class="eyebrow !text-copper-300">Toko {{ $site['site_name'] }}</p>
                 <h1 class="heading mt-3 max-w-3xl text-[2.25rem] leading-[1.08] [text-wrap:balance] sm:text-6xl">
-                    <span class="text-orange-300">Eksplor.</span> Lengkapi kedai kopi Anda dari satu toko.
+                    <span class="text-copper-300">Eksplor.</span> Lengkapi kedai kopi Anda dari satu toko.
                 </h1>
                 <p class="mt-5 max-w-xl text-base text-stone-300">{{ $site['tagline'] }}</p>
             </div>
@@ -70,16 +71,16 @@
 
     {{-- KATEGORI (strip bersih: foto tanpa kotak, nama di bawahnya) --}}
     @if($categoryCards->isNotEmpty())
-        <section class="container-x pt-10 sm:pt-12" aria-label="Kategori produk">
+        <section class="container-x pt-6 sm:pt-12" aria-label="Kategori produk">
             <x-rail>
                 @foreach($categoryCards as $c)
                     <a href="{{ route('products.index', ['category' => $c->slug]) }}" class="group flex w-[120px] shrink-0 snap-start flex-col items-center text-center first:ml-auto last:mr-auto sm:w-[168px]">
                         @if(!empty($c->image))
                             <img src="{{ media_url($c->image) }}" alt="" loading="lazy" class="h-20 w-20 object-contain transition duration-300 group-hover:scale-110 sm:h-28 sm:w-28">
                         @else
-                            <span class="heading flex h-20 w-20 items-center justify-center rounded-full bg-orange-50 text-3xl text-orange-600 sm:h-28 sm:w-28">{{ \Illuminate\Support\Str::substr($c->name, 0, 1) }}</span>
+                            <span class="heading flex h-20 w-20 items-center justify-center rounded-full bg-copper-50 text-3xl text-copper-600 sm:h-28 sm:w-28">{{ \Illuminate\Support\Str::substr($c->name, 0, 1) }}</span>
                         @endif
-                        <span class="mt-3 text-[13px] font-semibold text-orange-600 group-hover:text-orange-700 sm:text-sm">{{ $c->name }}</span>
+                        <span class="mt-3 text-[13px] font-semibold text-copper-600 group-hover:text-copper-700 sm:text-sm">{{ $c->name }}</span>
                     </a>
                 @endforeach
             </x-rail>
@@ -88,10 +89,10 @@
 
     {{-- TERBARU (selalu di atas semua produk lain) --}}
     @if($latest->isNotEmpty())
-        <section class="container-x pt-14 sm:pt-16" aria-labelledby="terbaru-title">
-            <div class="mb-6 flex items-end justify-between gap-4">
-                <h2 id="terbaru-title" class="heading text-2xl sm:text-3xl"><span class="text-orange-500">Terbaru.</span> Temukan sekarang.</h2>
-                <a href="#semua" class="hidden text-sm font-medium text-orange-700 underline underline-offset-4 hover:decoration-2 sm:block">Lihat semua produk</a>
+        <section class="container-x pt-8 sm:pt-16" aria-labelledby="terbaru-title">
+            <div class="mb-4 flex items-end justify-between gap-4 sm:mb-6">
+                <h2 id="terbaru-title" class="heading text-xl sm:text-3xl"><span class="text-copper-500">Terbaru.</span> Temukan sekarang.</h2>
+                <a href="#semua" class="hidden text-sm font-medium text-copper-700 underline underline-offset-4 hover:decoration-2 sm:block">Lihat semua produk</a>
             </div>
             <x-rail>
                 @foreach($latest as $product)
@@ -103,7 +104,7 @@
 
     {{-- SOROTAN (slider produk unggulan) --}}
     @if($featured->isNotEmpty())
-        <section class="container-x py-16 sm:py-20" aria-label="Produk unggulan"
+        <section class="container-x py-10 sm:py-20" aria-label="Produk unggulan"
                  x-data="{ i: 0, n: {{ $featured->count() }}, timer: null,
                            next() { this.i = (this.i + 1) % this.n },
                            play() { if (this.n > 1) this.timer = setInterval(() => this.next(), 6000) },
@@ -124,7 +125,7 @@
                             <span class="eyebrow">Unggulan</span>
                             <h2 class="heading mt-2 text-2xl leading-tight sm:text-3xl">{{ $spot->name }}</h2>
                             <p class="mt-3 max-w-md text-[15px] leading-relaxed text-stone-600">{{ \Illuminate\Support\Str::limit(strip_tags((string) $spot->description), 170) }}</p>
-                            <div class="mt-4 text-xl font-semibold text-orange-500">Rp {{ number_format($spot->price, 0, ',', '.') }}</div>
+                            <div class="mt-4 text-xl font-semibold text-copper-500">Rp {{ number_format($spot->price, 0, ',', '.') }}</div>
                             <a href="{{ route('products.show', $spot->slug) }}" class="btn btn-primary mt-5 !h-12 !rounded-full px-7" :tabindex="i === {{ $loop->index }} ? 0 : -1">Jelajahi sekarang</a>
                         </div>
                     </div>
@@ -133,7 +134,7 @@
                 @if($featured->count() > 1)
                     <div class="absolute bottom-3 left-1/2 flex -translate-x-1/2 flex-row gap-2 md:bottom-auto md:left-auto md:right-5 md:top-1/2 md:-translate-y-1/2 md:translate-x-0 md:flex-col">
                         @foreach($featured as $spot)
-                            <button type="button" @click="i = {{ $loop->index }}" class="h-2 w-2 rounded-full transition" :class="i === {{ $loop->index }} ? 'bg-orange-400' : 'bg-stone-300 hover:bg-stone-400'" aria-label="Tampilkan unggulan {{ $loop->iteration }}"></button>
+                            <button type="button" @click="i = {{ $loop->index }}" class="h-2 w-2 rounded-full transition" :class="i === {{ $loop->index }} ? 'bg-copper-400' : 'bg-stone-300 hover:bg-stone-400'" aria-label="Tampilkan unggulan {{ $loop->iteration }}"></button>
                         @endforeach
                     </div>
                 @endif
@@ -142,8 +143,8 @@
     @endif
 
     {{-- KELEBIHAN (edit teks di array $perks sesuai kebutuhan) --}}
-    <section class="container-x {{ $featured->isEmpty() ? 'pt-14' : '' }} pb-4" aria-labelledby="plus-title">
-        <h2 id="plus-title" class="heading mb-6 text-2xl sm:text-3xl">Kelebihan berbelanja di <span class="text-orange-500">{{ $site['site_name'] }}</span></h2>
+    <section class="container-x {{ $featured->isEmpty() ? 'pt-8 sm:pt-14' : '' }} pb-4" aria-labelledby="plus-title">
+        <h2 id="plus-title" class="heading mb-4 text-xl sm:mb-6 sm:text-3xl">Kelebihan berbelanja di <span class="text-copper-500">{{ $site['site_name'] }}</span></h2>
         @php
             $perks = [
                 ['Rangkaian produk lengkap untuk kedai dan roastery Anda.', 'M3 9l1.5-5h15L21 9M4 9v11h16V9M9 20v-6h6v6'],
@@ -158,7 +159,7 @@
         <x-rail>
             @foreach($perks as [$text, $icon])
                 <div class="w-[240px] shrink-0 snap-start rounded-2xl border border-stone-200 bg-white p-5 text-stone-800 sm:w-[calc(25%-12px)]">
-                    <svg class="h-8 w-8 text-orange-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ $icon }}"/></svg>
+                    <svg class="h-8 w-8 text-copper-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ $icon }}"/></svg>
                     <p class="mt-4 text-[15px] font-medium leading-snug">{{ $text }}</p>
                 </div>
             @endforeach
@@ -185,7 +186,7 @@
                     <img src="{{ media_url($bannerPhoto) }}" alt="" class="absolute inset-0 -z-10 h-full w-full object-cover">
                     <div class="absolute inset-0 -z-10 bg-black/40"></div>
                 @else
-                    <div class="pointer-events-none absolute -right-16 -top-16 -z-10 h-72 w-72 rounded-full bg-orange-500/25 blur-3xl"></div>
+                    <div class="pointer-events-none absolute -right-16 -top-16 -z-10 h-72 w-72 rounded-full bg-copper-500/25 blur-3xl"></div>
                 @endif
                 <div class="px-6">
                     <h1 class="heading text-3xl uppercase tracking-[0.08em] sm:text-5xl">{{ $current->name }}</h1>
@@ -206,7 +207,7 @@
 @endif
 
 {{-- SEMUA PRODUK --}}
-<div id="semua" class="container-x {{ $landing ? 'pb-12 pt-16 sm:pt-20' : 'pb-12 pt-5 sm:pt-6' }}">
+<div id="semua" class="container-x {{ $landing ? 'pb-10 pt-10 sm:pb-12 sm:pt-20' : 'pb-10 pt-4 sm:pb-12 sm:pt-6' }}">
 
     @unless($landing)
     @php
@@ -243,7 +244,7 @@
                 <div class="relative w-full sm:max-w-sm sm:flex-1">
                     <label for="f-search" class="sr-only">Cari produk</label>
                     <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg>
-                    <input id="f-search" type="search" name="search" value="{{ request('search') }}" placeholder="Cari nama, SKU, deskripsi…" enterkeyhint="search" class="field !pl-9">
+                    <input id="f-search" type="search" name="search" value="{{ request('search') }}" placeholder="Cari nama, SKU, deskripsi…" enterkeyhint="search" class="field !pl-9 max-sm:!text-base">
                 </div>
 
                 <div class="flex w-full items-center gap-2 sm:ml-auto sm:w-auto">
@@ -279,7 +280,7 @@
              class="fixed inset-x-0 bottom-0 z-[71] flex max-h-[88vh] flex-col rounded-t-2xl bg-white shadow-2xl sm:inset-y-0 sm:left-auto sm:right-0 sm:max-h-none sm:w-[400px] sm:rounded-none sm:rounded-l-2xl">
             <div class="flex items-center justify-between border-b border-stone-200 px-5 py-3">
                 <h2 id="filter-title" class="heading text-xl">Filter</h2>
-                <button type="button" @click="close()" class="flex h-11 w-11 items-center justify-center rounded-full text-stone-600 hover:bg-stone-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500" aria-label="Tutup filter">
+                <button type="button" @click="close()" class="flex h-11 w-11 items-center justify-center rounded-full text-stone-600 hover:bg-stone-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-500" aria-label="Tutup filter">
                     <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
                 </button>
             </div>
@@ -305,7 +306,7 @@
                 </fieldset>
 
                 <label class="flex min-h-11 cursor-pointer items-center gap-3 text-[15px] text-stone-800">
-                    <input type="checkbox" name="in_stock" form="filter-form" value="1" @checked(request()->boolean('in_stock')) class="h-5 w-5 rounded border-stone-300 text-orange-600 focus:ring-orange-500">
+                    <input type="checkbox" name="in_stock" form="filter-form" value="1" @checked(request()->boolean('in_stock')) class="h-5 w-5 rounded border-stone-300 text-copper-600 focus:ring-copper-500">
                     Hanya yang stoknya tersedia
                 </label>
             </div>
@@ -320,8 +321,8 @@
 
     <div class="min-w-0 {{ $landing ? '' : 'mt-5' }}">
         @if($landing)
-            <div class="mb-6 flex items-end justify-between gap-4">
-                <h2 class="heading text-2xl sm:text-3xl">Semua produk</h2>
+            <div class="mb-4 flex items-end justify-between gap-4 sm:mb-6">
+                <h2 class="heading text-xl sm:text-3xl">Semua produk</h2>
                 <span class="text-sm text-stone-500">{{ $products->total() }} produk</span>
             </div>
         @else
@@ -337,7 +338,7 @@
             <div class="mb-4 flex flex-wrap items-center gap-x-4 gap-y-2">
                 <span class="text-sm text-stone-600" role="status">{{ $products->total() }} produk</span>
                 @foreach($chips as $key => $label)
-                    <a href="{{ route('products.index', request()->except($key, 'page')) }}" class="inline-flex min-h-8 items-center gap-1.5 rounded-full border border-stone-300 bg-white px-3 py-1 text-xs text-stone-700 transition hover:border-orange-500" aria-label="Hapus filter {{ $label }}">
+                    <a href="{{ route('products.index', request()->except($key, 'page')) }}" class="inline-flex min-h-8 items-center gap-1.5 rounded-full border border-stone-300 bg-white px-3 py-1 text-xs text-stone-700 transition hover:border-copper-500" aria-label="Hapus filter {{ $label }}">
                         {{ $label }} <span aria-hidden="true">×</span>
                     </a>
                 @endforeach
@@ -345,7 +346,7 @@
         @endif
 
         @if($products->count())
-            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 lg:gap-5">
+            <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 lg:gap-5">
                 @foreach($products as $product)
                     <x-product-card :product="$product" />
                 @endforeach
@@ -354,7 +355,7 @@
         @else
             <div class="rounded-xl border border-stone-200 bg-white py-16 text-center">
                 <p class="text-stone-500">Produk tidak ditemukan.</p>
-                <a href="{{ route('products.index') }}" class="mt-3 inline-block text-sm text-orange-600 hover:underline">Reset filter</a>
+                <a href="{{ route('products.index') }}" class="mt-3 inline-block text-sm text-copper-600 hover:underline">Reset filter</a>
             </div>
         @endif
     </div>

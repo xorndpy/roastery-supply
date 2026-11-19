@@ -8,7 +8,7 @@
     <h1 class="text-2xl font-bold text-stone-900">Hero Beranda</h1>
     <p class="text-sm text-stone-500 mt-1">
         Foto latar slideshow di bagian paling atas beranda. Judul dan teksnya diatur di
-        <a href="{{ route('admin.settings.index', ['tab' => 'tampilan']) }}" class="text-orange-600 hover:underline">Pengaturan &gt; Tampilan</a>.
+        <a href="{{ route('admin.settings.index', ['tab' => 'tampilan']) }}" class="text-copper-600 hover:underline">Pengaturan &gt; Tampilan</a>.
     </p>
 </div>
 
@@ -41,7 +41,7 @@
         </template>
     </div>
 
-    <button class="mt-4 bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-lg font-medium disabled:opacity-50"
+    <button class="mt-4 bg-copper-500 hover:bg-copper-600 text-white px-5 py-2 rounded-lg font-medium disabled:opacity-50"
             :disabled="!previews.length" x-bind:disabled="!previews.length">Unggah</button>
 </form>
 @endcan
@@ -75,7 +75,7 @@
                     <div class="flex items-center gap-3">
                         <form method="POST" action="{{ route('admin.hero.toggle', $s->id) }}">
                             @csrf @method('PATCH')
-                            <button class="text-orange-600 hover:underline">{{ $s->is_active ? 'Nonaktifkan' : 'Aktifkan' }}</button>
+                            <button class="text-copper-600 hover:underline">{{ $s->is_active ? 'Nonaktifkan' : 'Aktifkan' }}</button>
                         </form>
                         <form method="POST" action="{{ route('admin.hero.destroy', $s->id) }}" data-confirm-title="Hapus foto hero ini?" data-confirm-text="Foto akan hilang dari slideshow halaman utama." data-confirm-ok="Ya, hapus foto" data-confirm-tone="danger">
                             @csrf @method('DELETE')

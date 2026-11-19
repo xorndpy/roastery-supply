@@ -14,7 +14,7 @@
     <div class="flex flex-wrap gap-2">
         @can('create_expenses')
             <form method="POST" action="{{ route('admin.expenses.copy-recurring') }}">@csrf<button class="border border-stone-300 px-4 py-2.5 rounded-lg text-sm hover:bg-stone-50">Salin biaya berulang bulan lalu</button></form>
-            <a href="{{ route('admin.expenses.create') }}" class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-lg font-medium">+ Catat Biaya</a>
+            <a href="{{ route('admin.expenses.create') }}" class="bg-copper-500 hover:bg-copper-600 text-white px-5 py-2.5 rounded-lg font-medium">+ Catat Biaya</a>
         @endcan
     </div>
 </div>

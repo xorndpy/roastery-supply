@@ -10,7 +10,7 @@
         <p class="text-sm text-stone-500 mt-1">Seret baris untuk mengatur urutan. Banner tayang sesuai jadwal.</p>
     </div>
     @can('create_banners')
-        <a href="{{ route('admin.banners.create') }}" class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-lg font-medium">+ Tambah Banner</a>
+        <a href="{{ route('admin.banners.create') }}" class="bg-copper-500 hover:bg-copper-600 text-white px-5 py-2.5 rounded-lg font-medium">+ Tambah Banner</a>
     @endcan
 </div>
 
@@ -51,7 +51,7 @@
         </div>
         <span class="px-2 py-0.5 rounded text-xs {{ $state[1] }}">{{ $state[0] }}</span>
         <div class="whitespace-nowrap text-sm">
-            @can('edit_banners')<a href="{{ route('admin.banners.edit', $b->id) }}" class="text-orange-600 hover:underline mr-3">Edit</a>@endcan
+            @can('edit_banners')<a href="{{ route('admin.banners.edit', $b->id) }}" class="text-copper-600 hover:underline mr-3">Edit</a>@endcan
             @can('delete_banners')
             <form method="POST" action="{{ route('admin.banners.destroy', $b->id) }}" class="inline" data-confirm-title="Hapus banner ini?" data-confirm-text="Banner tidak akan tampil lagi di website." data-confirm-ok="Ya, hapus banner" data-confirm-tone="danger">
                 @csrf @method('DELETE')

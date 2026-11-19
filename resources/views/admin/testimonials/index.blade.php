@@ -10,7 +10,7 @@
         <p class="text-sm text-stone-500 mt-1">Hanya testimoni yang disetujui yang tampil di website. @if($pending)<strong class="text-amber-600">{{ $pending }} menunggu tinjauan.</strong>@endif</p>
     </div>
     @can('approve_testimonials')
-        <a href="{{ route('admin.testimonials.create') }}" class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-lg font-medium">+ Tambah Manual</a>
+        <a href="{{ route('admin.testimonials.create') }}" class="bg-copper-500 hover:bg-copper-600 text-white px-5 py-2.5 rounded-lg font-medium">+ Tambah Manual</a>
     @endcan
 </div>
 
@@ -41,7 +41,7 @@
                 <div class="text-xs text-stone-400">{{ $t->created_at->format('d M Y') }}@if($t->order_id) · dari pesanan #{{ $t->order_id }}@else · input manual @endif</div>
             </div>
             <div class="flex gap-2 self-start">
-                @if($t->is_featured)<span class="px-2 py-0.5 rounded text-xs bg-orange-100 text-orange-800">Disematkan</span>@endif
+                @if($t->is_featured)<span class="px-2 py-0.5 rounded text-xs bg-copper-100 text-copper-800">Disematkan</span>@endif
                 <span class="px-2 py-0.5 rounded text-xs {{ $t->is_approved ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700' }}">
                     {{ $t->is_approved ? 'Tampil' : 'Menunggu' }}
                 </span>
@@ -57,10 +57,10 @@
             @if($t->is_approved)
             <form method="POST" action="{{ route('admin.testimonials.toggle-featured', $t->id) }}">
                 @csrf @method('PATCH')
-                <button class="{{ $t->is_featured ? 'text-orange-700 font-medium' : 'text-stone-600' }} hover:underline">{{ $t->is_featured ? 'Lepas sematan' : 'Sematkan di beranda' }}</button>
+                <button class="{{ $t->is_featured ? 'text-copper-700 font-medium' : 'text-stone-600' }} hover:underline">{{ $t->is_featured ? 'Lepas sematan' : 'Sematkan di beranda' }}</button>
             </form>
             @endif
-            <a href="{{ route('admin.testimonials.edit', $t->id) }}" class="text-orange-600 hover:underline">Edit</a>
+            <a href="{{ route('admin.testimonials.edit', $t->id) }}" class="text-copper-600 hover:underline">Edit</a>
             @endcan
             @can('delete_testimonials')
             <form method="POST" action="{{ route('admin.testimonials.destroy', $t->id) }}" data-confirm-title="Hapus testimoni ini?" data-confirm-text="Testimoni tidak akan tampil lagi di website." data-confirm-ok="Ya, hapus testimoni" data-confirm-tone="danger">

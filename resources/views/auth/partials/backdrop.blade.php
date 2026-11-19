@@ -4,6 +4,6 @@
 @else
     <div class="absolute inset-0 bg-gradient-to-br from-[#24150e] via-[#35200f] to-brand"></div>
     <div class="auth-beans absolute inset-0"></div>
-    <div class="auth-glow absolute -right-24 top-1/4 h-96 w-96 rounded-full bg-orange-500/30 blur-3xl"></div>
-    <div class="auth-glow absolute -left-20 bottom-0 h-80 w-80 rounded-full bg-orange-300/15 blur-3xl"></div>
+    <div class="auth-glow absolute -right-24 top-1/4 h-96 w-96 rounded-full bg-copper-500/30 blur-3xl"></div>
+    <div class="auth-glow absolute -left-20 bottom-0 h-80 w-80 rounded-full bg-copper-300/15 blur-3xl"></div>
 @endif

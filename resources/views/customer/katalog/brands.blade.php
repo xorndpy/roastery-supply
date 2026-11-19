@@ -19,7 +19,7 @@
             @foreach($brands as $b)
                 <a href="{{ route('products.index', ['brand' => $b->slug]) }}"
                    x-show="@js(\Illuminate\Support\Str::lower($b->name)).includes(q.toLowerCase())"
-                   class="group flex aspect-[4/3] flex-col items-center justify-center gap-2 rounded-2xl border border-stone-200 bg-white p-4 transition hover:-translate-y-0.5 hover:border-orange-500 hover:shadow-lg hover:shadow-stone-900/5">
+                   class="group flex aspect-[4/3] flex-col items-center justify-center gap-2 rounded-2xl border border-stone-200 bg-white p-4 transition hover:-translate-y-0.5 hover:border-copper-500 hover:shadow-lg hover:shadow-stone-900/5">
                     @if($b->logo)
                         <img src="{{ media_url($b->logo) }}" alt="{{ $b->name }}" loading="lazy" class="max-h-14 max-w-[80%] object-contain opacity-70 grayscale transition group-hover:opacity-100 group-hover:grayscale-0">
                     @else

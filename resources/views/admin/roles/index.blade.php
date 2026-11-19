@@ -21,7 +21,7 @@
                 <td class="px-4 py-3 text-right">{{ $r->users_count }}</td>
                 <td class="px-4 py-3 text-right">{{ $r->name === 'super_admin' ? 'Semua' : $r->permissions_count }}</td>
                 <td class="px-4 py-3 text-right">
-                    <a href="{{ route('admin.roles.edit', $r->id) }}" class="text-orange-600 hover:underline">
+                    <a href="{{ route('admin.roles.edit', $r->id) }}" class="text-copper-600 hover:underline">
                         {{ in_array($r->name, $locked, true) ? 'Lihat' : 'Atur' }}
                     </a>
                 </td>

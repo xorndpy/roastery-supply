@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Setting;
+use App\View\Composers\ShopNavComposer;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
@@ -35,5 +36,8 @@ class AppServiceProvider extends ServiceProvider
         View::composer(['layouts.*', 'components.*', 'customer.*', 'auth.*'], function ($view) {
             $view->with('site', Setting::site());
         });
+
+        // Menu kategori + jumlah keranjang untuk navbar toko.
+        View::composer('components.shop-navbar', ShopNavComposer::class);
     }
 }

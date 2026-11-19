@@ -19,8 +19,8 @@
     @endphp
     @foreach($statusList as $key => $s)
         <a href="{{ route('admin.orders.index', $key === 'all' ? [] : ['status' => $key]) }}"
-           class="bg-white p-3 rounded-lg border border-stone-200 hover:border-orange-500 transition
-                  {{ request('status') == $key || ($key === 'all' && !request('status')) ? 'border-orange-500 ring-2 ring-orange-200' : '' }}">
+           class="bg-white p-3 rounded-lg border border-stone-200 hover:border-copper-500 transition
+                  {{ request('status') == $key || ($key === 'all' && !request('status')) ? 'border-copper-500 ring-2 ring-copper-200' : '' }}">
             <div class="text-xs text-stone-500">{{ $s['label'] }}</div>
             <div class="text-xl font-bold mt-1">{{ $stats[$key] }}</div>
         </a>
@@ -39,7 +39,7 @@
                class="border border-stone-300 rounded-lg px-3 py-2 text-sm">
         <div class="flex gap-2">
             <button type="submit"
-                    class="flex-1 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
+                    class="flex-1 bg-copper-500 hover:bg-copper-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
                 Filter
             </button>
             <a href="{{ route('admin.orders.index') }}"
@@ -102,7 +102,7 @@
                     </td>
                     <td class="px-4 py-3 text-right">
                         <a href="{{ route('admin.orders.show', $order->id) }}"
-                           class="text-orange-500 hover:text-orange-600 font-medium text-sm underline underline-offset-4 hover:decoration-2">
+                           class="text-copper-500 hover:text-copper-600 font-medium text-sm underline underline-offset-4 hover:decoration-2">
                             Detail <span class="sr-only">pesanan {{ $order->order_number }}</span>
                         </a>
                     </td>

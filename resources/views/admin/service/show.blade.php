@@ -16,7 +16,7 @@
         <div class="rounded-lg border border-stone-200 bg-white p-5">
             <div class="flex flex-wrap items-start justify-between gap-3">
                 <div><h1 class="font-mono text-xl font-bold text-stone-900">{{ $ticket->ticket_number }}</h1><p class="text-sm text-stone-600">{{ $ticket->product_name }}@if($ticket->serial_number) · SN {{ $ticket->serial_number }}@endif</p></div>
-                <div class="text-right"><span class="rounded-full bg-orange-100 px-3 py-1 text-sm text-orange-800">{{ $ticket->statusLabel() }}</span><p class="mt-1 text-xs {{ $ticket->in_warranty ? 'text-green-700' : 'text-stone-500' }}">{{ $ticket->in_warranty ? 'MASIH GARANSI (gratis)' : 'Di luar garansi (berbayar)' }}</p></div>
+                <div class="text-right"><span class="rounded-full bg-copper-100 px-3 py-1 text-sm text-copper-800">{{ $ticket->statusLabel() }}</span><p class="mt-1 text-xs {{ $ticket->in_warranty ? 'text-green-700' : 'text-stone-500' }}">{{ $ticket->in_warranty ? 'MASIH GARANSI (gratis)' : 'Di luar garansi (berbayar)' }}</p></div>
             </div>
             <dl class="mt-4 grid gap-3 text-sm md:grid-cols-2">
                 <div><dt class="text-stone-500">Pelanggan</dt><dd>{{ $ticket->user->name ?? '-' }} · {{ $ticket->contact_phone }}</dd></div>
@@ -32,7 +32,7 @@
             <h3 class="mb-4 font-semibold">Riwayat</h3>
             <ol class="relative ml-2 space-y-4 border-l border-stone-200">
                 @foreach($ticket->events->reverse() as $e)
-                    <li class="ml-5"><span class="absolute -left-[5px] mt-1.5 h-2.5 w-2.5 rounded-full {{ $loop->first ? 'bg-orange-500 ring-4 ring-orange-100' : 'bg-stone-400' }}"></span>
+                    <li class="ml-5"><span class="absolute -left-[5px] mt-1.5 h-2.5 w-2.5 rounded-full {{ $loop->first ? 'bg-copper-500 ring-4 ring-copper-100' : 'bg-stone-400' }}"></span>
                         <div class="flex flex-wrap justify-between gap-x-3"><p class="text-sm font-medium">{{ \App\Models\ServiceTicket::STATUSES[$e->status] ?? $e->status }} <span class="font-normal text-stone-500">oleh {{ $e->actor->name ?? 'sistem' }}</span></p><p class="text-xs text-stone-500">{{ wib($e->created_at, 'd M Y, H:i') }}</p></div>
                         @if($e->note)<p class="text-xs text-stone-600">{{ $e->note }}</p>@endif</li>
                 @endforeach
@@ -58,7 +58,7 @@
                 <div><label class="mb-1 block text-xs text-stone-500">Biaya akhir (Rp), untuk "Selesai"</label><input type="text" inputmode="numeric" data-rupiah name="final_cost" value=""{{ old('final_cost', (float) $ticket->final_cost ? (int) $ticket->final_cost : '') }}" class="w-full rounded-lg border border-stone-300 px-3 py-2"></div>
             @endunless
             <div><label class="mb-1 block text-xs text-stone-500">Catatan internal (tidak terlihat pelanggan)</label><textarea name="admin_note" rows="2" maxlength="2000" class="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm">{{ old('admin_note', $ticket->admin_note) }}</textarea></div>
-            <button class="w-full rounded-lg bg-orange-500 py-2.5 font-medium text-white hover:bg-orange-600">Simpan</button>
+            <button class="w-full rounded-lg bg-copper-500 py-2.5 font-medium text-white hover:bg-copper-600">Simpan</button>
         </form>
 
         @if($ticket->status === 'selesai' && ! $ticket->in_warranty && (float) $ticket->final_cost > 0)

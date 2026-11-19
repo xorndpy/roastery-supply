@@ -40,17 +40,17 @@
                 <div>
                     <label class="block text-sm font-medium mb-1.5">Nama</label>
                     <input type="text" name="name" value="{{ old('name', auth()->user()->name) }}" required
-                           class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-orange-500 focus:border-orange-500">
+                           class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-copper-500 focus:border-copper-500">
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-1.5">Email</label>
                     <input type="email" name="email" value="{{ old('email', auth()->user()->email) }}" required
-                           class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-orange-500 focus:border-orange-500">
+                           class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-copper-500 focus:border-copper-500">
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-1.5">No. Telepon</label>
                     <input type="text" name="phone" value="{{ old('phone', auth()->user()->phone) }}"
-                           class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-orange-500 focus:border-orange-500">
+                           class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-copper-500 focus:border-copper-500">
                 </div>
             </div>
         </div>
@@ -63,13 +63,13 @@
                 <div>
                     <label class="block text-sm font-medium mb-1.5">Alamat Lengkap</label>
                     <textarea name="address" rows="3"
-                              class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-orange-500 focus:border-orange-500">{{ old('address', $customer->address ?? '') }}</textarea>
+                              class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-copper-500 focus:border-copper-500">{{ old('address', $customer->address ?? '') }}</textarea>
                 </div>
                 <x-region-select :province-id="old('province_id', $customer->province_id ?? null)" :city-id="old('city_id', $customer->city_id ?? null)" :required="false" />
                 <div class="md:w-1/2">
                     <label class="block text-sm font-medium mb-1.5">Kode Pos</label>
                     <input type="text" name="postal_code" inputmode="numeric" maxlength="5" value="{{ old('postal_code', $customer->postal_code ?? '') }}"
-                           class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-orange-500 focus:border-orange-500">
+                           class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-copper-500 focus:border-copper-500">
                     @error('postal_code') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
             </div>
@@ -78,7 +78,7 @@
         {{-- Submit --}}
         <div class="flex gap-3">
             <button type="submit"
-                    class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-medium transition">
+                    class="bg-copper-500 hover:bg-copper-600 text-white px-6 py-3 rounded-lg font-medium transition">
                 Simpan Perubahan
             </button>
             <a href="{{ route('customer.dashboard') }}"

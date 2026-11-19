@@ -51,7 +51,7 @@
             <div class="absolute inset-0 bg-gradient-to-r from-[#24150e]/70 to-transparent"></div>
 
             <div class="relative z-10 flex h-full flex-col justify-between p-12 xl:p-14">
-                <a href="{{ route('home') }}" class="heading auth-rise inline-block w-fit text-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#24150e]">
+                <a href="{{ route('home') }}" class="heading auth-rise inline-block w-fit text-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#24150e]">
                     {{ $name }}
                 </a>
 
@@ -65,7 +65,7 @@
                             ['Harga dan stok langsung dari distributor', '<path d="M3.5 12.4V4.5h7.9l9.1 9.1-7.9 7.9-9.1-9.1z"/><circle cx="8" cy="9" r="1.2"/>'],
                         ] as $i => [$text, $icon])
                             <li class="auth-rise flex items-center gap-3.5 py-2.5" style="--d:{{ 260 + $i * 110 }}ms">
-                                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-orange-200 ">
+                                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-copper-200 ">
                                     <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $icon !!}</svg>
                                 </span>
                                 {{ $text }}

@@ -23,18 +23,18 @@
                         </a>
 
                         <div class="min-w-0 flex-1">
-                            <a href="{{ route('products.show', $item['slug']) }}" class="font-medium hover:text-orange-600">{{ $item['name'] }}</a>
-                            <div class="mt-0.5 text-sm text-stone-500">Rp {{ number_format($item['price'], 0, ',', '.') }}@if(!empty($item['original_price'])) <span class="text-xs text-stone-400 line-through">Rp {{ number_format($item['original_price'], 0, ',', '.') }}</span> <span class="rounded bg-orange-100 px-1.5 text-xs text-orange-800">Flash Sale</span>@endif</div>
+                            <a href="{{ route('products.show', $item['slug']) }}" class="font-medium hover:text-copper-600">{{ $item['name'] }}</a>
+                            <div class="mt-0.5 text-sm text-stone-500">Rp {{ number_format($item['price'], 0, ',', '.') }}@if(!empty($item['original_price'])) <span class="text-xs text-stone-400 line-through">Rp {{ number_format($item['original_price'], 0, ',', '.') }}</span> <span class="rounded bg-copper-100 px-1.5 text-xs text-copper-800">Flash Sale</span>@endif</div>
 
                             <div class="mt-3 flex flex-wrap items-center gap-4">
                                 {{-- Gaya marketplace: ubah jumlah langsung tersimpan (tanpa tombol "Perbarui"). --}}
                                 <div x-data="cartLine({ url: @js(route('customer.cart.update', $id)), id: @js((string) $id), qty: {{ (int) $item['quantity'] }}, max: {{ max(1, (int) $item['stock']) }} })" class="flex flex-col">
                                     <div class="flex items-center gap-3">
                                         <div class="inline-flex h-9 items-center rounded-lg border border-stone-300 bg-white" role="group" aria-label="Jumlah {{ $item['name'] }}">
-                                            <button type="button" @click="step(-1)" :disabled="qty <= 1" class="h-full w-9 text-lg text-stone-700 transition hover:text-orange-600 disabled:cursor-not-allowed disabled:text-stone-300" aria-label="Kurangi jumlah">−</button>
+                                            <button type="button" @click="step(-1)" :disabled="qty <= 1" class="h-full w-9 text-lg text-stone-700 transition hover:text-copper-600 disabled:cursor-not-allowed disabled:text-stone-300" aria-label="Kurangi jumlah">−</button>
                                             <input type="text" inputmode="numeric" autocomplete="off" x-model="qty" @input="digits()" @change="commit()" @keydown.enter.prevent="commit()"
-                                                   class="h-full w-12 border-0 border-x border-stone-300 bg-transparent p-0 text-center text-sm font-medium focus:ring-1 focus:ring-orange-500" aria-label="Jumlah">
-                                            <button type="button" @click="step(1)" :disabled="qty >= max" class="h-full w-9 text-lg text-stone-700 transition hover:text-orange-600 disabled:cursor-not-allowed disabled:text-stone-300" aria-label="Tambah jumlah">+</button>
+                                                   class="h-full w-12 border-0 border-x border-stone-300 bg-transparent p-0 text-center text-sm font-medium focus:ring-1 focus:ring-copper-500" aria-label="Jumlah">
+                                            <button type="button" @click="step(1)" :disabled="qty >= max" class="h-full w-9 text-lg text-stone-700 transition hover:text-copper-600 disabled:cursor-not-allowed disabled:text-stone-300" aria-label="Tambah jumlah">+</button>
                                         </div>
                                         <span class="text-xs text-stone-500">Stok {{ (int) $item['stock'] }}</span>
                                         <span x-show="busy" x-cloak class="text-xs text-stone-400">Menyimpan…</span>
@@ -61,7 +61,7 @@
                 <div class="flex justify-between py-1.5 text-sm text-stone-500"><span>Subtotal</span><span data-cart-total>Rp {{ number_format($total, 0, ',', '.') }}</span></div>
                 <div class="flex justify-between py-1.5 text-sm text-stone-500"><span>Ongkos kirim</span><span>Dihitung saat checkout</span></div>
                 <div class="mt-3 flex justify-between border-t border-stone-200 pt-4 text-[17px] font-semibold">
-                    <span>Total</span><span class="text-orange-500" data-cart-total>Rp {{ number_format($total, 0, ',', '.') }}</span>
+                    <span>Total</span><span class="text-copper-500" data-cart-total>Rp {{ number_format($total, 0, ',', '.') }}</span>
                 </div>
                 <a href="{{ route('customer.checkout.index') }}" class="btn btn-primary mt-5 w-full">Lanjut ke Checkout</a>
                 <a href="{{ route('products.index') }}" class="btn btn-outline mt-3 w-full">Lanjut belanja</a>

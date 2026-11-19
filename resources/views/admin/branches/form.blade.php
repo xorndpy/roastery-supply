@@ -43,6 +43,6 @@
         <input type="url" name="maps_url" value="{{ old('maps_url', $branch->maps_url) }}" placeholder="https://maps.app.goo.gl/..." class="w-full border border-stone-300 rounded-lg px-3 py-2">
     </div>
     <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="is_active" value="1" @checked(old('is_active', $branch->is_active))> Tampilkan di website</label>
-    <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg font-medium">{{ $isEdit ? 'Simpan' : 'Tambah' }}</button>
+    <button class="bg-copper-500 hover:bg-copper-600 text-white px-6 py-2.5 rounded-lg font-medium">{{ $isEdit ? 'Simpan' : 'Tambah' }}</button>
 </form>
 @endsection

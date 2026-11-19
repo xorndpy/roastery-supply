@@ -22,8 +22,8 @@ export default {
                     dark: '#35200f',
                     soft: '#efe6dc',
                 },
-                // "orange" dipetakan ke copper agar seluruh view lama (admin, checkout, dll) ikut tema baru
-                orange: {
+                // Aksen tembaga (dulu bernama "orange"; sekarang namanya sesuai warnanya).
+                copper: {
                     50: '#fbf3ec', 100: '#f4e3d3', 200: '#ecd0b0', 300: '#d9a97a', 400: '#c48655',
                     500: '#a8643a', 600: '#8f5230', 700: '#734027', 800: '#5a321f', 900: '#402216', 950: '#24150e',
                 },

@@ -86,7 +86,7 @@
                     <td class="px-4 py-3 text-right">
                         <button type="button"
                                 @click="openFor({ id: {{ $p->id }}, name: @js($p->name), stock: {{ (int) $p->stock }} })"
-                                class="border border-stone-300 hover:border-orange-500 hover:text-orange-700 px-3 py-1.5 rounded-lg text-xs font-medium transition">
+                                class="border border-stone-300 hover:border-copper-500 hover:text-copper-700 px-3 py-1.5 rounded-lg text-xs font-medium transition">
                             Atur stok
                         </button>
                     </td>
@@ -128,7 +128,7 @@
                     Kurangi
                 </button>
                 <button type="button" @click="setType('set')" class="rounded-lg border px-2 py-2.5 font-medium transition"
-                        :class="type === 'set' ? 'border-orange-600 bg-orange-50 text-orange-800' : 'border-stone-300 text-stone-600 hover:border-stone-400'">
+                        :class="type === 'set' ? 'border-copper-600 bg-copper-50 text-copper-800' : 'border-stone-300 text-stone-600 hover:border-stone-400'">
                     Hitung fisik
                 </button>
             </div>
@@ -137,7 +137,7 @@
             <div>
                 <label class="block text-sm font-medium mb-1.5" x-text="type === 'set' ? 'Jumlah hasil hitung fisik' : 'Jumlah'"></label>
                 <input x-ref="qty" type="number" name="quantity" min="0" inputmode="numeric" required x-model="qty"
-                       class="w-full border border-stone-300 rounded-lg px-3 py-2.5 text-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20">
+                       class="w-full border border-stone-300 rounded-lg px-3 py-2.5 text-lg focus:border-copper-500 focus:ring-2 focus:ring-copper-500/20">
             </div>
 
             <div class="rounded-lg bg-stone-50 border border-stone-200 px-4 py-3 text-sm flex items-center justify-between">
@@ -154,10 +154,10 @@
                     Alasan <span class="text-xs font-normal text-stone-500" x-text="type === 'in' ? '(opsional)' : '(wajib)'"></span>
                 </label>
                 <input type="text" name="note" maxlength="255" x-model="note" placeholder="Tulis alasan singkat"
-                       class="w-full border border-stone-300 rounded-lg px-3 py-2.5 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20">
+                       class="w-full border border-stone-300 rounded-lg px-3 py-2.5 text-sm focus:border-copper-500 focus:ring-2 focus:ring-copper-500/20">
                 <div class="flex flex-wrap gap-1.5 mt-2">
                     <template x-for="r in reasons[type]" :key="r">
-                        <button type="button" @click="note = r" class="text-xs px-2.5 py-1 rounded-full border border-stone-300 text-stone-600 hover:border-orange-500 hover:text-orange-700" x-text="r"></button>
+                        <button type="button" @click="note = r" class="text-xs px-2.5 py-1 rounded-full border border-stone-300 text-stone-600 hover:border-copper-500 hover:text-copper-700" x-text="r"></button>
                     </template>
                 </div>
             </div>

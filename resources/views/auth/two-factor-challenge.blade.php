@@ -24,7 +24,7 @@
 
             <button type="submit" class="auth-btn">Verifikasi</button>
 
-            <button type="button" class="text-sm font-medium text-orange-700 hover:underline"
+            <button type="button" class="text-sm font-medium text-copper-700 hover:underline"
                     @click="recovery = !recovery"
                     x-text="recovery ? 'Pakai kode authenticator' : 'Pakai kode pemulihan'"></button>
         </form>

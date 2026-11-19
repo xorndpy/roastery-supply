@@ -31,7 +31,7 @@
                 </div>
             </div>
             <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
-                <label class="inline-flex cursor-pointer items-center rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-xs font-medium text-stone-700 hover:bg-stone-50 focus-within:ring-2 focus-within:ring-orange-500">
+                <label class="inline-flex cursor-pointer items-center rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-xs font-medium text-stone-700 hover:bg-stone-50 focus-within:ring-2 focus-within:ring-copper-500">
                     <input x-ref="file" id="f-{{ $key }}" type="file" name="{{ $key }}" accept="image/jpeg,image/png,image/webp" class="sr-only"
                            @change="const f = $event.target.files[0]; src = f ? URL.createObjectURL(f) : null; if (f) removed = false; dirty = true">
                     <span x-text="(src || (existing && !removed)) ? 'Ganti foto' : 'Pilih foto'"></span>

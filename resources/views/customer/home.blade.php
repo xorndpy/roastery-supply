@@ -44,12 +44,12 @@
     @else
         <div class="absolute inset-0 -z-20 bg-gradient-to-br from-[#24150e] via-[#35200f] to-brand"></div>
         <div class="auth-beans absolute inset-0 -z-10"></div>
-        <div class="absolute -right-24 top-1/4 -z-10 h-[28rem] w-[28rem] rounded-full bg-orange-500/20 blur-3xl"></div>
+        <div class="absolute -right-24 top-1/4 -z-10 h-[28rem] w-[28rem] rounded-full bg-copper-500/20 blur-3xl"></div>
     @endif
 
     <div class="container-x flex w-full flex-1 items-center py-20">
         <div class="max-w-2xl">
-            <p class="eyebrow auth-rise !text-orange-300">{{ $site['site_name'] }}</p>
+            <p class="eyebrow auth-rise !text-copper-300">{{ $site['site_name'] }}</p>
             <h1 class="heading auth-rise mt-5 text-[2.75rem] leading-[1.05] [text-wrap:balance] sm:text-6xl lg:text-[4.25rem]" style="--d:70ms">{{ $site['tagline'] }}</h1>
             <p class="auth-rise mt-6 max-w-xl text-lg leading-relaxed text-stone-100" style="--d:140ms">{{ $site['hero_text'] }}</p>
             <div class="auth-rise mt-9 flex flex-wrap gap-3" style="--d:210ms">
@@ -60,7 +60,7 @@
                     @foreach($slides as $i => $slide)
                         <button type="button" @click="active = {{ $i }}"
                                 class="h-1.5 rounded-full transition-all duration-300"
-                                :class="active === {{ $i }} ? 'w-8 bg-orange-300' : 'w-4 bg-white/40 hover:bg-white/70'"
+                                :class="active === {{ $i }} ? 'w-8 bg-copper-300' : 'w-4 bg-white/40 hover:bg-white/70'"
                                 :aria-current="active === {{ $i }} ? 'true' : 'false'"
                                 aria-label="Foto {{ $i + 1 }} dari {{ $slides->count() }}"></button>
                     @endforeach
@@ -89,7 +89,7 @@
             <p class="eyebrow">Mengenal kami</p>
             <h2 id="kenali-title" class="heading mt-3 text-3xl leading-[1.15] [text-wrap:balance] sm:text-[2.5rem]">{{ $site['home_intro_title'] }}</h2>
             <p class="mt-4 max-w-md text-[15px] leading-relaxed text-stone-600">{{ $site['home_intro_body'] }}</p>
-            <a href="{{ route('about') }}" class="mt-6 inline-flex items-center text-sm font-medium text-orange-700 underline underline-offset-4 hover:decoration-2">Tentang {{ $site['site_name'] }}</a>
+            <a href="{{ route('about') }}" class="mt-6 inline-flex items-center text-sm font-medium text-copper-700 underline underline-offset-4 hover:decoration-2">Tentang {{ $site['site_name'] }}</a>
         </div>
 
         <ol class="svc-list">
@@ -114,7 +114,7 @@
                 @php $img = '<img src="' . e(media_url($b->image)) . '" alt="' . e($b->title) . '" loading="lazy" class="block h-auto w-full rounded-2xl">'; @endphp
                 <div data-reveal>
                     @if($b->link)
-                        <a href="{{ $b->link }}" class="block rounded-2xl transition hover:opacity-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2">{!! $img !!}</a>
+                        <a href="{{ $b->link }}" class="block rounded-2xl transition hover:opacity-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-500 focus-visible:ring-offset-2">{!! $img !!}</a>
                     @else
                         {!! $img !!}
                     @endif
@@ -154,7 +154,7 @@
                     $extra = $loop->index >= 6; // di HP hanya 6 merek pertama sampai "Tampilkan semua" ditekan
                 @endphp
                 @if($p->link)
-                    <a href="{{ $p->link }}" target="_blank" rel="noopener noreferrer" @if($extra) :class="all ? 'flex' : 'hidden sm:flex'" @endif class="{{ $card }} {{ $extra ? '' : 'flex' }} transition hover:border-orange-500">{!! $logo !!}</a>
+                    <a href="{{ $p->link }}" target="_blank" rel="noopener noreferrer" @if($extra) :class="all ? 'flex' : 'hidden sm:flex'" @endif class="{{ $card }} {{ $extra ? '' : 'flex' }} transition hover:border-copper-500">{!! $logo !!}</a>
                 @else
                     <div @if($extra) :class="all ? 'flex' : 'hidden sm:flex'" @endif class="{{ $card }} {{ $extra ? '' : 'flex' }}">{!! $logo !!}</div>
                 @endif
@@ -162,15 +162,15 @@
         </div>
 
         @if($partners->count() > 6)
-            <button type="button" x-show="!all" @click="all = true" class="mt-5 w-full rounded-full border border-stone-300 py-2.5 text-sm font-medium text-stone-700 hover:border-orange-500 sm:hidden">Tampilkan semua merek</button>
+            <button type="button" x-show="!all" @click="all = true" class="mt-5 w-full rounded-full border border-stone-300 py-2.5 text-sm font-medium text-stone-700 hover:border-copper-500 sm:hidden">Tampilkan semua merek</button>
         @endif
 
         @if($partners->count() > 6)
             <div class="mt-6 hidden justify-center gap-3 sm:flex">
-                <button type="button" @click="scroll(-1)" class="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-white hover:border-orange-500" aria-label="Sebelumnya">
+                <button type="button" @click="scroll(-1)" class="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-white hover:border-copper-500" aria-label="Sebelumnya">
                     <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
                 </button>
-                <button type="button" @click="scroll(1)" class="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-white hover:border-orange-500" aria-label="Berikutnya">
+                <button type="button" @click="scroll(1)" class="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-white hover:border-copper-500" aria-label="Berikutnya">
                     <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
                 </button>
             </div>
@@ -238,7 +238,7 @@
             <p class="mt-2 text-sm text-white/80">Jelajahi katalog lengkap dengan harga dan stok yang jelas, atau konsultasikan kebutuhan Anda lebih dulu.</p>
         </div>
         <div class="flex shrink-0 flex-wrap gap-3">
-            <a href="{{ route('products.index') }}" class="btn bg-white text-brand hover:bg-orange-100">Buka Katalog</a>
+            <a href="{{ route('products.index') }}" class="btn bg-white text-brand hover:bg-copper-100">Buka Katalog</a>
             <a href="{{ route('contact.index') }}" class="btn btn-ghost-light">Konsultasi Gratis</a>
         </div>
     </div>

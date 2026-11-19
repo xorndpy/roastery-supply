@@ -53,7 +53,7 @@
             @foreach($tabs as $tk => [$label, $desc, $gs])
                 <button type="button" role="tab" @click="tab = '{{ $tk }}'" :aria-selected="(tab === '{{ $tk }}').toString()"
                         :class="tab === '{{ $tk }}' ? 'border-stone-200 bg-white text-stone-900 shadow-sm' : 'border-transparent text-stone-600 hover:bg-stone-100'"
-                        class="shrink-0 rounded-lg border px-3.5 py-2.5 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500">
+                        class="shrink-0 rounded-lg border px-3.5 py-2.5 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-500">
                     <span class="block whitespace-nowrap text-sm font-medium">{{ $label }}</span>
                     <span class="hidden text-xs text-stone-500 lg:block">{{ $desc }}</span>
                 </button>
@@ -96,7 +96,7 @@
                             <div class="flex gap-2">
                                 <input id="mid-webhook" type="text" readonly value="{{ $midtrans['webhook'] }}" class="w-full rounded-lg border border-stone-300 bg-stone-50 px-3 py-2 font-mono text-[13px] text-stone-700">
                                 <button type="button" @click="navigator.clipboard && navigator.clipboard.writeText(document.getElementById('mid-webhook').value); copied = true; setTimeout(() => copied = false, 2000)"
-                                        class="shrink-0 rounded-lg border border-stone-300 bg-white px-3 text-sm font-medium text-stone-700 hover:bg-stone-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500">
+                                        class="shrink-0 rounded-lg border border-stone-300 bg-white px-3 text-sm font-medium text-stone-700 hover:bg-stone-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-500">
                                     <span x-text="copied ? 'Tersalin' : 'Salin'" aria-live="polite">Salin</span>
                                 </button>
                             </div>
@@ -108,24 +108,24 @@
                 @endif
 
                 @if($tk === 'tampilan')
-                    <a href="{{ route('admin.hero.index') }}" class="flex items-center justify-between gap-4 rounded-xl border border-orange-200 bg-orange-50 p-5 transition hover:bg-orange-100/60">
+                    <a href="{{ route('admin.hero.index') }}" class="flex items-center justify-between gap-4 rounded-xl border border-copper-200 bg-copper-50 p-5 transition hover:bg-copper-100/60">
                         <div>
                             <p class="font-bold text-stone-900">Foto latar hero beranda (slideshow)</p>
                             <p class="mt-0.5 text-sm text-stone-600">Unggah banyak foto sekaligus, atur urutannya, dan aktif/nonaktifkan.</p>
                         </div>
-                        <span class="shrink-0 text-sm font-medium text-orange-700 underline underline-offset-4">Kelola</span>
+                        <span class="shrink-0 text-sm font-medium text-copper-700 underline underline-offset-4">Kelola</span>
                     </a>
                 @endif
 
                 @if($tk === 'header')
-                    <a href="{{ route('admin.banners.index') }}" class="flex items-center justify-between gap-4 rounded-xl border border-orange-200 bg-orange-50 p-5 transition hover:bg-orange-100/60">
+                    <a href="{{ route('admin.banners.index') }}" class="flex items-center justify-between gap-4 rounded-xl border border-copper-200 bg-copper-50 p-5 transition hover:bg-copper-100/60">
                         <div>
                             <p class="font-bold text-stone-900">Slider beranda produk (3–5 foto)</p>
                             <p class="mt-0.5 text-sm text-stone-600">Foto terbaru dan promo di paling atas halaman Produk. Atur di Banner &amp; Promo, pilih tampil di "Katalog".</p>
                         </div>
-                        <span class="shrink-0 text-sm font-medium text-orange-700 underline underline-offset-4">Kelola</span>
+                        <span class="shrink-0 text-sm font-medium text-copper-700 underline underline-offset-4">Kelola</span>
                     </a>
-                    <p class="rounded-xl border border-stone-200 bg-white p-4 text-sm leading-relaxed text-stone-600">Setiap halaman punya fotonya sendiri, jadi tidak lagi seragam. Halaman tanpa foto tampil dengan latar polos. Banner tiap kategori produk diatur di <a href="{{ route('admin.categories.index') }}" class="font-medium text-orange-700 underline">Kategori</a>.</p>
+                    <p class="rounded-xl border border-stone-200 bg-white p-4 text-sm leading-relaxed text-stone-600">Setiap halaman punya fotonya sendiri, jadi tidak lagi seragam. Halaman tanpa foto tampil dengan latar polos. Banner tiap kategori produk diatur di <a href="{{ route('admin.categories.index') }}" class="font-medium text-copper-700 underline">Kategori</a>.</p>
                 @endif
 
                 @foreach($gs as $group)
@@ -166,7 +166,7 @@
         @can('edit_settings')
             <div class="sticky bottom-4 z-10 mt-6 flex items-center justify-between gap-4 rounded-xl border border-stone-200 bg-white/95 px-5 py-3 shadow-lg backdrop-blur">
                 <p class="text-sm" :class="dirty ? 'text-amber-700' : 'text-stone-500'" x-text="dirty ? 'Ada perubahan yang belum disimpan' : 'Belum ada perubahan'" role="status"></p>
-                <button class="rounded-lg bg-orange-500 px-6 py-2 font-medium text-white hover:bg-orange-600">Simpan Pengaturan</button>
+                <button class="rounded-lg bg-copper-500 px-6 py-2 font-medium text-white hover:bg-copper-600">Simpan Pengaturan</button>
             </div>
         @endcan
     </div>

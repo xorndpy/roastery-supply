@@ -3,7 +3,7 @@
 @section('title', 'Tiket Servis')
 
 @php
-    $badge = ['baru' => 'bg-amber-100 text-amber-800', 'diterima' => 'bg-orange-100 text-orange-800', 'diperiksa' => 'bg-orange-200 text-orange-900', 'menunggu_persetujuan' => 'bg-yellow-100 text-yellow-800', 'dikerjakan' => 'bg-stone-200 text-stone-800', 'selesai' => 'bg-green-100 text-green-800', 'ditolak' => 'bg-red-100 text-red-800', 'dibatalkan' => 'bg-stone-100 text-stone-600'];
+    $badge = ['baru' => 'bg-amber-100 text-amber-800', 'diterima' => 'bg-copper-100 text-copper-800', 'diperiksa' => 'bg-copper-200 text-copper-900', 'menunggu_persetujuan' => 'bg-yellow-100 text-yellow-800', 'dikerjakan' => 'bg-stone-200 text-stone-800', 'selesai' => 'bg-green-100 text-green-800', 'ditolak' => 'bg-red-100 text-red-800', 'dibatalkan' => 'bg-stone-100 text-stone-600'];
 @endphp
 
 @section('content')

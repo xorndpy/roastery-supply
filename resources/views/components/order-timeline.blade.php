@@ -37,7 +37,7 @@
     <ol class="relative border-l border-stone-200 ml-2 space-y-5">
         @foreach($steps as $s)
             <li class="ml-5">
-                <span class="absolute -left-[5px] mt-1.5 h-2.5 w-2.5 rounded-full {{ $loop->first ? 'bg-orange-500 ring-4 ring-orange-100' : 'bg-stone-400' }}"></span>
+                <span class="absolute -left-[5px] mt-1.5 h-2.5 w-2.5 rounded-full {{ $loop->first ? 'bg-copper-500 ring-4 ring-copper-100' : 'bg-stone-400' }}"></span>
                 <div class="flex flex-wrap items-baseline justify-between gap-x-3">
                     <p class="text-sm font-medium text-stone-900">{{ $s['title'] }}</p>
                     @if($s['at'])<p class="text-xs text-stone-500">{{ wib($s['at'], 'd M Y, H:i') }}</p>@endif

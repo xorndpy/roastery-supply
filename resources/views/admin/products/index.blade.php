@@ -12,7 +12,7 @@
     </div>
     @can('create_products')
 <a href="{{ route('admin.products.create') }}"
-       class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-lg font-medium transition flex items-center gap-2">
+       class="bg-copper-500 hover:bg-copper-600 text-white px-5 py-2.5 rounded-lg font-medium transition flex items-center gap-2">
         <span>+</span> Tambah Produk
     </a>
 @endcan
@@ -30,7 +30,7 @@
     </div>
     <div class="bg-white p-4 rounded-lg border border-stone-200">
         <div class="text-xs text-stone-500">Stok Menipis</div>
-        <div class="text-2xl font-bold text-orange-500 mt-1">{{ $stats['low_stock'] }}</div>
+        <div class="text-2xl font-bold text-copper-500 mt-1">{{ $stats['low_stock'] }}</div>
     </div>
     <div class="bg-white p-4 rounded-lg border border-stone-200">
         <div class="text-xs text-stone-500">Stok Habis</div>
@@ -43,7 +43,7 @@
     <form method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
         <input type="text" name="search" value="{{ request('search') }}"
                placeholder="Cari nama / SKU..."
-               class="lg:col-span-2 border border-stone-300 rounded-lg px-3 py-2 text-sm focus:ring-orange-500 focus:border-orange-500">
+               class="lg:col-span-2 border border-stone-300 rounded-lg px-3 py-2 text-sm focus:ring-copper-500 focus:border-copper-500">
 
         <select name="category" class="border border-stone-300 rounded-lg px-3 py-2 text-sm">
             <option value="">Semua Kategori</option>
@@ -119,7 +119,7 @@
                             <div class="text-xs text-stone-500 mt-0.5">
                                 SKU: {{ $product->sku }}
                                 @if($product->is_featured)
-                                    <span class="ml-2 text-orange-500">Unggulan</span>
+                                    <span class="ml-2 text-copper-500">Unggulan</span>
                                 @endif
                             </div>
                         </td>
@@ -138,7 +138,7 @@
                                     Habis
                                 </span>
                             @elseif($product->stock <= $product->stock_threshold)
-                                <span class="text-xs px-2 py-1 rounded-full bg-orange-100 text-orange-800 font-medium">
+                                <span class="text-xs px-2 py-1 rounded-full bg-copper-100 text-copper-800 font-medium">
                                     {{ $product->stock }} (menipis)
                                 </span>
                             @else
@@ -189,7 +189,7 @@
                             <p class="mb-3">Belum ada produk.</p>
                             @can('create_products')
 <a href="{{ route('admin.products.create') }}"
-                               class="inline-block bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-lg text-sm font-medium">
+                               class="inline-block bg-copper-500 hover:bg-copper-600 text-white px-5 py-2 rounded-lg text-sm font-medium">
                                 + Tambah Produk Pertama
                             </a>
 @endcan

@@ -8,7 +8,7 @@
     $count = fn ($status = null) => \App\Models\Order::where('user_id', $uid)->when($status, fn ($q) => $q->where('status', $status))->count();
     $recentOrders = \App\Models\Order::where('user_id', $uid)->with('items')->latest()->take(4)->get();
     $statusLabels = ['menunggu_bayar' => 'Menunggu Bayar', 'dikonfirmasi' => 'Dikonfirmasi', 'diproses' => 'Diproses', 'dikirim' => 'Dikirim', 'selesai' => 'Selesai', 'batal' => 'Batal'];
-    $statusBadge = ['menunggu_bayar' => 'bg-amber-100 text-amber-800', 'dikonfirmasi' => 'bg-orange-100 text-orange-800', 'diproses' => 'bg-orange-200 text-orange-900', 'dikirim' => 'bg-stone-200 text-stone-800', 'selesai' => 'bg-green-100 text-green-800', 'batal' => 'bg-red-100 text-red-800'];
+    $statusBadge = ['menunggu_bayar' => 'bg-amber-100 text-amber-800', 'dikonfirmasi' => 'bg-copper-100 text-copper-800', 'diproses' => 'bg-copper-200 text-copper-900', 'dikirim' => 'bg-stone-200 text-stone-800', 'selesai' => 'bg-green-100 text-green-800', 'batal' => 'bg-red-100 text-red-800'];
 @endphp
 
 <div class="border-b border-stone-200 bg-stone-100">
@@ -47,8 +47,8 @@
             ['chat', 'Garansi & Servis', route('customer.service.index')],
             ['chat', 'Hubungi Kami', route('contact.index')],
         ] as [$icon, $label, $url])
-            <a href="{{ $url }}" class="group flex items-center gap-3 rounded-xl border border-stone-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-orange-500 hover:shadow-md">
-                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-orange-500"><x-ui-icon :name="$icon" class="h-5 w-5" /></span>
+            <a href="{{ $url }}" class="group flex items-center gap-3 rounded-xl border border-stone-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-copper-500 hover:shadow-md">
+                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-copper-50 text-copper-500"><x-ui-icon :name="$icon" class="h-5 w-5" /></span>
                 <span class="text-sm font-medium">{{ $label }}</span>
             </a>
         @endforeach
@@ -58,7 +58,7 @@
     <div class="overflow-hidden rounded-xl border border-stone-200 bg-white">
         <div class="flex items-center justify-between px-6 py-4">
             <h2 class="heading text-lg">Pesanan Terakhir</h2>
-            <a href="{{ route('customer.orders.index') }}" class="text-sm text-orange-600 underline underline-offset-4 hover:decoration-2">Lihat semua pesanan</a>
+            <a href="{{ route('customer.orders.index') }}" class="text-sm text-copper-600 underline underline-offset-4 hover:decoration-2">Lihat semua pesanan</a>
         </div>
 
         @forelse($recentOrders as $order)

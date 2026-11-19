@@ -12,7 +12,7 @@
         <h1 class="text-2xl font-bold text-stone-900">Flash Sale</h1>
         <p class="mt-1 text-sm text-stone-500">Harga promo berjadwal dengan kuota. Yang tampil di etalase: kampanye berjalan yang paling cepat berakhir.</p>
     </div>
-    @can('create_flash_sales')<a href="{{ route('admin.flash-sales.create') }}" class="rounded-lg bg-orange-500 px-5 py-2.5 font-medium text-white hover:bg-orange-600">+ Kampanye Baru</a>@endcan
+    @can('create_flash_sales')<a href="{{ route('admin.flash-sales.create') }}" class="rounded-lg bg-copper-500 px-5 py-2.5 font-medium text-white hover:bg-copper-600">+ Kampanye Baru</a>@endcan
 </div>
 
 @if(session('success'))<div class="mb-4 rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800">{{ session('success') }}</div>@endif

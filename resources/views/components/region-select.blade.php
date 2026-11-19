@@ -7,7 +7,7 @@
     <div>
         <label class="block text-sm font-medium mb-2" for="province_id">Provinsi {{ $required ? '*' : '' }}</label>
         <select id="province_id" name="province_id" x-model="provinceId" @change="cityId = ''; notify()" {{ $required ? 'required' : '' }}
-                class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-orange-500 focus:border-orange-500">
+                class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-copper-500 focus:border-copper-500">
             <option value="">Pilih provinsi</option>
             <template x-for="p in provinces" :key="p.id">
                 <option :value="p.id" x-text="p.name" :selected="String(p.id) === String(provinceId)"></option>
@@ -18,7 +18,7 @@
     <div>
         <label class="block text-sm font-medium mb-2" for="city_id">Kota / Kabupaten {{ $required ? '*' : '' }}</label>
         <select id="city_id" name="city_id" x-model="cityId" @change="notify()" :disabled="!provinceId" {{ $required ? 'required' : '' }}
-                class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-orange-500 focus:border-orange-500 disabled:bg-stone-50">
+                class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-copper-500 focus:border-copper-500 disabled:bg-stone-50">
             <option value="">Pilih kota / kabupaten</option>
             <template x-for="c in cityList" :key="c.id">
                 <option :value="c.id" x-text="c.name" :selected="String(c.id) === String(cityId)"></option>

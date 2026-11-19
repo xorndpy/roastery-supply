@@ -28,7 +28,7 @@
         @else
             <div class="absolute inset-0 bg-gradient-to-br from-[#2b1a10] to-[#4a2f21]"></div>
             <div class="auth-beans absolute inset-0 opacity-90"></div>
-            <div class="absolute -right-24 top-1/4 h-96 w-96 rounded-full bg-orange-500/20 blur-3xl"></div>
+            <div class="absolute -right-24 top-1/4 h-96 w-96 rounded-full bg-copper-500/20 blur-3xl"></div>
         @endif
     </div>
     <div class="absolute inset-0 bg-[#1a0f0a]/80 lg:hidden"></div>
@@ -37,7 +37,7 @@
 
     <div class="container-x relative py-16 sm:py-20 lg:py-28">
         <div class="max-w-[34rem]">
-            <p class="eyebrow auth-rise !text-orange-300">{{ $site['about_title'] }}</p>
+            <p class="eyebrow auth-rise !text-copper-300">{{ $site['about_title'] }}</p>
             <h1 class="heading auth-rise mt-4 text-4xl leading-[1.1] sm:text-[3.25rem] [text-wrap:balance]" style="--d:70ms">{{ $site['about_headline'] }}</h1>
             <p class="auth-rise mt-6 text-base leading-relaxed text-stone-100 sm:text-[17px]" style="--d:140ms">{{ $site['about_lead'] }}</p>
         </div>
@@ -108,7 +108,7 @@
                     $extra = $loop->index >= 6; // di HP hanya 6 merek pertama sampai "Tampilkan semua" ditekan
                 @endphp
                 @if($p->link)
-                    <a href="{{ $p->link }}" target="_blank" rel="noopener noreferrer" @if($extra) :class="all ? 'flex' : 'hidden sm:flex'" @endif class="{{ $card }} {{ $extra ? '' : 'flex' }} transition hover:border-orange-500">{!! $logo !!}</a>
+                    <a href="{{ $p->link }}" target="_blank" rel="noopener noreferrer" @if($extra) :class="all ? 'flex' : 'hidden sm:flex'" @endif class="{{ $card }} {{ $extra ? '' : 'flex' }} transition hover:border-copper-500">{!! $logo !!}</a>
                 @else
                     <div @if($extra) :class="all ? 'flex' : 'hidden sm:flex'" @endif class="{{ $card }} {{ $extra ? '' : 'flex' }}">{!! $logo !!}</div>
                 @endif
@@ -116,15 +116,15 @@
         </div>
 
         @if($partners->count() > 6)
-            <button type="button" x-show="!all" @click="all = true" class="mt-5 w-full rounded-full border border-stone-300 py-2.5 text-sm font-medium text-stone-700 hover:border-orange-500 sm:hidden">Tampilkan semua merek</button>
+            <button type="button" x-show="!all" @click="all = true" class="mt-5 w-full rounded-full border border-stone-300 py-2.5 text-sm font-medium text-stone-700 hover:border-copper-500 sm:hidden">Tampilkan semua merek</button>
         @endif
 
         @if($partners->count() > 6)
             <div class="mt-6 hidden justify-center gap-3 sm:flex">
-                <button type="button" @click="scroll(-1)" class="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-white hover:border-orange-500" aria-label="Sebelumnya">
+                <button type="button" @click="scroll(-1)" class="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-white hover:border-copper-500" aria-label="Sebelumnya">
                     <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
                 </button>
-                <button type="button" @click="scroll(1)" class="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-white hover:border-orange-500" aria-label="Berikutnya">
+                <button type="button" @click="scroll(1)" class="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-white hover:border-copper-500" aria-label="Berikutnya">
                     <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
                 </button>
             </div>
@@ -139,7 +139,7 @@
             <h2 class="heading text-2xl sm:text-3xl">Diskusikan kebutuhan kedai Anda.</h2>
             <p class="mt-1 max-w-md text-sm text-white/80">Tim kami siap membantu memilih peralatan yang sesuai dengan kapasitas dan anggaran usaha Anda.</p>
         </div>
-        <a href="{{ route('contact.index') }}" class="btn shrink-0 bg-white text-brand hover:bg-orange-100">Hubungi Kami</a>
+        <a href="{{ route('contact.index') }}" class="btn shrink-0 bg-white text-brand hover:bg-copper-100">Hubungi Kami</a>
     </div>
 </section>
 @endsection

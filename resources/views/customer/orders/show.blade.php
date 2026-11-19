@@ -37,8 +37,8 @@
                 @php
                     $statusColors = [
                         'menunggu_bayar' => 'bg-yellow-100 text-yellow-800',
-                        'dikonfirmasi' => 'bg-orange-100 text-orange-800',
-                        'diproses' => 'bg-orange-200 text-orange-900',
+                        'dikonfirmasi' => 'bg-copper-100 text-copper-800',
+                        'diproses' => 'bg-copper-200 text-copper-900',
                         'dikirim' => 'bg-stone-200 text-stone-800',
                         'selesai' => 'bg-green-100 text-green-800',
                         'batal' => 'bg-red-100 text-red-800',
@@ -98,7 +98,7 @@
             </div>
             <div class="flex justify-between font-bold text-lg pt-2 border-t">
                 <span>Total</span>
-                <span class="text-orange-500">Rp {{ number_format($order->total, 0, ',', '.') }}</span>
+                <span class="text-copper-500">Rp {{ number_format($order->total, 0, ',', '.') }}</span>
             </div>
         </div>
     </div>
@@ -142,7 +142,7 @@
                     <p class="mt-1 text-sm text-stone-600">Virtual Account, QRIS, e-wallet, atau kartu. Pembayaran terkonfirmasi otomatis dalam hitungan detik, tanpa perlu mengunggah bukti.</p>
                     <div class="mt-4 flex flex-wrap items-center gap-4">
                         <button type="button" id="payBtn" data-start="{{ route('customer.orders.pay-online', $order->order_number) }}"
-                                class="rounded-lg bg-orange-500 px-6 py-3 font-medium text-white transition hover:bg-orange-600 disabled:cursor-wait disabled:opacity-70">
+                                class="rounded-lg bg-copper-500 px-6 py-3 font-medium text-white transition hover:bg-copper-600 disabled:cursor-wait disabled:opacity-70">
                             {{ $hasLive ? 'Lanjutkan pembayaran' : 'Bayar Sekarang' }}
                         </button>
                         <button type="button" id="checkBtn" class="text-sm text-stone-600 underline hover:text-stone-900">Cek status pembayaran</button>
@@ -173,24 +173,24 @@
             <details class="group" @if(!$onlineEnabled || $isPending || $isRejected) open @endif>
                 @if($onlineEnabled)<summary class="mb-4 cursor-pointer text-sm font-medium text-stone-700 hover:text-stone-900">Atau bayar dengan transfer manual (unggah bukti)</summary>@endif
             @unless($isPending)
-                <div class="bg-orange-50 border border-orange-200 p-4 rounded-lg mb-6">
-                    <div class="font-medium text-orange-900">Instruksi Pembayaran</div>
-                    <p class="text-sm text-orange-700 mt-1">
+                <div class="bg-copper-50 border border-copper-200 p-4 rounded-lg mb-6">
+                    <div class="font-medium text-copper-900">Instruksi Pembayaran</div>
+                    <p class="text-sm text-copper-700 mt-1">
                         Transfer ke rekening berikut, lalu upload bukti transfer:
                     </p>
                     @if($site['bank_name'] && $site['bank_account_number'])
-                        <div class="mt-2 font-mono text-sm bg-white p-3 rounded border border-orange-200">
+                        <div class="mt-2 font-mono text-sm bg-white p-3 rounded border border-copper-200">
                             <div>{{ $site['bank_name'] }}</div>
                             <div>No. Rek: <strong>{{ $site['bank_account_number'] }}</strong></div>
                             @if($site['bank_account_name'])<div>a/n: {{ $site['bank_account_name'] }}</div>@endif
                         </div>
                     @else
-                        <div class="mt-2 text-sm bg-white p-3 rounded border border-orange-200 text-stone-600">
+                        <div class="mt-2 text-sm bg-white p-3 rounded border border-copper-200 text-stone-600">
                             Nomor rekening belum diatur. Silakan <a href="{{ route('contact.index') }}" class="underline">hubungi kami</a> untuk detail pembayaran.
                         </div>
                     @endif
-                    @if($site['payment_note'])<p class="mt-2 text-sm text-orange-700 whitespace-pre-line">{{ $site['payment_note'] }}</p>@endif
-                    <div class="mt-3 text-sm text-orange-700">
+                    @if($site['payment_note'])<p class="mt-2 text-sm text-copper-700 whitespace-pre-line">{{ $site['payment_note'] }}</p>@endif
+                    <div class="mt-3 text-sm text-copper-700">
                         Jumlah: <strong>Rp {{ number_format($order->total, 0, ',', '.') }}</strong>
                     </div>
                 </div>
@@ -224,7 +224,7 @@
                 </div>
 
                 <button type="submit"
-                        class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-medium transition">
+                        class="bg-copper-500 hover:bg-copper-600 text-white px-6 py-3 rounded-lg font-medium transition">
                     {{ $isPending ? 'Ganti Bukti Pembayaran' : 'Upload Bukti Pembayaran' }}
                 </button>
             </form>
@@ -260,7 +260,7 @@
                     <div><span class="text-stone-500">Dikirim:</span> {{ $order->shipment->shipped_at->copy()->timezone('Asia/Jakarta')->locale('id')->translatedFormat('j F Y') }}</div>
                 @endif
                 <a href="{{ config('couriers.tracker_url') }}" target="_blank" rel="noopener noreferrer"
-                   class="inline-block text-sm text-orange-700 underline">Lacak paket di situs cek resi</a>
+                   class="inline-block text-sm text-copper-700 underline">Lacak paket di situs cek resi</a>
             </div>
         </div>
     @endif
@@ -273,7 +273,7 @@
                     <h2 class="font-bold">Retur</h2>
                     <p class="text-sm text-stone-600">{{ ['pending' => 'Pengajuan retur sedang ditinjau.', 'approved' => 'Retur disetujui, menunggu refund.', 'refunded' => 'Retur selesai, refund sudah ditransfer.', 'rejected' => 'Pengajuan retur ditolak.'][$rs] }}</p>
                 </div>
-                <a href="{{ route('customer.returns.show', $order->return->id) }}" class="text-sm text-orange-600 underline underline-offset-4 hover:decoration-2">Lihat detail retur</a>
+                <a href="{{ route('customer.returns.show', $order->return->id) }}" class="text-sm text-copper-600 underline underline-offset-4 hover:decoration-2">Lihat detail retur</a>
             </div>
         @elseif($returnEligible)
             <div class="bg-white rounded-lg border border-stone-200 p-6 mb-6 flex flex-wrap justify-between items-center gap-3">
@@ -320,7 +320,7 @@
 
     <div class="text-center mb-4">
         <a href="{{ route('customer.orders.invoice', $order->order_number) }}" target="_blank"
-           class="text-sm text-orange-600 hover:underline">Unduh Invoice (PDF)</a>
+           class="text-sm text-copper-600 hover:underline">Unduh Invoice (PDF)</a>
     </div>
 
     <div class="text-center">

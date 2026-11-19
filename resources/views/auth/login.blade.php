@@ -40,13 +40,13 @@
                               :invalid="(bool) $loginError" required autocomplete="current-password">
                     @if (Route::has('password.request'))
                         <x-slot:aside>
-                            <a href="{{ route('password.request') }}" class="rounded text-[13px] font-medium text-orange-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500">Lupa password?</a>
+                            <a href="{{ route('password.request') }}" class="rounded text-[13px] font-medium text-copper-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-500">Lupa password?</a>
                         </x-slot:aside>
                     @endif
                 </x-auth-input>
 
                 <label for="remember_me" class="-my-1 inline-flex min-h-[44px] cursor-pointer items-center gap-2.5 text-sm text-stone-700">
-                    <input id="remember_me" type="checkbox" name="remember" class="h-5 w-5 rounded border-stone-400 text-orange-500 focus:ring-orange-500">
+                    <input id="remember_me" type="checkbox" name="remember" class="h-5 w-5 rounded border-stone-400 text-copper-500 focus:ring-copper-500">
                     Ingat saya di perangkat ini
                 </label>
 
@@ -61,7 +61,7 @@
 
             <p class="mt-8 text-center text-sm text-stone-600">
                 Belum punya akun?
-                <a href="{{ route('register') }}" class="rounded font-medium text-orange-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500">Daftar gratis</a>
+                <a href="{{ route('register') }}" class="rounded font-medium text-copper-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-500">Daftar gratis</a>
             </p>
         </div>
     </div>

@@ -34,7 +34,7 @@
                 <div class="mt-6 flex flex-wrap gap-2.5">
                     @foreach($socials as $name => $url)
                         <a href="{{ $url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ ucfirst($name) }}"
-                           class="flex h-11 w-11 items-center justify-center rounded-full border border-stone-200 bg-white text-orange-600 shadow-sm transition hover:-translate-y-0.5 hover:border-orange-500 hover:bg-orange-50">
+                           class="flex h-11 w-11 items-center justify-center rounded-full border border-stone-200 bg-white text-copper-600 shadow-sm transition hover:-translate-y-0.5 hover:border-copper-500 hover:bg-copper-50">
                             <x-ui-icon :name="$name" class="h-5 w-5" />
                         </a>
                     @endforeach
@@ -47,7 +47,7 @@
             <h4 class="mb-4 text-xs font-semibold uppercase tracking-[0.12em] text-stone-900">Navigasi</h4>
             <ul class="space-y-2.5 text-sm">
                 @foreach($nav as [$label, $route])
-                    <li><a href="{{ route($route) }}" class="text-stone-600 transition hover:text-orange-600">{{ $label }}</a></li>
+                    <li><a href="{{ route($route) }}" class="text-stone-600 transition hover:text-copper-600">{{ $label }}</a></li>
                 @endforeach
             </ul>
         </div>
@@ -58,18 +58,18 @@
             <ul class="space-y-3.5 text-sm">
                 @forelse($contacts as [$icon, $text, $href])
                     <li class="flex items-start gap-3">
-                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-stone-200 bg-white text-orange-500">
+                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-stone-200 bg-white text-copper-500">
                             <x-ui-icon :name="$icon" class="h-[18px] w-[18px]" />
                         </span>
                         @if($href)
                             <a href="{{ $href }}" @if(str_starts_with($href, 'http')) target="_blank" rel="noopener noreferrer" @endif
-                               class="self-center break-all text-stone-700 transition hover:text-orange-600">{{ $text }}</a>
+                               class="self-center break-all text-stone-700 transition hover:text-copper-600">{{ $text }}</a>
                         @else
                             <span class="self-center whitespace-pre-line leading-relaxed text-stone-700">{{ $text }}</span>
                         @endif
                     </li>
                 @empty
-                    <li><a href="{{ route('contact.index') }}" class="text-stone-700 hover:text-orange-600">Kirim pesan kepada kami</a></li>
+                    <li><a href="{{ route('contact.index') }}" class="text-stone-700 hover:text-copper-600">Kirim pesan kepada kami</a></li>
                 @endforelse
             </ul>
         </div>

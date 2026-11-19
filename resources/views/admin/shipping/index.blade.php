@@ -9,7 +9,7 @@
         <h1 class="text-2xl font-bold text-stone-900">Tarif Pengiriman</h1>
         <p class="text-sm text-stone-500 mt-1">Layanan dan tarif per wilayah yang ditawarkan di checkout.</p>
     </div>
-    @can('manage_shipping_rates')<a href="{{ route('admin.shipping.create') }}" class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-lg font-medium">+ Tambah Layanan</a>@endcan
+    @can('manage_shipping_rates')<a href="{{ route('admin.shipping.create') }}" class="bg-copper-500 hover:bg-copper-600 text-white px-5 py-2.5 rounded-lg font-medium">+ Tambah Layanan</a>@endcan
 </div>
 
 @if($methods->where('is_active', true)->where('rates_count', '>', 0)->isEmpty())
@@ -26,11 +26,11 @@
         @forelse($methods as $m)
             <tr>
                 <td class="px-4 py-3"><div class="font-medium">{{ $m->name }}</div>@if($m->description)<div class="text-xs text-stone-500">{{ $m->description }}</div>@endif</td>
-                <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-xs {{ $m->type === 'own' ? 'bg-orange-100 text-orange-800' : 'bg-stone-100 text-stone-700' }}">{{ $m->type === 'own' ? 'Kargo Kami' : 'Ekspedisi luar' }}</span></td>
+                <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-xs {{ $m->type === 'own' ? 'bg-copper-100 text-copper-800' : 'bg-stone-100 text-stone-700' }}">{{ $m->type === 'own' ? 'Kargo Kami' : 'Ekspedisi luar' }}</span></td>
                 <td class="px-4 py-3">{{ $m->rates_count }} tarif wilayah</td>
                 <td class="px-4 py-3">{{ $m->sort_order }}</td>
                 <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-xs {{ $m->is_active ? 'bg-green-100 text-green-700' : 'bg-stone-100 text-stone-600' }}">{{ $m->is_active ? 'Aktif' : 'Nonaktif' }}</span></td>
-                <td class="px-4 py-3 text-right"><a href="{{ route('admin.shipping.edit', $m->id) }}" class="text-orange-600 hover:underline">Atur tarif</a></td>
+                <td class="px-4 py-3 text-right"><a href="{{ route('admin.shipping.edit', $m->id) }}" class="text-copper-600 hover:underline">Atur tarif</a></td>
             </tr>
         @empty
             <tr><td colspan="6" class="px-4 py-10 text-center text-stone-500">Belum ada layanan pengiriman.</td></tr>

@@ -42,7 +42,7 @@
                                     @if($a->cover_url)<img src="{{ $a->cover_url }}" alt="" class="h-12 w-16 rounded-md border border-stone-200 object-cover">@else<span class="flex h-12 w-16 items-center justify-center rounded-md bg-stone-100 text-[10px] text-stone-400">Tanpa foto</span>@endif
                                     <div class="min-w-0">
                                         <p class="max-w-md truncate font-medium text-stone-900">{{ $a->title }}</p>
-                                        <p class="text-xs text-stone-500">{{ $a->category }}@if($a->is_featured) · <span class="text-orange-700">Slider</span>@endif @if($a->video_url) · Video @endif</p>
+                                        <p class="text-xs text-stone-500">{{ $a->category }}@if($a->is_featured) · <span class="text-copper-700">Slider</span>@endif @if($a->video_url) · Video @endif</p>
                                     </div>
                                 </div>
                             </td>

@@ -12,7 +12,7 @@
     $dateLabel = $now->copy()->locale('id')->translatedFormat('l, j F Y');
 
     $cards = [
-        ['Perlu dikemas', $toPack, 'Sudah dibayar, belum dikemas', route('admin.orders.index', ['status' => 'dikonfirmasi']), 'view_orders', 'text-orange-700'],
+        ['Perlu dikemas', $toPack, 'Sudah dibayar, belum dikemas', route('admin.orders.index', ['status' => 'dikonfirmasi']), 'view_orders', 'text-copper-700'],
         ['Siap dikirim', $toShip, 'Sudah dikemas: isi resi, lalu admin yang kirim', route('admin.orders.index', ['status' => 'diproses']), 'view_orders', 'text-amber-700'],
         ['Dalam pengiriman', $inTransit, 'Sedang di jalan', route('admin.orders.index', ['status' => 'dikirim']), 'view_orders', 'text-stone-800'],
         ['Retur terbuka', $returnsOpen, 'Menunggu keputusan atau barang kembali', route('admin.returns.index'), 'view_returns', 'text-red-700'],
@@ -35,7 +35,7 @@
 <div class="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
     @foreach($cards as [$label, $count, $hint, $href, $perm, $color])
         @can($perm)
-            <a href="{{ $href }}" class="bg-white rounded-lg border border-stone-200 p-5 hover:border-orange-400 transition block">
+            <a href="{{ $href }}" class="bg-white rounded-lg border border-stone-200 p-5 hover:border-copper-400 transition block">
                 <div class="text-sm text-stone-500">{{ $label }}</div>
                 <div class="text-3xl font-bold mt-1 {{ $count > 0 ? $color : 'text-stone-300' }}">{{ $count }}</div>
                 <div class="text-xs text-stone-500 mt-1">{{ $hint }}</div>
@@ -51,7 +51,7 @@
     <div class="xl:col-span-2 bg-white rounded-lg border border-stone-200 overflow-x-auto">
         <div class="p-4 border-b border-stone-100 flex justify-between items-center">
             <h2 class="font-bold">Antrean kerja</h2>
-            <a href="{{ route('admin.orders.index', ['status' => 'dikonfirmasi']) }}" class="text-sm text-orange-600 hover:underline">Lihat semua</a>
+            <a href="{{ route('admin.orders.index', ['status' => 'dikonfirmasi']) }}" class="text-sm text-copper-600 hover:underline">Lihat semua</a>
         </div>
         <table class="w-full text-sm">
             <thead class="bg-stone-50 text-left text-stone-500">
@@ -60,18 +60,18 @@
             <tbody class="divide-y divide-stone-100">
             @forelse($queue as $o)
                 <tr class="hover:bg-stone-50">
-                    <td class="px-4 py-3"><a href="{{ route('admin.orders.show', $o->id) }}" class="font-medium text-orange-700 hover:underline">{{ $o->order_number }}</a></td>
+                    <td class="px-4 py-3"><a href="{{ route('admin.orders.show', $o->id) }}" class="font-medium text-copper-700 hover:underline">{{ $o->order_number }}</a></td>
                     <td class="px-4 py-3 text-stone-600">{{ $o->shipping_city ?: '-' }}</td>
                     <td class="px-4 py-3 text-right">{{ (int) $o->items->sum('quantity') }} pcs</td>
                     <td class="px-4 py-3">
-                        <span class="px-2 py-0.5 rounded text-xs {{ $o->status === 'dikonfirmasi' ? 'bg-orange-100 text-orange-800' : 'bg-amber-100 text-amber-800' }}">
+                        <span class="px-2 py-0.5 rounded text-xs {{ $o->status === 'dikonfirmasi' ? 'bg-copper-100 text-copper-800' : 'bg-amber-100 text-amber-800' }}">
                             {{ $o->status === 'dikonfirmasi' ? 'Perlu dikemas' : ($o->shipment?->tracking_number ? 'Menunggu admin kirim' : 'Perlu resi') }}
                         </span>
                     </td>
                     <td class="px-4 py-3 text-stone-500">{{ $o->created_at->locale('id')->diffForHumans() }}</td>
                     <td class="px-4 py-3">
                         <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-                            <a href="{{ route('admin.orders.delivery-note', $o->id) }}" target="_blank" class="text-orange-700 hover:underline">Surat jalan</a>
+                            <a href="{{ route('admin.orders.delivery-note', $o->id) }}" target="_blank" class="text-copper-700 hover:underline">Surat jalan</a>
                             @if($o->status === 'dikonfirmasi')
                                 @can('process_orders')
                                     <form method="POST" action="{{ route('admin.orders.process', $o->id) }}">
@@ -102,7 +102,7 @@
     <div class="bg-white rounded-lg border border-stone-200">
         <div class="p-4 border-b border-stone-100 flex justify-between items-center">
             <h2 class="font-bold">Stok perlu perhatian</h2>
-            <a href="{{ route('admin.stock.index') }}" class="text-sm text-orange-600 hover:underline">Kelola stok</a>
+            <a href="{{ route('admin.stock.index') }}" class="text-sm text-copper-600 hover:underline">Kelola stok</a>
         </div>
         <div class="grid grid-cols-2 border-b border-stone-100 text-center">
             <div class="p-3 border-r border-stone-100"><div class="text-xl font-bold text-amber-700">{{ $lowStock }}</div><div class="text-xs text-stone-500">Menipis</div></div>
@@ -127,7 +127,7 @@
 <div class="bg-white rounded-lg border border-stone-200 mt-6 overflow-x-auto">
     <div class="p-4 border-b border-stone-100 flex justify-between items-center">
         <h2 class="font-bold">Pergerakan stok terbaru</h2>
-        <a href="{{ route('admin.stock.history') }}" class="text-sm text-orange-600 hover:underline">Riwayat lengkap</a>
+        <a href="{{ route('admin.stock.history') }}" class="text-sm text-copper-600 hover:underline">Riwayat lengkap</a>
     </div>
     <table class="w-full text-sm">
         <tbody class="divide-y divide-stone-100">

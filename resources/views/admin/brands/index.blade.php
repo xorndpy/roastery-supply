@@ -11,7 +11,7 @@
     </div>
     @can('create_brands')
 <a href="{{ route('admin.brands.create') }}"
-       class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-lg font-medium transition">
+       class="bg-copper-500 hover:bg-copper-600 text-white px-5 py-2.5 rounded-lg font-medium transition">
         + Tambah Merek
     </a>
 @endcan
@@ -38,7 +38,7 @@
     <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-3">
         <input type="text" name="search" value="{{ request('search') }}"
                placeholder="Cari nama merek..."
-               class="md:col-span-2 border border-stone-300 rounded-lg px-3 py-2 text-sm focus:ring-orange-500 focus:border-orange-500">
+               class="md:col-span-2 border border-stone-300 rounded-lg px-3 py-2 text-sm focus:ring-copper-500 focus:border-copper-500">
 
         <select name="status" class="border border-stone-300 rounded-lg px-3 py-2 text-sm">
             <option value="">Semua Status</option>
@@ -140,7 +140,7 @@
                             <p class="mb-3">Belum ada merek.</p>
                             @can('create_brands')
 <a href="{{ route('admin.brands.create') }}"
-                               class="inline-block bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-lg text-sm font-medium">
+                               class="inline-block bg-copper-500 hover:bg-copper-600 text-white px-5 py-2 rounded-lg text-sm font-medium">
                                 + Tambah Merek
                             </a>
 @endcan

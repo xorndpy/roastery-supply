@@ -17,7 +17,7 @@
                     <img src="{{ $s->cover_url }}" alt="" class="absolute inset-0 h-full w-full object-cover" @if($k) loading="lazy" @endif>
                     <div class="absolute inset-0 bg-gradient-to-t from-[#1a0f0a]/90 via-[#1a0f0a]/45 to-[#1a0f0a]/20"></div>
                     <div class="container-x relative flex h-full flex-col justify-end pb-14">
-                        <span class="w-fit rounded-full bg-orange-500 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wide text-white">{{ $s->category }}</span>
+                        <span class="w-fit rounded-full bg-copper-500 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wide text-white">{{ $s->category }}</span>
                         <h2 class="heading mt-4 max-w-4xl text-3xl leading-tight text-white [text-wrap:balance] sm:text-4xl lg:text-[2.75rem]">
                             <a href="{{ route('articles.show', $s->slug) }}" class="after:absolute after:inset-0 focus:outline-none focus-visible:underline">{{ $s->title }}</a>
                         </h2>
@@ -53,7 +53,7 @@
             </h1>
             @if($articles->total())<p class="mt-1 text-sm text-stone-500">{{ $articles->total() }} artikel</p>@endif
         </div>
-        @if($filtering)<a href="{{ route('articles.index') }}" class="text-sm font-medium text-orange-700 hover:underline">Hapus filter ×</a>@endif
+        @if($filtering)<a href="{{ route('articles.index') }}" class="text-sm font-medium text-copper-700 hover:underline">Hapus filter ×</a>@endif
     </div>
 
     @if($articles->isEmpty())

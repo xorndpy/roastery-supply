@@ -9,7 +9,7 @@
         <h1 class="text-2xl font-bold text-stone-900">Partner & Merek Rekanan</h1>
         <p class="text-sm text-stone-500 mt-1">Logo tampil di beranda sesuai urutan.</p>
     </div>
-    @can('create_partners')<a href="{{ route('admin.partners.create') }}" class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-lg font-medium">+ Tambah Partner</a>@endcan
+    @can('create_partners')<a href="{{ route('admin.partners.create') }}" class="bg-copper-500 hover:bg-copper-600 text-white px-5 py-2.5 rounded-lg font-medium">+ Tambah Partner</a>@endcan
 </div>
 
 <div class="bg-white rounded-lg border border-stone-200 overflow-x-auto">
@@ -24,7 +24,7 @@
                 <td class="px-4 py-3">{{ $p->sort_order }}</td>
                 <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-xs {{ $p->is_active ? 'bg-green-100 text-green-700' : 'bg-stone-100 text-stone-600' }}">{{ $p->is_active ? 'Aktif' : 'Nonaktif' }}</span></td>
                 <td class="px-4 py-3 text-right whitespace-nowrap">
-                    @can('edit_partners')<a href="{{ route('admin.partners.edit', $p->id) }}" class="text-orange-600 hover:underline mr-3">Edit</a>@endcan
+                    @can('edit_partners')<a href="{{ route('admin.partners.edit', $p->id) }}" class="text-copper-600 hover:underline mr-3">Edit</a>@endcan
                     @can('delete_partners')
                     <form method="POST" action="{{ route('admin.partners.destroy', $p->id) }}" class="inline" data-confirm-title="Hapus partner ini?" data-confirm-text="Logo partner tidak akan tampil lagi di halaman Tentang." data-confirm-ok="Ya, hapus partner" data-confirm-tone="danger">@csrf @method('DELETE')<button class="text-red-600 hover:underline">Hapus</button></form>
                     @endcan

@@ -46,7 +46,7 @@
         </div>
 
         <div class="flex gap-3">
-            <button class="rounded-lg bg-orange-500 px-6 py-2.5 font-medium text-white hover:bg-orange-600">Kirim pengajuan</button>
+            <button class="rounded-lg bg-copper-500 px-6 py-2.5 font-medium text-white hover:bg-copper-600">Kirim pengajuan</button>
             <a href="{{ route('customer.service.index') }}" class="rounded-lg border border-stone-300 px-6 py-2.5 text-stone-700">Batal</a>
         </div>
     </form>

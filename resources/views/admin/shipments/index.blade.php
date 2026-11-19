@@ -16,7 +16,7 @@
 <div class="flex gap-2 mb-4 border-b border-stone-200">
     @foreach($tabs as $key => $label)
         <a href="{{ route('admin.shipments.index', ['tab' => $key]) }}"
-           class="px-4 py-2 -mb-px border-b-2 {{ $tab === $key ? 'border-orange-500 text-stone-900 font-medium' : 'border-transparent text-stone-500 hover:text-stone-700' }}">
+           class="px-4 py-2 -mb-px border-b-2 {{ $tab === $key ? 'border-copper-500 text-stone-900 font-medium' : 'border-transparent text-stone-500 hover:text-stone-700' }}">
             {{ $label }} <span class="text-xs text-stone-400">({{ $counts[$key] }})</span>
         </a>
     @endforeach
@@ -56,9 +56,9 @@
                 <td class="px-4 py-3 text-xs">
                     <div class="font-medium text-stone-800">{{ $o->shipping_method ?: '-' }}</div>
                     @if($o->shipping_etd)<div class="text-stone-500">estimasi {{ $o->shipping_etd }}</div>@endif
-                    <a href="{{ route('admin.orders.show', $o->id) }}" class="text-orange-600 hover:underline">Detail</a>
+                    <a href="{{ route('admin.orders.show', $o->id) }}" class="text-copper-600 hover:underline">Detail</a>
                     <span class="text-stone-300" aria-hidden="true">·</span>
-                    <a href="{{ route('admin.orders.delivery-note', $o->id) }}" target="_blank" class="text-orange-600 hover:underline">Surat jalan</a>
+                    <a href="{{ route('admin.orders.delivery-note', $o->id) }}" target="_blank" class="text-copper-600 hover:underline">Surat jalan</a>
                 </td>
                 <td class="px-4 py-3">
                     @if($o->status === 'dikonfirmasi')
@@ -108,7 +108,7 @@
         @forelse($shipments as $s)
             <tr>
                 <td class="px-4 py-3">
-                    <a href="{{ route('admin.orders.show', $s->order_id) }}" class="font-mono text-orange-600 hover:underline">{{ $s->order->order_number ?? '-' }}</a>
+                    <a href="{{ route('admin.orders.show', $s->order_id) }}" class="font-mono text-copper-600 hover:underline">{{ $s->order->order_number ?? '-' }}</a>
                 </td>
                 <td class="px-4 py-3">{{ $s->order->shipping_name ?: ($s->order->customer->name ?? '-') }}</td>
                 <td class="px-4 py-3">

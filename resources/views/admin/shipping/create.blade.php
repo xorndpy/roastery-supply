@@ -33,6 +33,6 @@
         <input type="number" name="sort_order" min="0" value="{{ old('sort_order', 0) }}" class="w-32 border border-stone-300 rounded-lg px-3 py-2">
     </div>
     <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="is_active" value="1" checked> Aktif</label>
-    <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg font-medium">Buat & Isi Tarif</button>
+    <button class="bg-copper-500 hover:bg-copper-600 text-white px-6 py-2.5 rounded-lg font-medium">Buat & Isi Tarif</button>
 </form>
 @endsection

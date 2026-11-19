@@ -36,8 +36,8 @@
         @forelse($cards as [$icon, $title, $text, $href])
             @php $tag = $href ? 'a' : 'div'; @endphp
             <{{ $tag }} @if($href) href="{{ $href }}" @if(str_starts_with($href, 'http')) target="_blank" rel="noopener noreferrer" @endif @endif
-                class="flex items-start gap-4 rounded-xl border border-stone-200 bg-white p-4 shadow-sm {{ $href ? 'transition hover:-translate-y-0.5 hover:border-orange-500 hover:shadow-md' : '' }}">
-                <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-orange-500">
+                class="flex items-start gap-4 rounded-xl border border-stone-200 bg-white p-4 shadow-sm {{ $href ? 'transition hover:-translate-y-0.5 hover:border-copper-500 hover:shadow-md' : '' }}">
+                <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-copper-50 text-copper-500">
                     <x-ui-icon :name="$icon" class="h-5 w-5" />
                 </span>
                 <span class="min-w-0">
@@ -125,14 +125,14 @@
                     <template x-for="(item, n) in list" :key="n">
                         <button type="button" @click="i = n"
                                 class="flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold transition"
-                                :class="i === n ? 'bg-orange-500 text-white' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'" x-text="n + 1"></button>
+                                :class="i === n ? 'bg-copper-500 text-white' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'" x-text="n + 1"></button>
                     </template>
                 </div>
                 <div class="text-sm font-semibold uppercase tracking-wide" x-text="b.name"></div>
                 <p class="mt-1.5 whitespace-pre-line text-[13px] leading-relaxed text-stone-500" x-text="b.address"></p>
                 <div class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[13px] font-medium">
-                    <a :href="b.url" target="_blank" rel="noopener noreferrer" class="text-orange-600 underline underline-offset-4 hover:decoration-2">Buka di Maps</a>
-                    <template x-if="b.phone"><a :href="'tel:' + b.phone" class="text-orange-600 underline underline-offset-4 hover:decoration-2">Hubungi cabang ini</a></template>
+                    <a :href="b.url" target="_blank" rel="noopener noreferrer" class="text-copper-600 underline underline-offset-4 hover:decoration-2">Buka di Maps</a>
+                    <template x-if="b.phone"><a :href="'tel:' + b.phone" class="text-copper-600 underline underline-offset-4 hover:decoration-2">Hubungi cabang ini</a></template>
                 </div>
             </div>
         </div>

@@ -9,7 +9,7 @@
         <h1 class="text-2xl font-bold text-stone-900">FAQ</h1>
         <p class="text-sm text-stone-500 mt-1">Dikelompokkan per kategori. Urutan mengikuti angka urut.</p>
     </div>
-    @can('create_faqs')<a href="{{ route('admin.faqs.create') }}" class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-lg font-medium">+ Tambah FAQ</a>@endcan
+    @can('create_faqs')<a href="{{ route('admin.faqs.create') }}" class="bg-copper-500 hover:bg-copper-600 text-white px-5 py-2.5 rounded-lg font-medium">+ Tambah FAQ</a>@endcan
 </div>
 
 <form method="GET" class="bg-white p-4 rounded-lg border border-stone-200 mb-6 flex flex-wrap gap-3">
@@ -33,7 +33,7 @@
                         <div class="text-sm text-stone-600 mt-1 line-clamp-2">{{ $f->answer }}</div>
                     </div>
                     <div class="whitespace-nowrap text-sm">
-                        @can('edit_faqs')<a href="{{ route('admin.faqs.edit', $f->id) }}" class="text-orange-600 hover:underline mr-3">Edit</a>@endcan
+                        @can('edit_faqs')<a href="{{ route('admin.faqs.edit', $f->id) }}" class="text-copper-600 hover:underline mr-3">Edit</a>@endcan
                         @can('delete_faqs')
                         <form method="POST" action="{{ route('admin.faqs.destroy', $f->id) }}" class="inline" data-confirm-title="Hapus FAQ ini?" data-confirm-text="FAQ akan hilang dari halaman bantuan." data-confirm-ok="Ya, hapus FAQ" data-confirm-tone="danger">@csrf @method('DELETE')<button class="text-red-600 hover:underline">Hapus</button></form>
                         @endcan

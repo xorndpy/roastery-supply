@@ -126,7 +126,7 @@
 <div class="flex h-full flex-col">
     {{-- Brand: memakai logo dari Pengaturan > Umum > Logo --}}
     <div class="flex h-16 shrink-0 items-center border-b border-stone-200 px-4">
-        <a href="{{ route('admin.dashboard') }}" class="group flex min-w-0 items-center gap-3 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500">
+        <a href="{{ route('admin.dashboard') }}" class="group flex min-w-0 items-center gap-3 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-500">
             @if($siteLogo)
                 <img src="{{ media_url($siteLogo) }}" alt="" class="h-9 w-9 shrink-0 rounded-lg bg-white object-contain p-0.5 ring-1 ring-stone-200">
             @else
@@ -152,9 +152,9 @@
                  x-init="@if(!$hasActive) try { const v = localStorage.getItem('nav-{{ $slug }}'); if (v !== null) open = v === '1'; } catch (e) {} @endif">
                 <button type="button" @click="open = !open; try { localStorage.setItem('nav-{{ $slug }}', open ? '1' : '0'); } catch (e) {}"
                         :aria-expanded="open.toString()" aria-controls="nav-{{ $slug }}"
-                        class="flex w-full items-center justify-between rounded-md px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-stone-500 transition hover:text-stone-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500">
+                        class="flex w-full items-center justify-between rounded-md px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-stone-500 transition hover:text-stone-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-500">
                     <span class="flex items-center gap-2">{{ $menu['group'] }}
-                        @if($groupBadge > 0)<span x-show="!open" class="h-1.5 w-1.5 rounded-full bg-orange-500" aria-hidden="true"></span>@endif
+                        @if($groupBadge > 0)<span x-show="!open" class="h-1.5 w-1.5 rounded-full bg-copper-500" aria-hidden="true"></span>@endif
                     </span>
                     <svg class="h-3.5 w-3.5 transition-transform duration-150" :class="open ? '' : '-rotate-90'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
                 </button>
@@ -167,12 +167,12 @@
                         @endphp
                         <a href="{{ route($item['route']) }}" data-nav data-nav-group="{{ $menu['group'] }}" data-nav-label="{{ $item['label'] }}"
                            @if($isActive) aria-current="page" @endif
-                           class="group flex items-center gap-3 rounded-lg px-3 py-2 text-[13.5px] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500
+                           class="group flex items-center gap-3 rounded-lg px-3 py-2 text-[13.5px] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-500
                                   {{ $isActive ? 'bg-stone-100 font-medium text-stone-900' : 'text-stone-600 hover:bg-stone-50 hover:text-stone-900' }}">
-                            <svg class="h-[18px] w-[18px] shrink-0 {{ $isActive ? 'text-orange-600' : 'text-stone-400 group-hover:text-stone-600' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $icons[$item['icon']] ?? '' !!}</svg>
+                            <svg class="h-[18px] w-[18px] shrink-0 {{ $isActive ? 'text-copper-600' : 'text-stone-400 group-hover:text-stone-600' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $icons[$item['icon']] ?? '' !!}</svg>
                             <span class="truncate">{{ $item['label'] }}</span>
                             @if($badge > 0)
-                                <span class="ml-auto min-w-[1.375rem] rounded-full bg-orange-500 px-1.5 py-0.5 text-center text-[11px] font-semibold leading-none text-white tabular-nums" aria-label="{{ $badge }} menunggu">{{ $badge }}</span>
+                                <span class="ml-auto min-w-[1.375rem] rounded-full bg-copper-500 px-1.5 py-0.5 text-center text-[11px] font-semibold leading-none text-white tabular-nums" aria-label="{{ $badge }} menunggu">{{ $badge }}</span>
                             @endif
                         </a>
                     @endforeach
@@ -182,7 +182,7 @@
     </nav>
 
     <div class="flex shrink-0 items-center justify-between border-t border-stone-200 px-4 py-3 text-xs text-stone-500">
-        <a href="{{ route('home') }}" class="inline-flex items-center gap-1 rounded-md px-1.5 py-1 hover:bg-stone-100 hover:text-stone-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500">Lihat toko
+        <a href="{{ route('home') }}" class="inline-flex items-center gap-1 rounded-md px-1.5 py-1 hover:bg-stone-100 hover:text-stone-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-500">Lihat toko
             <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
         <span class="hidden items-center gap-1 lg:flex"><kbd class="rounded border border-stone-300 bg-white px-1.5 py-0.5 font-sans text-[10px] text-stone-600">Ctrl</kbd><kbd class="rounded border border-stone-300 bg-white px-1.5 py-0.5 font-sans text-[10px] text-stone-600">K</kbd></span>
     </div>

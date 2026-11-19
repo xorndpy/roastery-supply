@@ -64,7 +64,7 @@
                 <input type="checkbox" name="apply_to_past" value="1" class="rounded border-stone-300">
                 Terapkan juga ke pesanan lama yang belum punya HPP
             </label>
-            <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg font-medium">Simpan HPP</button>
+            <button class="bg-copper-500 hover:bg-copper-600 text-white px-6 py-2.5 rounded-lg font-medium">Simpan HPP</button>
         </div>
     @endcan
 </form>

@@ -40,7 +40,7 @@
                     <div>
                         <label class="block text-sm font-medium mb-1.5">Nama Kategori *</label>
                         <input type="text" name="name" value="{{ old('name', $category->name) }}" required
-                               class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-orange-500 focus:border-orange-500"
+                               class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-copper-500 focus:border-copper-500"
                                placeholder="Contoh: Espresso Machine">
                         @error('name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
@@ -48,7 +48,7 @@
                     <div>
                         <label class="block text-sm font-medium mb-1.5">Parent Kategori (Opsional)</label>
                         <select name="parent_id"
-                                class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-orange-500 focus:border-orange-500">
+                                class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-copper-500 focus:border-copper-500">
                             <option value="">— Kategori Utama (tanpa parent) —</option>
                             @foreach($parents as $parent)
                                 <option value="{{ $parent->id }}" {{ old('parent_id', $category->parent_id) == $parent->id ? 'selected' : '' }}>
@@ -63,7 +63,7 @@
                     <div>
                         <label class="block text-sm font-medium mb-1.5">Deskripsi</label>
                         <textarea name="description" rows="4"
-                                  class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-orange-500 focus:border-orange-500"
+                                  class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:ring-copper-500 focus:border-copper-500"
                                   placeholder="Deskripsi kategori (opsional)">{{ old('description', $category->description) }}</textarea>
                         @error('description') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
@@ -116,7 +116,7 @@
                 <label class="flex items-center gap-3 cursor-pointer">
                     <input type="checkbox" name="is_active" value="1"
                            {{ old('is_active', $category->is_active ?? true) ? 'checked' : '' }}
-                           class="w-4 h-4 text-orange-500 rounded">
+                           class="w-4 h-4 text-copper-500 rounded">
                     <div>
                         <div class="font-medium text-sm">Aktif</div>
                         <div class="text-xs text-stone-500">Tampil di katalog publik</div>
@@ -127,7 +127,7 @@
             {{-- Submit --}}
             <div class="bg-white p-6 rounded-lg border border-stone-200">
                 <button type="submit"
-                        class="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-medium transition">
+                        class="w-full bg-copper-500 hover:bg-copper-600 text-white py-3 rounded-lg font-medium transition">
                     {{ $mode === 'create' ? 'Simpan Kategori' : 'Update Kategori' }}
                 </button>
                 <a href="{{ route('admin.categories.index') }}"

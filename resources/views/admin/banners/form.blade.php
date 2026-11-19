@@ -32,7 +32,7 @@
             </div>
         </div>
         <div class="mt-2 flex items-center gap-3">
-            <label class="inline-flex cursor-pointer items-center rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-sm font-medium text-stone-700 hover:bg-stone-50 focus-within:ring-2 focus-within:ring-orange-500">
+            <label class="inline-flex cursor-pointer items-center rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-sm font-medium text-stone-700 hover:bg-stone-50 focus-within:ring-2 focus-within:ring-copper-500">
                 <input id="banner-image" type="file" name="image" accept="image/jpeg,image/png,image/webp" {{ $isEdit ? '' : 'required' }} class="sr-only"
                        @change="const f = $event.target.files[0]; src = f ? URL.createObjectURL(f) : null">
                 <span x-text="(src || existing) ? 'Ganti foto' : 'Pilih foto'"></span>
@@ -71,6 +71,6 @@
 
     <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="is_active" value="1" @checked(old('is_active', $banner->is_active))> Aktif</label>
 
-    <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg font-medium">{{ $isEdit ? 'Simpan' : 'Tambah Banner' }}</button>
+    <button class="bg-copper-500 hover:bg-copper-600 text-white px-6 py-2.5 rounded-lg font-medium">{{ $isEdit ? 'Simpan' : 'Tambah Banner' }}</button>
 </form>
 @endsection

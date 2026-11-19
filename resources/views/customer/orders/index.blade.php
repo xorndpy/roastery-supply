@@ -6,7 +6,7 @@
 <x-page-header plain title="Pesanan Saya" :crumbs="[['Beranda', route('home')], ['Pesanan Saya']]" />
 
 @php
-    $statusBadge = ['menunggu_bayar' => 'bg-amber-100 text-amber-800', 'dikonfirmasi' => 'bg-orange-100 text-orange-800', 'diproses' => 'bg-orange-200 text-orange-900', 'dikirim' => 'bg-stone-200 text-stone-800', 'selesai' => 'bg-green-100 text-green-800', 'batal' => 'bg-red-100 text-red-800'];
+    $statusBadge = ['menunggu_bayar' => 'bg-amber-100 text-amber-800', 'dikonfirmasi' => 'bg-copper-100 text-copper-800', 'diproses' => 'bg-copper-200 text-copper-900', 'dikirim' => 'bg-stone-200 text-stone-800', 'selesai' => 'bg-green-100 text-green-800', 'batal' => 'bg-red-100 text-red-800'];
     $statusLabels = ['menunggu_bayar' => 'Menunggu Bayar', 'dikonfirmasi' => 'Dikonfirmasi', 'diproses' => 'Diproses', 'dikirim' => 'Dikirim', 'selesai' => 'Selesai', 'batal' => 'Batal'];
 @endphp
 
@@ -21,7 +21,7 @@
     @if($orders->count())
         <div class="space-y-4">
             @foreach($orders as $order)
-                <div class="rounded-xl border border-stone-200 bg-white p-6 transition hover:border-orange-500/60">
+                <div class="rounded-xl border border-stone-200 bg-white p-6 transition hover:border-copper-500/60">
                     <div class="flex flex-wrap items-start justify-between gap-4">
                         <div>
                             <div class="text-xs text-stone-500">No. Pesanan</div>
@@ -38,7 +38,7 @@
                     </div>
 
                     <div class="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-stone-100 pt-4">
-                        <div><span class="text-xs text-stone-500">Total</span> <span class="ml-1 text-lg font-semibold text-orange-500">Rp {{ number_format($order->total, 0, ',', '.') }}</span></div>
+                        <div><span class="text-xs text-stone-500">Total</span> <span class="ml-1 text-lg font-semibold text-copper-500">Rp {{ number_format($order->total, 0, ',', '.') }}</span></div>
                         <a href="{{ route('customer.orders.show', $order->order_number) }}" class="btn btn-outline btn-sm">Lihat Detail</a>
                     </div>
                 </div>

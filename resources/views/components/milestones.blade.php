@@ -30,8 +30,8 @@
             @foreach($items as $i => $m)
                 @php $left = $i % 2 === 0; $top = $y($i) / $H * 100; @endphp
                 <li class="contents">
-                    <span class="absolute z-10 flex h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-[3px] border-orange-500 bg-white shadow-sm" style="left: {{ $x($i) / 10 }}%; top: {{ $top }}%" data-reveal>
-                        <span class="h-3 w-3 rounded-full bg-orange-500"></span>
+                    <span class="absolute z-10 flex h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-[3px] border-copper-500 bg-white shadow-sm" style="left: {{ $x($i) / 10 }}%; top: {{ $top }}%" data-reveal>
+                        <span class="h-3 w-3 rounded-full bg-copper-500"></span>
                     </span>
                     <div class="absolute -translate-y-1/2 {{ $left ? 'text-right' : 'text-left' }}"
                          style="top: {{ $top }}%; {{ $left ? 'right: ' . ((1000 - $x($i) + 60) / 10) . '%' : 'left: ' . (($x($i) + 60) / 10) . '%' }}; width: 30%; --d: {{ 120 + $i * 80 }}ms"
@@ -48,7 +48,7 @@
     <ol class="relative ml-3 space-y-9 border-l-2 border-stone-300 pl-8 lg:hidden">
         @foreach($items as $i => $m)
             <li class="relative" data-reveal style="--d: {{ $i * 70 }}ms">
-                <span class="absolute -left-[45px] top-1 flex h-6 w-6 items-center justify-center rounded-full border-[3px] border-orange-500 bg-white"><span class="h-2 w-2 rounded-full bg-orange-500"></span></span>
+                <span class="absolute -left-[45px] top-1 flex h-6 w-6 items-center justify-center rounded-full border-[3px] border-copper-500 bg-white"><span class="h-2 w-2 rounded-full bg-copper-500"></span></span>
                 <p class="ms-year">{{ $m->year }}</p>
                 <h3 class="ms-title">{{ $m->title }}</h3>
                 @if($m->description)<p class="ms-desc">{{ $m->description }}</p>@endif

@@ -67,7 +67,7 @@
                 </div>
             </fieldset>
 
-            <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-medium">Kirim Pengajuan</button>
+            <button class="bg-copper-500 hover:bg-copper-600 text-white px-6 py-3 rounded-lg font-medium">Kirim Pengajuan</button>
             <p class="text-xs text-stone-500">Setiap pesanan hanya bisa diajukan retur satu kali.</p>
         </form>
     @endif

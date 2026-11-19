@@ -69,7 +69,7 @@
         </div>
     </div>
 
-    <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg font-medium">
+    <button class="bg-copper-500 hover:bg-copper-600 text-white px-6 py-2.5 rounded-lg font-medium">
         {{ $isEdit ? 'Simpan Perubahan' : 'Buat User' }}
     </button>
 </form>

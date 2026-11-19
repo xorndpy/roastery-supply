@@ -40,7 +40,7 @@
         @foreach($periods as $key => $label)
             <a href="{{ route('admin.reports.index', ['period' => $key]) }}"
                class="px-3 py-1.5 rounded-lg text-sm font-medium transition
-                      {{ $period === $key ? 'bg-orange-500 text-white' : 'bg-stone-100 text-stone-600 hover:bg-stone-200' }}">
+                      {{ $period === $key ? 'bg-copper-500 text-white' : 'bg-stone-100 text-stone-600 hover:bg-stone-200' }}">
                 {{ $label }}
             </a>
         @endforeach
@@ -103,7 +103,7 @@
         <div class="flex items-center justify-between mb-2">
             <div class="text-xs text-stone-500 uppercase">Menunggu Bayar</div>
         </div>
-        <div class="text-2xl font-bold text-orange-500">
+        <div class="text-2xl font-bold text-copper-500">
             {{ number_format($stats['pending_orders']) }}
         </div>
     </div>
@@ -141,7 +141,7 @@
                                 <td class="py-3 text-stone-500">{{ $i + 1 }}</td>
                                 <td class="py-3 font-medium">{{ $product->product_name }}</td>
                                 <td class="py-3 text-right">
-                                    <span class="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full font-medium">
+                                    <span class="bg-copper-100 text-copper-800 text-xs px-2 py-1 rounded-full font-medium">
                                         {{ $product->total_sold }}x
                                     </span>
                                 </td>

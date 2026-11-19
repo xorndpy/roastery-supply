@@ -136,6 +136,30 @@ class Product extends Model
     }
 
     /**
+     * Nama untuk kartu produk: awalan merek dibuang karena merek sudah tampil di baris sendiri.
+     * "Nuova Simonelli Appia Life V 2" dengan merek "Nuova Simonelli" menjadi "Appia Life V 2".
+     * Hanya untuk tampilan; data tetap utuh. Bila sisanya terlalu pendek, nama asli dipakai.
+     */
+    public function getShortNameAttribute(): string
+    {
+        $brand = $this->brand?->name;
+        if (! $brand || ! str_starts_with(mb_strtolower($this->name), mb_strtolower($brand))) {
+            return $this->name;
+        }
+
+        $after = mb_substr($this->name, mb_strlen($brand));
+
+        // Merek harus berakhir di batas kata ("Bravo Trittico" ya, "Bravotech" tidak).
+        if (! preg_match('/^[\s\-–—:·]/u', $after)) {
+            return $this->name;
+        }
+
+        $rest = ltrim($after, " \t-–—:·");
+
+        return mb_strlen($rest) >= 4 ? $rest : $this->name;
+    }
+
+    /**
      * Generate standard SKU: RS-[CATEGORY]-[NUMBER] (e.g. RS-ESP-001)
      */
     public static function generateSku(string $categoryCode = 'GEN'): string

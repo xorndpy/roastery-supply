@@ -9,7 +9,7 @@
         <h1 class="text-2xl font-bold text-stone-900">Voucher</h1>
         <p class="text-sm text-stone-500 mt-1">Satu kode per pesanan, tidak bisa digabung. Kuota dikembalikan jika pesanan dibatalkan.</p>
     </div>
-    @can('create_vouchers')<a href="{{ route('admin.vouchers.create') }}" class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-lg font-medium">+ Buat Voucher</a>@endcan
+    @can('create_vouchers')<a href="{{ route('admin.vouchers.create') }}" class="bg-copper-500 hover:bg-copper-600 text-white px-5 py-2.5 rounded-lg font-medium">+ Buat Voucher</a>@endcan
 </div>
 
 @php
@@ -60,7 +60,7 @@
                 </td>
                 <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-xs {{ $stateColors[$v->state] }}">{{ $stateLabels[$v->state] }}</span></td>
                 <td class="px-4 py-3 text-right whitespace-nowrap">
-                    @can('edit_vouchers')<a href="{{ route('admin.vouchers.edit', $v->id) }}" class="text-orange-600 hover:underline mr-3">Edit</a>@endcan
+                    @can('edit_vouchers')<a href="{{ route('admin.vouchers.edit', $v->id) }}" class="text-copper-600 hover:underline mr-3">Edit</a>@endcan
                     @can('delete_vouchers')
                     <form method="POST" action="{{ route('admin.vouchers.destroy', $v->id) }}" class="inline" data-confirm-title="Hapus voucher {{ $v->code }}?" data-confirm-text="Voucher tidak bisa dipakai lagi di checkout." data-confirm-ok="Ya, hapus voucher" data-confirm-tone="danger">@csrf @method('DELETE')<button class="text-red-600 hover:underline">Hapus</button></form>
                     @endcan
