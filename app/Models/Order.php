@@ -154,6 +154,35 @@ class Order extends Model
     /**
      * Translate status to Indonesian label.
      */
+    /**
+     * Pesanan yang melewati batas waktu proses (lihat config/orders.php).
+     */
+    public function scopeLate(Builder $query): Builder
+    {
+        $sla = config('orders.sla_hours');
+
+        return $query->where(function (Builder $q) use ($sla) {
+            $q->where(fn ($w) => $w->where('status', 'dikonfirmasi')->where('updated_at', '<=', now()->subHours($sla['dikonfirmasi'])))
+              ->orWhere(fn ($w) => $w->where('status', 'diproses')->where('updated_at', '<=', now()->subHours($sla['diproses'])));
+        });
+    }
+
+    public function getLateHoursAttribute(): ?int
+    {
+        $limit = config('orders.sla_hours')[$this->status] ?? null;
+        if ($limit === null) {
+            return null;
+        }
+        $hours = (int) $this->updated_at->diffInHours(now());
+
+        return $hours >= $limit ? $hours : null;
+    }
+
+    public function getIsLateAttribute(): bool
+    {
+        return $this->late_hours !== null;
+    }
+
     public function getStatusLabelAttribute(): string
     {
         return match ($this->status) {

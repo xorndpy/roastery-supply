@@ -96,6 +96,25 @@ class FinanceController extends Controller
         }, "laba-rugi-{$from}-sd-{$to}.csv", ['Content-Type' => 'text/csv; charset=UTF-8']);
     }
 
+    public function profitPdf(Request $request)
+    {
+        [$from, $to] = $this->period($request);
+        $r = $this->service->report($from, $to);
+
+        return \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.finance.profit-pdf', compact('r', 'from', 'to'))
+            ->download("laba-rugi-{$from}-sd-{$to}.pdf");
+    }
+
+    public function profitXlsx(Request $request)
+    {
+        [$from, $to] = $this->period($request);
+
+        return \Maatwebsite\Excel\Facades\Excel::download(
+            new \App\Exports\ProfitLossExport($this->service->report($from, $to)),
+            "laba-rugi-{$from}-sd-{$to}.xlsx"
+        );
+    }
+
     /** Daftar HPP per produk. */
     public function costs(Request $request)
     {
