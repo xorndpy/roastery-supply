@@ -35,7 +35,7 @@
         @can('delete_contact_messages')
         <form method="POST" action="{{ route('admin.messages.destroy', $message->id) }}" data-confirm-title="Hapus pesan ini?" data-confirm-text="Pesan dari pengunjung ini akan dihapus dari kotak masuk." data-confirm-ok="Ya, hapus pesan" data-confirm-tone="danger" class="ml-auto">
             @csrf @method('DELETE')
-            <button class="text-red-600 hover:underline text-sm">Hapus</button>
+            <button class="row-btn is-danger">Hapus</button>
         </form>
         @endcan
     </div>

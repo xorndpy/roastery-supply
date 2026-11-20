@@ -19,8 +19,6 @@
     </div>
 </div>
 
-@if(session('success'))<div class="mb-4 p-4 bg-green-50 border border-green-200 text-green-800 rounded-lg text-sm">{{ session('success') }}</div>@endif
-@if(session('error'))<div class="mb-4 p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg text-sm">{{ session('error') }}</div>@endif
 @if($lockedUntil)<div class="mb-4 p-3 rounded-lg border border-stone-200 bg-white text-sm text-stone-600">Buku ditutup sampai <strong class="text-stone-900">{{ \Carbon\Carbon::parse($lockedUntil)->format('d M Y') }}</strong>. Biaya sampai tanggal itu terkunci.</div>@endif
 
 <form method="GET" class="bg-white p-4 rounded-lg border border-stone-200 mb-4 flex flex-wrap items-end gap-3">
@@ -58,7 +56,7 @@
                 <td class="px-4 py-3 text-right whitespace-nowrap space-x-3">
                     @can('edit_expenses')<a href="{{ route('admin.expenses.edit', $e->id) }}" class="text-stone-700 hover:underline">Ubah</a>@endcan
                     @can('delete_expenses')
-                        <form method="POST" action="{{ route('admin.expenses.destroy', $e->id) }}" class="inline" data-confirm-title="Hapus biaya ini?" data-confirm-text="{{ $e->description }} (Rp {{ number_format($e->amount, 0, ',', '.') }}) tidak lagi dihitung di laba rugi." data-confirm-ok="Ya, hapus" data-confirm-tone="danger">@csrf @method('DELETE')<button class="text-red-600 hover:underline">Hapus</button></form>
+                        <form method="POST" action="{{ route('admin.expenses.destroy', $e->id) }}" class="inline" data-confirm-title="Hapus biaya ini?" data-confirm-text="{{ $e->description }} (Rp {{ number_format($e->amount, 0, ',', '.') }}) tidak lagi dihitung di laba rugi." data-confirm-ok="Ya, hapus" data-confirm-tone="danger">@csrf @method('DELETE')<button class="row-btn is-danger">Hapus</button></form>
                     @endcan
                 </td>
             </tr>

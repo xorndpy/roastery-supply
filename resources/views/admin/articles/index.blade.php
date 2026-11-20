@@ -54,10 +54,10 @@
                                     @if($a->is_published && !$scheduled)<a href="{{ route('articles.show', $a->slug) }}" target="_blank" rel="noopener" class="pay-btn is-quiet !py-1.5">Lihat</a>@endif
                                     @can('edit_articles')
                                         <form method="POST" action="{{ route('admin.articles.toggle-publish', $a->id) }}">@csrf @method('PATCH')<button class="pay-btn is-quiet !py-1.5">{{ $a->is_published ? 'Jadikan draft' : 'Terbitkan' }}</button></form>
-                                        <a href="{{ route('admin.articles.edit', $a->id) }}" class="pay-btn is-primary !py-1.5">Edit</a>
+                                        <a href="{{ route('admin.articles.edit', $a->id) }}" class="row-btn">Edit</a>
                                     @endcan
                                     @can('delete_articles')
-                                        <form method="POST" action="{{ route('admin.articles.destroy', $a->id) }}" data-confirm-title="Hapus artikel ini?" data-confirm-text="Artikel tidak akan tampil lagi di website." data-confirm-ok="Ya, hapus artikel" data-confirm-tone="danger">@csrf @method('DELETE')<button class="pay-btn is-quiet !py-1.5 !text-red-700">Hapus</button></form>
+                                        <form method="POST" action="{{ route('admin.articles.destroy', $a->id) }}" data-confirm-title="Hapus artikel ini?" data-confirm-text="Artikel tidak akan tampil lagi di website." data-confirm-ok="Ya, hapus artikel" data-confirm-tone="danger">@csrf @method('DELETE')<button class="row-btn is-danger">Hapus</button></form>
                                     @endcan
                                 </div>
                             </td>

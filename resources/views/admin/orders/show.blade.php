@@ -10,18 +10,6 @@
     </a>
 </div>
 
-@if(session('success'))
-    <div class="mb-4 p-4 bg-green-50 border border-green-200 text-green-800 rounded-lg">
-        {{ session('success') }}
-    </div>
-@endif
-
-@if(session('error'))
-    <div class="mb-4 p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg">
-        {{ session('error') }}
-    </div>
-@endif
-
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
     {{-- Left Column --}}

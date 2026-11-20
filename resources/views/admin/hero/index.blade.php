@@ -12,9 +12,6 @@
     </p>
 </div>
 
-@if (session('success'))
-    <div class="mb-4 p-3 bg-green-50 border border-green-200 text-green-800 rounded-lg text-sm">{{ session('success') }}</div>
-@endif
 @if ($errors->any())
     <div class="mb-4 p-3 bg-red-50 border border-red-200 text-red-800 rounded-lg text-sm">
         <ul class="list-disc list-inside">@foreach ($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
@@ -79,7 +76,7 @@
                         </form>
                         <form method="POST" action="{{ route('admin.hero.destroy', $s->id) }}" data-confirm-title="Hapus foto hero ini?" data-confirm-text="Foto akan hilang dari slideshow halaman utama." data-confirm-ok="Ya, hapus foto" data-confirm-tone="danger">
                             @csrf @method('DELETE')
-                            <button class="text-red-600 hover:underline">Hapus</button>
+                            <button class="row-btn is-danger">Hapus</button>
                         </form>
                     </div>
                     @endcan

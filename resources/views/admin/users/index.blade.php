@@ -50,12 +50,12 @@
                 </td>
                 <td class="px-4 py-3 text-stone-500">{{ $u->created_at->format('d M Y') }}</td>
                 <td class="px-4 py-3 text-right whitespace-nowrap">
-                    <a href="{{ route('admin.users.edit', $u->id) }}" class="text-copper-600 hover:underline mr-3">Edit</a>
+                    <a href="{{ route('admin.users.edit', $u->id) }}" class="row-btn">Edit</a>
                     @if($u->id !== auth()->id())
                     <form method="POST" action="{{ route('admin.users.destroy', $u->id) }}" class="inline"
                           data-confirm-title="Hapus user {{ $u->name }}?" data-confirm-text="Akun ini tidak akan bisa masuk ke sistem lagi." data-confirm-ok="Ya, hapus user" data-confirm-tone="danger">
                         @csrf @method('DELETE')
-                        <button class="text-red-600 hover:underline">Hapus</button>
+                        <button class="row-btn is-danger">Hapus</button>
                     </form>
                     @endif
                 </td>

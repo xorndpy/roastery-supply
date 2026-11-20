@@ -11,7 +11,6 @@
     <p class="text-sm text-stone-500 mt-1">Periode yang ditutup terkunci (biaya operasional tidak bisa diubah) dan angkanya disimpan. Kalau data berubah setelahnya, selisihnya terlihat di sini.</p>
 </div>
 
-@if(session('success'))<div class="mb-4 p-4 bg-green-50 border border-green-200 text-green-800 rounded-lg text-sm">{{ session('success') }}</div>@endif
 @if ($errors->any())
     <div class="mb-4 p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg text-sm"><ul class="list-disc list-inside">@foreach ($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul></div>
 @endif

@@ -7,8 +7,6 @@
 @section('content')
 <div class="mb-6"><a href="{{ route('admin.service.index') }}" class="text-sm text-stone-500 hover:text-stone-700">Kembali ke Tiket Servis</a></div>
 
-@if(session('success'))<div class="mb-4 rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800">{{ session('success') }}</div>@endif
-@if(session('error'))<div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">{{ session('error') }}</div>@endif
 @if ($errors->any())<div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800"><ul class="list-inside list-disc">@foreach ($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul></div>@endif
 
 <div class="grid gap-6 lg:grid-cols-3">

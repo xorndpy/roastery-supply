@@ -24,9 +24,9 @@
                 <td class="px-4 py-3">{{ $p->sort_order }}</td>
                 <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-xs {{ $p->is_active ? 'bg-green-100 text-green-700' : 'bg-stone-100 text-stone-600' }}">{{ $p->is_active ? 'Aktif' : 'Nonaktif' }}</span></td>
                 <td class="px-4 py-3 text-right whitespace-nowrap">
-                    @can('edit_partners')<a href="{{ route('admin.partners.edit', $p->id) }}" class="text-copper-600 hover:underline mr-3">Edit</a>@endcan
+                    @can('edit_partners')<a href="{{ route('admin.partners.edit', $p->id) }}" class="row-btn">Edit</a>@endcan
                     @can('delete_partners')
-                    <form method="POST" action="{{ route('admin.partners.destroy', $p->id) }}" class="inline" data-confirm-title="Hapus partner ini?" data-confirm-text="Logo partner tidak akan tampil lagi di halaman Tentang." data-confirm-ok="Ya, hapus partner" data-confirm-tone="danger">@csrf @method('DELETE')<button class="text-red-600 hover:underline">Hapus</button></form>
+                    <form method="POST" action="{{ route('admin.partners.destroy', $p->id) }}" class="inline" data-confirm-title="Hapus partner ini?" data-confirm-text="Logo partner tidak akan tampil lagi di halaman Tentang." data-confirm-ok="Ya, hapus partner" data-confirm-tone="danger">@csrf @method('DELETE')<button class="row-btn is-danger">Hapus</button></form>
                     @endcan
                 </td>
             </tr>

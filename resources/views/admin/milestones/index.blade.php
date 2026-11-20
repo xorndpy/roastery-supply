@@ -26,8 +26,8 @@
                             <td><span class="dash-badge" style="--c: {{ $m->is_active ? '#5b7f4b' : '#a8998b' }}"><i></i>{{ $m->is_active ? 'Tampil' : 'Disembunyikan' }}</span></td>
                             <td class="text-right">
                                 <div class="flex items-center justify-end gap-2">
-                                    @can('edit_milestones')<a href="{{ route('admin.milestones.edit', $m->id) }}" class="pay-btn is-primary !py-1.5">Edit</a>@endcan
-                                    @can('delete_milestones')<form method="POST" action="{{ route('admin.milestones.destroy', $m->id) }}" data-confirm-title="Hapus milestone ini?" data-confirm-text="Milestone akan hilang dari halaman Tentang." data-confirm-ok="Ya, hapus milestone" data-confirm-tone="danger">@csrf @method('DELETE')<button class="pay-btn is-quiet !py-1.5 !text-red-700">Hapus</button></form>@endcan
+                                    @can('edit_milestones')<a href="{{ route('admin.milestones.edit', $m->id) }}" class="row-btn">Edit</a>@endcan
+                                    @can('delete_milestones')<form method="POST" action="{{ route('admin.milestones.destroy', $m->id) }}" data-confirm-title="Hapus milestone ini?" data-confirm-text="Milestone akan hilang dari halaman Tentang." data-confirm-ok="Ya, hapus milestone" data-confirm-tone="danger">@csrf @method('DELETE')<button class="row-btn is-danger">Hapus</button></form>@endcan
                                 </div>
                             </td>
                         </tr>

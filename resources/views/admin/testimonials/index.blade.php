@@ -60,12 +60,12 @@
                 <button class="{{ $t->is_featured ? 'text-copper-700 font-medium' : 'text-stone-600' }} hover:underline">{{ $t->is_featured ? 'Lepas sematan' : 'Sematkan di beranda' }}</button>
             </form>
             @endif
-            <a href="{{ route('admin.testimonials.edit', $t->id) }}" class="text-copper-600 hover:underline">Edit</a>
+            <a href="{{ route('admin.testimonials.edit', $t->id) }}" class="row-btn">Edit</a>
             @endcan
             @can('delete_testimonials')
             <form method="POST" action="{{ route('admin.testimonials.destroy', $t->id) }}" data-confirm-title="Hapus testimoni ini?" data-confirm-text="Testimoni tidak akan tampil lagi di website." data-confirm-ok="Ya, hapus testimoni" data-confirm-tone="danger">
                 @csrf @method('DELETE')
-                <button class="text-red-600 hover:underline">Hapus</button>
+                <button class="row-btn is-danger">Hapus</button>
             </form>
             @endcan
         </div>

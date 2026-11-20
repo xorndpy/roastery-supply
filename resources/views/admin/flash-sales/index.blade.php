@@ -15,8 +15,6 @@
     @can('create_flash_sales')<a href="{{ route('admin.flash-sales.create') }}" class="rounded-lg bg-copper-500 px-5 py-2.5 font-medium text-white hover:bg-copper-600">+ Kampanye Baru</a>@endcan
 </div>
 
-@if(session('success'))<div class="mb-4 rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800">{{ session('success') }}</div>@endif
-@if(session('error'))<div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">{{ session('error') }}</div>@endif
 
 <div class="overflow-x-auto rounded-lg border border-stone-200 bg-white">
     <table class="w-full text-sm">
@@ -33,7 +31,7 @@
                 <td class="space-x-3 whitespace-nowrap px-4 py-3 text-right">
                     @can('edit_flash_sales')<a href="{{ route('admin.flash-sales.edit', $s->id) }}" class="hover:underline">Ubah</a>@endcan
                     @can('delete_flash_sales')
-                        <form method="POST" action="{{ route('admin.flash-sales.destroy', $s->id) }}" class="inline" data-confirm-title="Hapus kampanye {{ $s->name }}?" data-confirm-text="Kampanye yang sudah punya penjualan tidak bisa dihapus." data-confirm-ok="Ya, hapus" data-confirm-tone="danger">@csrf @method('DELETE')<button class="text-red-600 hover:underline">Hapus</button></form>
+                        <form method="POST" action="{{ route('admin.flash-sales.destroy', $s->id) }}" class="inline" data-confirm-title="Hapus kampanye {{ $s->name }}?" data-confirm-text="Kampanye yang sudah punya penjualan tidak bisa dihapus." data-confirm-ok="Ya, hapus" data-confirm-tone="danger">@csrf @method('DELETE')<button class="row-btn is-danger">Hapus</button></form>
                     @endcan
                 </td>
             </tr>

@@ -95,8 +95,9 @@
     .shop-ui main :is(input:not([type=checkbox]):not([type=radio]):not([type=file]), select, textarea):focus {
         border-color: theme('colors.copper.500'); box-shadow: 0 0 0 3px rgb(168 100 58 / 0.18); outline: none;
     }
-    .admin-ui main :is(input[type=checkbox], input[type=radio]),
     .shop-ui main :is(input[type=checkbox], input[type=radio]) { accent-color: theme('colors.copper.500'); color: theme('colors.copper.500'); }
+    .admin-ui main :is(input[type=checkbox], input[type=radio]) { accent-color: theme('colors.stone.900'); color: theme('colors.stone.900'); }
+    .admin-ui main :is(input[type=checkbox], input[type=radio]):focus { --tw-ring-color: theme('colors.stone.400'); }
     .admin-ui main input[type=file], .shop-ui main input[type=file] { font-size: 0.8125rem; color: theme('colors.stone.600'); }
     .admin-ui main input[type=file]::file-selector-button, .shop-ui main input[type=file]::file-selector-button {
         margin-right: 0.75rem; padding: 0.4rem 0.85rem; border: 1px solid theme('colors.stone.300'); border-radius: 0.375rem;
@@ -373,6 +374,13 @@
     .pay-flag { display: flex; gap: .85rem; padding: 1.1rem 1.25rem; border: 1px solid #ecc9c2; border-left: 4px solid #b3402f; border-radius: 12px; background: #fff7f5; }
     .pay-flag h2 { font-size: 1.05rem; }
     .pay-flag p { margin-top: .25rem; font-size: 13.5px; line-height: 1.55; color: #5f5046; }
+    /* Tombol aksi baris tabel (Edit / Hapus): seragam, bergaris tipis */
+    .row-btn { display: inline-flex; align-items: center; padding: .25rem .65rem; border: 1px solid theme('colors.stone.300'); border-radius: .375rem; background: #fff; font-size: 12.5px; font-weight: 500; line-height: 1.25; color: theme('colors.stone.700'); transition: background-color .15s, border-color .15s; }
+    .row-btn:hover { background: theme('colors.stone.50'); border-color: theme('colors.stone.400'); }
+    .row-btn:focus-visible { outline: 2px solid theme('colors.stone.500'); outline-offset: 2px; }
+    .row-btn.is-danger { color: #b42318; border-color: #fecdca; }
+    .row-btn.is-danger:hover { background: #fef3f2; border-color: #fda29b; }
+    .auth-error { margin-top: .5rem; font-size: 13px; color: #b42318; }
     .pay-btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; padding: .55rem 1rem; border-radius: 9px; font-size: 13.5px; font-weight: 500; transition: background-color .15s, border-color .15s; }
     .pay-btn:focus-visible { outline: 2px solid #a8643a; outline-offset: 2px; }
     .pay-btn.is-primary { background: #26180f; color: #f4e3d3; }

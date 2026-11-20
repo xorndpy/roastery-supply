@@ -331,7 +331,7 @@
         @can('view_shipping_rates')
             <div class="dash-notice" role="note">
                 <svg class="h-5 w-5 shrink-0 text-amber-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.8l9 15.7H3L12 3.8z"/><path d="M12 10v4M12 17v.1"/></svg>
-                <p><strong>Ongkir belum diatur.</strong> Checkout saat ini berjalan tanpa ongkos kirim. <a href="{{ route('admin.shipping.index') }}">Atur tarif pengiriman →</a></p>
+                <p><strong>Ongkir belum diatur.</strong> Checkout saat ini berjalan tanpa ongkos kirim. <a href="{{ route('admin.shipping.index') }}">Atur tarif pengiriman</a></p>
             </div>
         @endcan
     @endif
@@ -392,10 +392,7 @@
                 </ul>
                 @if($tasks->count() > 5)<p class="td-sub" style="margin-top:.75rem">+{{ $tasks->count() - 5 }} antrean lainnya</p>@endif
             @else
-                <div class="flex items-center gap-3 rounded-xl bg-emerald-50 px-4 py-3.5">
-                    <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-emerald-100 text-emerald-700"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
-                    <div><p class="text-sm font-semibold text-emerald-900">Semua beres</p><p class="text-[12.5px] text-emerald-800/80">Tidak ada yang menunggu tindakan.</p></div>
-                </div>
+                <p class="text-sm text-stone-500">Tidak ada antrean tindakan.</p>
             @endif
         </section>
 
@@ -438,7 +435,7 @@
         <section class="td-card td-c8" aria-labelledby="orders-title">
             <div class="td-head">
                 <h2 id="orders-title">Pesanan terbaru</h2>
-                <a href="{{ route('admin.orders.index') }}" class="dash-link">Lihat semua →</a>
+                <a href="{{ route('admin.orders.index') }}" class="dash-link">Lihat semua</a>
             </div>
             <div class="dash-tablewrap overflow-x-auto">
                 <table class="dash-table">
@@ -546,55 +543,39 @@
             </div>
         </section>
 
-        {{-- ============ Stok menipis ============ --}}
-        <section class="td-card td-c4" aria-labelledby="stock-title">
-            <div class="td-head">
-                <h2 id="stock-title">Stok menipis</h2>
-                @can('view_stock')<a href="{{ route('admin.stock.index') }}" class="dash-link">Kelola →</a>@endcan
-            </div>
-            @forelse($lowStockList as $product)
-                @php $pimg = $product->images->first()->image ?? null; @endphp
-                @if($loop->first)<ul class="dash-stock">@endif
-                <li>
-                    @if($pimg)
-                        <img src="{{ thumb_url($pimg) }}" alt="" loading="lazy" class="dash-thumb" onerror="this.onerror=null;this.src='{{ media_url($pimg) }}'">
-                    @else
-                        <span class="dash-thumb is-empty" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">{!! $ico['image'] !!}</svg></span>
-                    @endif
-                    <div class="min-w-0 flex-1">
-                        <p class="truncate text-sm font-medium">{{ $product->name }}</p>
-                        <p class="text-xs text-stone-500">{{ $product->sku }}</p>
-                        <div class="dash-track is-brick"><div class="dash-fill" style="width: {{ min(100, $product->stock / max(1, $product->stock_threshold) * 100) }}%"></div></div>
-                    </div>
-                    <div class="shrink-0 text-right"><p class="dash-stock-n">{{ $product->stock }}</p><p class="text-[11px] text-stone-500">min {{ $product->stock_threshold }}</p></div>
-                </li>
-                @if($loop->last)</ul>@endif
-            @empty
-                <p class="dash-empty is-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Semua stok di atas batas minimum.</p>
-            @endforelse
-        </section>
+        {{-- ============ Perlu perhatian (hanya tampil bila ada masalah) ============ --}}
+        @php
+            $showFollowUp = auth()->user()->can('view_customers') && $followUpTotal > 0;
+            $showAttention = $lowStockList->isNotEmpty() || $showFollowUp;
+        @endphp
+        @if($showAttention)
+        <section class="td-card td-c4" aria-labelledby="attn-title">
+            <div class="td-head"><h2 id="attn-title">Perlu perhatian</h2></div>
 
-        {{-- ============ Pelanggan (ringkasan + follow-up) ============ --}}
-        <section class="td-card td-c4" aria-labelledby="cust-title">
-            <div class="td-head"><div><h2 id="cust-title">Pelanggan</h2><p class="td-sub">{{ number_format($totalCustomers) }} terdaftar</p></div></div>
-            <div class="td-people">
-                <div><b>{{ number_format($buyers) }}</b><span>Pembeli</span></div>
-                <div><b>{{ number_format($newBuyers) }}</b><span>Baru</span></div>
-                <div><b>{{ $repeatPct }}%</b><span>Repeat</span></div>
-            </div>
-            @if($buyers > 0)
-                <div class="td-split" role="img" aria-label="{{ $newBuyers }} pembeli baru dan {{ $buyers - $newBuyers }} pembeli berulang" style="margin-top:1rem">
-                    <i style="flex: {{ max($newBuyers, 0.0001) }} 1 0%; background: #a8643a"></i>
-                    <i style="flex: {{ max($buyers - $newBuyers, 0.0001) }} 1 0%; background: #2563eb"></i>
+            @if($lowStockList->isNotEmpty())
+                <div class="td-sep" style="margin-top:0;padding-top:0;border-top:0;display:flex;justify-content:space-between;align-items:center">
+                    <span>Stok menipis</span>
+                    @can('view_stock')<a href="{{ route('admin.stock.index') }}" class="dash-link">Kelola</a>@endcan
                 </div>
+                <ul class="dash-stock">
+                    @foreach($lowStockList as $product)
+                        <li>
+                            <div class="min-w-0 flex-1">
+                                <p class="truncate text-sm font-medium">{{ $product->name }}</p>
+                                <p class="text-xs text-stone-500">{{ $product->sku }}</p>
+                            </div>
+                            <div class="shrink-0 text-right"><p class="dash-stock-n">{{ $product->stock }}</p><p class="text-[11px] text-stone-500">min {{ $product->stock_threshold }}</p></div>
+                        </li>
+                    @endforeach
+                </ul>
             @endif
 
-            @can('view_customers')
+            @if($showFollowUp)
                 <div class="td-sep" style="display:flex;justify-content:space-between;align-items:center">
                     <span>Perlu di-follow-up</span>
-                    <a href="{{ route('admin.customers.index', ['segment' => 'dormant']) }}" class="dash-link">{{ $followUpTotal }} dormant →</a>
+                    <a href="{{ route('admin.customers.index', ['segment' => 'dormant']) }}" class="dash-link">{{ $followUpTotal }} dormant</a>
                 </div>
-                @forelse($followUps->take(3) as $c)
+                @foreach($followUps->take(3) as $c)
                     @php
                         $wa = preg_replace('/\D+/', '', (string) $c->phone);
                         if (str_starts_with($wa, '0')) { $wa = '62' . substr($wa, 1); } elseif (str_starts_with($wa, '8')) { $wa = '62' . $wa; }
@@ -606,14 +587,22 @@
                             <p class="truncate text-xs text-stone-500">Terakhir belanja {{ \Illuminate\Support\Carbon::parse($c->last_paid_at)->locale('id')->diffForHumans() }}@if($canFinance) · {{ $rp($c->lifetime_total) }}@endif</p>
                         </div>
                         @if(strlen($wa) >= 9)
-                            <a href="https://wa.me/{{ $wa }}?text={{ rawurlencode($msg) }}" target="_blank" rel="noopener"
-                               class="shrink-0 rounded-full border border-green-300 bg-green-50 px-3 py-1 text-xs font-medium text-green-800 hover:bg-green-100">WhatsApp</a>
+                            <a href="https://wa.me/{{ $wa }}?text={{ rawurlencode($msg) }}" target="_blank" rel="noopener" class="row-btn shrink-0">WhatsApp</a>
                         @endif
                     </div>
-                @empty
-                    <p class="dash-empty is-ok" style="margin-top:.5rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Semua pelanggan aktif dalam 90 hari terakhir.</p>
-                @endforelse
-            @endcan
+                @endforeach
+            @endif
+        </section>
+        @endif
+
+        {{-- ============ Pelanggan ============ --}}
+        <section class="td-card td-c4" aria-labelledby="cust-title">
+            <div class="td-head"><div><h2 id="cust-title">Pelanggan</h2><p class="td-sub">{{ number_format($totalCustomers) }} terdaftar</p></div></div>
+            <div class="td-people">
+                <div><b>{{ number_format($buyers) }}</b><span>Pembeli</span></div>
+                <div><b>{{ number_format($newBuyers) }}</b><span>Baru</span></div>
+                <div><b>{{ $repeatPct }}%</b><span>Repeat</span></div>
+            </div>
         </section>
     </div>
 </div>

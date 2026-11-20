@@ -24,9 +24,9 @@
                 <td class="px-4 py-3">{!! $b->latitude !== null ? '<span class="text-green-700">Ada</span>' : '<span class="text-stone-400">Tanpa koordinat</span>' !!}</td>
                 <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-xs {{ $b->is_active ? 'bg-green-100 text-green-700' : 'bg-stone-100 text-stone-600' }}">{{ $b->is_active ? 'Aktif' : 'Nonaktif' }}</span></td>
                 <td class="px-4 py-3 text-right whitespace-nowrap">
-                    @can('edit_branches')<a href="{{ route('admin.branches.edit', $b->id) }}" class="text-copper-600 hover:underline mr-3">Edit</a>@endcan
+                    @can('edit_branches')<a href="{{ route('admin.branches.edit', $b->id) }}" class="row-btn">Edit</a>@endcan
                     @can('delete_branches')
-                    <form method="POST" action="{{ route('admin.branches.destroy', $b->id) }}" class="inline" data-confirm-title="Hapus cabang ini?" data-confirm-text="Cabang tidak akan tampil lagi di halaman Cabang dan Kontak." data-confirm-ok="Ya, hapus cabang" data-confirm-tone="danger">@csrf @method('DELETE')<button class="text-red-600 hover:underline">Hapus</button></form>
+                    <form method="POST" action="{{ route('admin.branches.destroy', $b->id) }}" class="inline" data-confirm-title="Hapus cabang ini?" data-confirm-text="Cabang tidak akan tampil lagi di halaman Cabang dan Kontak." data-confirm-ok="Ya, hapus cabang" data-confirm-tone="danger">@csrf @method('DELETE')<button class="row-btn is-danger">Hapus</button></form>
                     @endcan
                 </td>
             </tr>

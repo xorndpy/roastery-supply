@@ -121,16 +121,14 @@
                             <div class="flex items-center justify-end gap-2">
                                 @can('edit_categories')
 <a href="{{ route('admin.categories.edit', $category->id) }}"
-                                   class="text-xs text-blue-600 hover:text-blue-800 font-medium">Edit</a>
+                                   class="row-btn">Edit</a>
 @endcan
                                 @can('delete_categories')
 <form method="POST" action="{{ route('admin.categories.destroy', $category->id) }}"
                                       data-confirm-title="Hapus kategori {{ $category->name }}?" data-confirm-text="Kategori akan hilang dari katalog dan filter produk." data-confirm-ok="Ya, hapus kategori" data-confirm-tone="danger">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-xs text-red-600 hover:text-red-800 font-medium">
-                                        Hapus
-                                    </button>
+                                    <button type="submit" class="row-btn is-danger">Hapus</button>
                                 </form>
 @endcan
                             </div>

@@ -8,7 +8,6 @@
     <p class="mt-1 text-sm text-stone-500">Dibuat otomatis per unit saat pesanan selesai. Isi nomor seri unit agar pelanggan dan teknisi mudah mencocokkan.</p>
 </div>
 
-@if(session('success'))<div class="mb-4 rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800">{{ session('success') }}</div>@endif
 @if ($errors->any())<div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800"><ul class="list-inside list-disc">@foreach ($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul></div>@endif
 
 <form method="GET" class="mb-6 flex flex-wrap gap-3 rounded-lg border border-stone-200 bg-white p-4">

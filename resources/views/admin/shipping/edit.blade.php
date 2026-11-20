@@ -52,7 +52,7 @@
                     <td class="px-4 py-2.5 text-stone-500">{{ $r->etd_label ?? '-' }}</td>
                     <td class="px-4 py-2.5 text-right">
                         @can('manage_shipping_rates')
-                        <form method="POST" action="{{ route('admin.shipping.rates.destroy', [$method->id, $r->id]) }}" data-confirm-title="Hapus tarif pengiriman ini?" data-confirm-text="Tarif untuk wilayah ini akan dihapus dari layanan." data-confirm-ok="Ya, hapus tarif" data-confirm-tone="danger">@csrf @method('DELETE')<button class="text-red-600 hover:underline">Hapus</button></form>
+                        <form method="POST" action="{{ route('admin.shipping.rates.destroy', [$method->id, $r->id]) }}" data-confirm-title="Hapus tarif pengiriman ini?" data-confirm-text="Tarif untuk wilayah ini akan dihapus dari layanan." data-confirm-ok="Ya, hapus tarif" data-confirm-tone="danger">@csrf @method('DELETE')<button class="row-btn is-danger">Hapus</button></form>
                         @endcan
                     </td>
                 </tr>

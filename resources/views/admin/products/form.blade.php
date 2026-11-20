@@ -10,12 +10,6 @@
     </a>
 </div>
 
-@if(session('error'))
-    <div class="mb-4 p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg">
-        {{ session('error') }}
-    </div>
-@endif
-
 @if ($errors->any())
     <div class="mb-4 p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg">
         <div class="font-medium mb-2">Ada kesalahan:</div>

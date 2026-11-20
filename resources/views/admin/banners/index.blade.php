@@ -51,11 +51,11 @@
         </div>
         <span class="px-2 py-0.5 rounded text-xs {{ $state[1] }}">{{ $state[0] }}</span>
         <div class="whitespace-nowrap text-sm">
-            @can('edit_banners')<a href="{{ route('admin.banners.edit', $b->id) }}" class="text-copper-600 hover:underline mr-3">Edit</a>@endcan
+            @can('edit_banners')<a href="{{ route('admin.banners.edit', $b->id) }}" class="row-btn">Edit</a>@endcan
             @can('delete_banners')
             <form method="POST" action="{{ route('admin.banners.destroy', $b->id) }}" class="inline" data-confirm-title="Hapus banner ini?" data-confirm-text="Banner tidak akan tampil lagi di website." data-confirm-ok="Ya, hapus banner" data-confirm-tone="danger">
                 @csrf @method('DELETE')
-                <button class="text-red-600 hover:underline">Hapus</button>
+                <button class="row-btn is-danger">Hapus</button>
             </form>
             @endcan
         </div>

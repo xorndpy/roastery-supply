@@ -1,4 +1,5 @@
 import './bootstrap';
+import './inline-validation';
 
 import Alpine from 'alpinejs';
 

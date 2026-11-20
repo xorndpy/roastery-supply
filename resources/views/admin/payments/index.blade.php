@@ -95,9 +95,7 @@
                     @empty
                         <tr><td colspan="6" class="py-14 text-center text-stone-500">
                             @if($tab === 'perhatian')
-                                <span class="dash-clear-ico" style="display:inline-grid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
-                                <p class="dash-clear-title">Semua beres</p>
-                                <p class="dash-clear-text">Tidak ada pembayaran yang menunggu tindakan Anda.</p>
+                                Tidak ada pembayaran yang menunggu tindakan Anda.
                             @else
                                 Tidak ada pembayaran pada kelompok ini.
                             @endif
