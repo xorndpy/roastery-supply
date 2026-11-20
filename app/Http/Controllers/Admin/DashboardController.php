@@ -190,18 +190,23 @@ class DashboardController extends Controller
         $pendingReturns = ReturnOrder::where('status', 'pending')->count();
         $shippingConfigured = app(\App\Services\ShippingService::class)->configured();
 
-        // ---- Laba bersih, konversi, target, dan sumber penjualan ----
+        // ---- Laba bersih, refund, konversi, target, dan sumber penjualan ----
+        $refundPeriod = (float) ReturnOrder::where('status', 'approved')->where('approved_at', '>=', $start)->sum('refund_amount');
+
         $profitNet = $profitDelta = null;
         if ($u->can('view_profit')) {
             $svc = app(\App\Services\ProfitLossService::class);
-            $profitNet = (float) $svc->report($fromStr, $toStr)['net_profit'];
-            $profitPrev = (float) $svc->report($startWib->copy()->subDays($days)->toDateString(), $startWib->copy()->subDay()->toDateString())['net_profit'];
+            $profitNet = (float) $svc->report($startWib->toDateString(), $todayStr)['net_profit'];
+            $profitPrev = (float) $svc->report(
+                $startWib->copy()->subDays($range)->toDateString(),
+                $startWib->copy()->subDay()->toDateString()
+            )['net_profit'];
             $profitDelta = $profitPrev != 0.0 ? (int) round(($profitNet - $profitPrev) / abs($profitPrev) * 100) : null;
         }
 
-        $createdOrders = Order::where('created_at', '>=', $start)->where('created_at', '<=', $end)->count();
+        $createdOrders = Order::where('created_at', '>=', $start)->count();
         $conversion = $createdOrders > 0 ? round($paidOrders / $createdOrders * 100, 1) : null;
-        $createdPrev = Order::where('created_at', '>=', $prevStart)->where('created_at', '<', $start)->count();
+        $createdPrev = Order::whereBetween('created_at', [$prevStart, $start])->count();
         $conversionPrev = $createdPrev > 0 ? $paidOrdersPrev / $createdPrev * 100 : null;
         $conversionDelta = ($conversion !== null && $conversionPrev !== null) ? (int) round($conversion - $conversionPrev) : null;
 
@@ -209,29 +214,30 @@ class DashboardController extends Controller
         $monthStart = $nowWib->copy()->startOfMonth()->utc();
         $monthRevenue = (float) Order::whereIn('status', self::PAID)->where('created_at', '>=', $monthStart)->sum('total');
         $targetPct = $salesTarget > 0 ? (int) round($monthRevenue / $salesTarget * 100) : null;
-        $daysInMonth = $nowWib->daysInMonth;
-        $targetPace = $salesTarget > 0 ? (int) round($nowWib->day / $daysInMonth * 100) : null;
+        $targetPace = $salesTarget > 0 ? (int) round($nowWib->day / $nowWib->daysInMonth * 100) : null;
 
-        $sourceRows = Payment::where('status', 'verified')->where('created_at', '>=', $start)->where('created_at', '<=', $end)
+        $sourceRows = Payment::where('status', 'verified')->where('created_at', '>=', $start)
             ->get(['provider', 'payment_type', 'method', 'amount']);
         $sourceTotal = (float) $sourceRows->sum('amount');
         $salesSources = $sourceRows->groupBy(fn ($pay) => $pay->provider ? 'Midtrans' : 'Transfer manual')
-            ->map(fn ($g, $label) => ['label' => $label, 'count' => $g->count(), 'amount' => (float) $g->sum('amount'),
-                'pct' => $sourceTotal > 0 ? (int) round($g->sum('amount') / $sourceTotal * 100) : 0])
+            ->map(fn ($g, $label) => [
+                'label' => $label,
+                'count' => $g->count(),
+                'amount' => (float) $g->sum('amount'),
+                'pct' => $sourceTotal > 0 ? (int) round($g->sum('amount') / $sourceTotal * 100) : 0,
+            ])
             ->sortByDesc('amount')->values();
 
         return view('admin.dashboard', compact(
             'range', 'revenue', 'revenueDelta', 'orders', 'ordersDelta',
             'chartLabels', 'chartDates', 'chartData', 'chartOrders', 'todayStr', 'paidOrders', 'aov', 'aovDelta', 'buyers', 'newBuyers', 'repeatPct', 'categorySales', 'statusChart', 'topProducts', 'ordersToProcess', 'ordersToShip', 'lateToProcess', 'lateToShip', 'followUps', 'followUpTotal', 'autoPaymentsWeek', 'recentGatewayPayments',
-            'profitNet', 'profitDelta', 'createdOrders', 'conversion', 'conversionDelta', 'salesTarget', 'monthRevenue', 'targetPct', 'targetPace', 'salesSources', 'sourceTotal',
+            'profitNet', 'profitDelta', 'refundPeriod', 'createdOrders', 'conversion', 'conversionDelta', 'salesTarget', 'monthRevenue', 'targetPct', 'targetPace', 'salesSources', 'sourceTotal',
             'unreadMessages', 'pendingTestimonials', 'pendingReturns', 'shippingConfigured',
             'totalRefund', 'totalRevenue', 'totalOrders', 'pendingOrders', 'totalProducts',
             'totalCustomers', 'lowStockProducts', 'pendingPayments', 'recentOrders', 'lowStockList'
         ));
     }
 
-<<<<<<< HEAD
-=======
     /** Simpan target omzet bulanan (dipakai kartu "Target penjualan"). */
     public function setTarget(Request $request)
     {
@@ -241,60 +247,6 @@ class DashboardController extends Controller
         return back()->with('success', 'Target penjualan bulanan disimpan.');
     }
 
-    /** Tentukan periode dari preset atau from/to. Hasil: [awal WIB, akhir WIB, kode preset|'custom']. */
-    private function resolvePeriod(Request $request, Carbon $nowWib): array
-    {
-        $today = $nowWib->copy()->startOfDay();
-        $preset = (string) $request->query('range', '');
-
-        $range = match ($preset) {
-            'today' => [$today->copy(), $today->copy()],
-            '7', '30', '90' => [$today->copy()->subDays((int) $preset - 1), $today->copy()],
-            'month' => [$today->copy()->startOfMonth(), $today->copy()],
-            'lastmonth' => [$today->copy()->subMonthNoOverflow()->startOfMonth(), $today->copy()->subMonthNoOverflow()->endOfMonth()->startOfDay()],
-            default => null,
-        };
-
-        if ($range === null) {
-            $isDate = fn ($v) => is_string($v) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $v) && checkdate((int) substr($v, 5, 2), (int) substr($v, 8, 2), (int) substr($v, 0, 4));
-            $from = $request->query('from');
-            $to = $request->query('to');
-
-            if ($isDate($from) && $isDate($to)) {
-                $a = Carbon::createFromFormat('Y-m-d', $from, 'Asia/Jakarta')->startOfDay();
-                $b = Carbon::createFromFormat('Y-m-d', $to, 'Asia/Jakarta')->startOfDay();
-                if ($a->gt($b)) {
-                    [$a, $b] = [$b, $a];
-                }
-                $b = $b->gt($today) ? $today->copy() : $b;
-                $a = $a->gt($b) ? $b->copy() : $a;
-                $a = $a->lt($b->copy()->subDays(365)) ? $b->copy()->subDays(365) : $a; // maksimal 366 hari
-                $range = [$a, $b];
-                $preset = 'custom';
-            } else {
-                $range = [$today->copy()->subDays(29), $today->copy()];
-                $preset = '30';
-            }
-        }
-
-        return [$range[0]->startOfDay(), $range[1]->copy()->endOfDay(), $preset];
-    }
-
-    /** "9 Nov 2026" atau "10 Okt – 9 Nov 2026". */
-    private function periodText(Carbon $a, Carbon $b): string
-    {
-        $a = $a->copy()->locale('id');
-        $b = $b->copy()->locale('id');
-        if ($a->isSameDay($b)) {
-            return $b->translatedFormat('j M Y');
-        }
-
-        return $a->year === $b->year
-            ? $a->translatedFormat('j M') . ' – ' . $b->translatedFormat('j M Y')
-            : $a->translatedFormat('j M Y') . ' – ' . $b->translatedFormat('j M Y');
-    }
-
->>>>>>> 7d57e25 (update modul dasboard)
     /** Data kalender pesanan: pesanan satu bulan, dikelompokkan per tanggal (WIB). */
     public function calendar(Request $request)
     {

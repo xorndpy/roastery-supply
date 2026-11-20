@@ -60,18 +60,14 @@
     } else {
         $kpis[] = ['icon' => 'archive', 'label' => 'Produk aktif', 'value' => number_format($totalProducts), 'delta' => null, 'sub' => $lowStockProducts > 0 ? $lowStockProducts . ' stok menipis' : 'Stok aman'];
     }
-<<<<<<< HEAD
-    $kpis[] = ['icon' => 'users', 'label' => 'Pelanggan baru', 'value' => number_format($newBuyers), 'delta' => null, 'sub' => $buyers > 0 ? $buyers . ' pembeli · ' . $repeatPct . '% repeat order' : 'Belum ada pembeli di periode ini'];
-=======
     if (($profitNet ?? null) !== null) {
-        $kpis[] = ['icon' => 'coins', 'label' => 'Laba bersih', 'value' => $rpKpi($profitNet), 'full' => $rp($profitNet), 'delta' => $profitDelta, 'sub' => 'setelah HPP dan biaya'];
+        $kpis[] = ['icon' => 'coins', 'label' => 'Laba bersih', 'value' => $rp($profitNet), 'delta' => $profitDelta, 'sub' => 'setelah HPP dan biaya'];
     }
     if ($canFinance) {
-        $kpis[] = ['icon' => 'receipt', 'label' => 'Total refund', 'value' => $rpKpi($refundPeriod ?? 0), 'full' => $rp($refundPeriod ?? 0), 'delta' => null, 'sub' => 'retur disetujui pada periode'];
+        $kpis[] = ['icon' => 'undo', 'label' => 'Total refund', 'value' => $rp($refundPeriod ?? 0), 'delta' => null, 'sub' => 'retur disetujui, ' . $range . ' hari terakhir'];
     }
     $kpis[] = ['icon' => 'bag', 'label' => 'Konversi pesanan', 'value' => $conversion !== null ? number_format($conversion, 1, ',', '.') . '%' : '-', 'delta' => $conversionDelta, 'sub' => $createdOrders > 0 ? $paidOrders . ' dibayar dari ' . $createdOrders . ' pesanan' : 'Belum ada pesanan'];
-    $kpis[] = ['icon' => 'users', 'label' => 'Pelanggan baru', 'value' => number_format($newBuyers), 'delta' => null, 'sub' => $buyers > 0 ? $buyers . ' pembeli · ' . $repeatPct . '% repeat' : 'Belum ada pembeli'];
->>>>>>> 7d57e25 (update modul dasboard)
+    $kpis[] = ['icon' => 'users', 'label' => 'Pelanggan baru', 'value' => number_format($newBuyers), 'delta' => null, 'sub' => $buyers > 0 ? $buyers . ' pembeli · ' . $repeatPct . '% repeat order' : 'Belum ada pembeli di periode ini'];
 
     // Donut status
     $statusTotal = (int) collect($statusChart)->sum('count');
@@ -271,7 +267,41 @@
             @endif
         </section>
 
-<<<<<<< HEAD
+        {{-- ============ Target penjualan bulan ini ============ --}}
+        @if($canFinance)
+        <section class="td-card td-c4" aria-labelledby="target-title">
+            <div class="td-head"><div><h2 id="target-title">Target penjualan</h2><p class="td-sub">Bulan {{ now('Asia/Jakarta')->locale('id')->translatedFormat('F Y') }}</p></div></div>
+            @if($salesTarget > 0)
+                <p class="td-knum">{{ $rp($monthRevenue) }}</p>
+                <p class="td-sub">dari target {{ $rp($salesTarget) }} ({{ $targetPct }}%)</p>
+                <div class="mt-3 h-2.5 rounded-full bg-stone-100 overflow-hidden" role="progressbar" aria-valuenow="{{ min(100, $targetPct) }}" aria-valuemin="0" aria-valuemax="100">
+                    <div class="h-full rounded-full {{ $targetPct >= $targetPace ? 'bg-green-500' : 'bg-amber-500' }}" style="width: {{ min(100, $targetPct) }}%"></div>
+                </div>
+                <p class="td-sub mt-2">{{ $targetPct >= $targetPace ? 'Sesuai atau di atas laju target.' : 'Di bawah laju target (' . $targetPace . '% bulan berjalan).' }}</p>
+            @else
+                <p class="td-sub">Target belum diatur.</p>
+            @endif
+            <form method="POST" action="{{ route('admin.dashboard.target') }}" class="mt-3 flex gap-2">
+                @csrf
+                <input type="number" name="target" min="0" step="1000000" value="{{ (int) $salesTarget ?: '' }}" placeholder="Target omzet per bulan (Rp)" class="flex-1 border border-stone-200 rounded-lg px-3 py-2 text-sm" aria-label="Target omzet per bulan">
+                <button class="bg-stone-900 text-white rounded-lg px-3 py-2 text-sm">Simpan</button>
+            </form>
+        </section>
+
+        {{-- ============ Sumber penjualan (jalur pembayaran) ============ --}}
+        <section class="td-card td-c8" aria-labelledby="source-title">
+            <div class="td-head"><div><h2 id="source-title">Sumber penjualan</h2><p class="td-sub">Pembayaran terverifikasi menurut jalur bayar · {{ $range }} hari terakhir</p></div></div>
+            @forelse($salesSources as $src)
+                <div class="mb-3">
+                    <div class="flex justify-between text-sm"><span class="font-medium">{{ $src['label'] }} <span class="text-stone-400 font-normal">· {{ $src['count'] }} transaksi</span></span><span>{{ $rp($src['amount']) }} ({{ $src['pct'] }}%)</span></div>
+                    <div class="mt-1 h-2 rounded-full bg-stone-100 overflow-hidden"><div class="h-full rounded-full bg-stone-800" style="width: {{ $src['pct'] }}%"></div></div>
+                </div>
+            @empty
+                <p class="td-sub">Belum ada pembayaran terverifikasi pada periode ini.</p>
+            @endforelse
+        </section>
+        @endif
+
         {{-- ============ Status pesanan (donut) ============ --}}
         <section class="td-card td-c4" aria-labelledby="status-title">
             <div class="td-head">
@@ -373,42 +403,6 @@
             @endif
             <p class="mt-4 border-t border-stone-100 pt-3 text-[12.5px] text-stone-500">Total pelanggan terdaftar: <strong class="text-stone-800">{{ number_format($totalCustomers) }}</strong></p>
         </section>
-=======
-        {{-- ============ Target penjualan bulan ini ============ --}}
-        @if($canFinance)
-        <section class="td-card td-c4" aria-labelledby="target-title">
-            <div class="td-head"><div><h2 id="target-title">Target penjualan</h2><p class="td-sub">Bulan {{ now('Asia/Jakarta')->locale('id')->translatedFormat('F Y') }}</p></div></div>
-            @if($salesTarget > 0)
-                <p class="td-knum">{{ $rp($monthRevenue) }}</p>
-                <p class="td-sub">dari target {{ $rp($salesTarget) }} ({{ $targetPct }}%)</p>
-                <div class="mt-3 h-2.5 rounded-full bg-stone-100 overflow-hidden" role="progressbar" aria-valuenow="{{ min(100, $targetPct) }}" aria-valuemin="0" aria-valuemax="100">
-                    <div class="h-full rounded-full {{ $targetPct >= $targetPace ? 'bg-green-500' : 'bg-amber-500' }}" style="width: {{ min(100, $targetPct) }}%"></div>
-                </div>
-                <p class="td-sub mt-2">{{ $targetPct >= $targetPace ? 'Sesuai atau di atas laju target.' : 'Di bawah laju target (' . $targetPace . '% bulan berjalan).' }}</p>
-            @else
-                <p class="td-sub">Target belum diatur.</p>
-            @endif
-            <form method="POST" action="{{ route('admin.dashboard.target') }}" class="mt-3 flex gap-2">
-                @csrf
-                <input type="number" name="target" min="0" step="1000000" value="{{ (int) $salesTarget ?: '' }}" placeholder="Target omzet per bulan (Rp)" class="flex-1 border border-stone-200 rounded-lg px-3 py-2 text-sm" aria-label="Target omzet per bulan">
-                <button class="bg-stone-900 text-white rounded-lg px-3 py-2 text-sm">Simpan</button>
-            </form>
-        </section>
-
-        {{-- ============ Sumber penjualan (metode pembayaran) ============ --}}
-        <section class="td-card td-c8" aria-labelledby="source-title">
-            <div class="td-head"><div><h2 id="source-title">Sumber penjualan</h2><p class="td-sub">Pembayaran terverifikasi menurut jalur bayar · {{ $rangeLabel }}</p></div></div>
-            @forelse($salesSources as $src)
-                <div class="mb-3">
-                    <div class="flex justify-between text-sm"><span class="font-medium">{{ $src['label'] }} <span class="text-stone-400 font-normal">· {{ $src['count'] }} transaksi</span></span><span>{{ $rp($src['amount']) }} ({{ $src['pct'] }}%)</span></div>
-                    <div class="mt-1 h-2 rounded-full bg-stone-100 overflow-hidden"><div class="h-full rounded-full bg-stone-800" style="width: {{ $src['pct'] }}%"></div></div>
-                </div>
-            @empty
-                <p class="td-sub">Belum ada pembayaran terverifikasi pada periode ini.</p>
-            @endforelse
-        </section>
-        @endif
->>>>>>> 7d57e25 (update modul dasboard)
 
         {{-- ============ Pesanan terbaru ============ --}}
         <section class="td-card td-c8" aria-labelledby="orders-title">
