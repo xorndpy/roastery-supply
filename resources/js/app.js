@@ -4,6 +4,36 @@ import Alpine from 'alpinejs';
 
 window.Alpine = Alpine;
 
+// x-focus-trap="open": saat panel terbuka, fokus dikunci di dalamnya (Tab/Shift+Tab berputar), lalu dikembalikan
+// ke tombol pemicu saat ditutup. Dipakai drawer menu mobile; tanpa plugin tambahan.
+Alpine.directive('focus-trap', (el, { expression }, { effect, evaluateLater, cleanup }) => {
+    const isOpen = evaluateLater(expression);
+    const focusable = 'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])';
+    let returnTo = null;
+
+    const onKey = (e) => {
+        if (e.key !== 'Tab') return;
+        const items = [...el.querySelectorAll(focusable)].filter((n) => n.offsetParent !== null);
+        if (!items.length) return;
+        const first = items[0], last = items[items.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    };
+
+    effect(() => isOpen((open) => {
+        if (open) {
+            returnTo = document.activeElement;
+            el.addEventListener('keydown', onKey);
+            setTimeout(() => (el.querySelector('[data-autofocus]') || el).focus(), 30);
+        } else {
+            el.removeEventListener('keydown', onKey);
+            if (returnTo && returnTo.focus) returnTo.focus();
+            returnTo = null;
+        }
+    }));
+    cleanup(() => el.removeEventListener('keydown', onKey));
+});
+
 // Uploader foto produk (admin): pratinjau, drag & drop, jadikan utama, hapus. File baru dikirim lewat <input name="images[]">.
 Alpine.data('productImages', (initial = [], max = 5, maxMb = 2) => ({
     existing: initial,

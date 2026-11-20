@@ -4,7 +4,7 @@
     $navLink = 'rounded-full px-3.5 py-2 text-stone-600 transition hover:bg-stone-100 hover:text-stone-900';
 @endphp
 
-<header x-data="{ open: false, cat: false, s: {{ request('search') ? 'true' : 'false' }} }" @keydown.escape.window="open = false; cat = false; s = false" class="sticky top-0 z-40 border-b border-stone-200 bg-white">
+<header x-data="{ open: false, cat: false, s: {{ request('search') ? 'true' : 'false' }} }" :style="open ? 'z-index:60' : ''" @keydown.escape.window="open = false; cat = false; s = false" class="sticky top-0 z-40 border-b border-stone-200 bg-white">
     <div class="container-x flex h-14 items-center gap-3 sm:h-16 lg:h-20 lg:gap-8">
         <a href="{{ route('products.index') }}" class="shrink-0 leading-none">
             @if(!empty($site['site_logo']))
@@ -114,53 +114,53 @@
         </form>
     </div>
 
-    {{-- Menu mobile layar penuh --}}
-    <div x-show="open" x-cloak x-transition.opacity x-data="{ prod: false }" class="fixed inset-0 z-50 overflow-y-auto bg-white lg:hidden">
-        <div class="flex h-16 items-center justify-between px-4">
-            <span class="heading text-xl text-brand">{{ $site['site_name'] }}</span>
-            <button @click="open = false" class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand text-white" aria-label="Tutup menu">
-                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
-            </button>
-        </div>
+    {{-- Menu mobile: panel samping, bukan layar penuh --}}
+    <x-mobile-drawer label="Menu toko">
+        <x-slot:header>
+            <a href="{{ route('home') }}" class="heading block truncate text-lg leading-none text-brand">{{ $site['site_name'] }}</a>
+        </x-slot:header>
 
-        <nav class="px-6 pb-12 pt-2 text-[15px] font-semibold uppercase tracking-wide text-stone-900" aria-label="Menu mobile">
-            <button type="button" @click="prod = !prod" class="flex w-full items-center justify-between border-b border-stone-100 py-4 uppercase" :aria-expanded="prod">
+        @php
+            $row = 'flex min-h-12 w-full items-center justify-between border-b border-stone-100 border-l-4 border-l-transparent pl-4 pr-5 text-[15px] font-medium text-stone-800 hover:bg-stone-50';
+        @endphp
+        <nav x-data="{ prod: false }" aria-label="Menu mobile">
+            <button type="button" @click="prod = !prod" class="{{ $row }}" :aria-expanded="prod.toString()">
                 Produk
                 <svg class="h-4 w-4 transition" :class="prod && 'rotate-180'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
             </button>
-            <div x-show="prod" x-cloak class="border-b border-stone-100 pb-3 text-sm font-normal normal-case tracking-normal">
-                <a href="{{ route('products.index') }}" class="block py-2 font-medium text-copper-600">Semua produk</a>
+            <div x-show="prod" x-cloak class="border-b border-stone-100 bg-stone-50 py-1 text-sm">
+                <a href="{{ route('products.index') }}" class="flex min-h-11 items-center pl-8 pr-5 font-semibold text-copper-700">Semua produk</a>
                 @foreach($navCats as $c)
-                    <a href="{{ route('products.index', ['category' => $c->slug]) }}" class="block py-2 text-stone-800">{{ $c->name }}</a>
+                    <a href="{{ route('products.index', ['category' => $c->slug]) }}" class="flex min-h-11 items-center pl-8 pr-5 text-stone-800">{{ $c->name }}</a>
                     @foreach($c->children->take(5) as $ch)
-                        <a href="{{ route('products.index', ['category' => $ch->slug]) }}" class="block py-1.5 pl-4 text-stone-500">{{ $ch->name }}</a>
+                        <a href="{{ route('products.index', ['category' => $ch->slug]) }}" class="flex min-h-10 items-center pl-12 pr-5 text-stone-600">{{ $ch->name }}</a>
                     @endforeach
                 @endforeach
             </div>
 
-            <a href="{{ route('products.brands') }}" class="block border-b border-stone-100 py-4">Merek</a>
-            <a href="{{ route('home') }}" class="block border-b border-stone-100 py-4">Beranda</a>
-            <a href="{{ route('about') }}" class="block border-b border-stone-100 py-4">Tentang Kami</a>
-            <a href="{{ route('faq') }}" class="block border-b border-stone-100 py-4">Bantuan</a>
-            <a href="{{ route('contact.index') }}" class="block border-b border-stone-100 py-4">Hubungi Kami</a>
-
-            <div class="pt-6 text-sm font-medium normal-case tracking-normal">
-                @auth
-                    <div class="grid grid-cols-2 gap-3">
-                        <a href="{{ route('customer.orders.index') }}" class="rounded-xl bg-stone-100 px-4 py-3 text-center">Pesanan Saya</a>
-                        <a href="{{ route('customer.service.index') }}" class="rounded-xl bg-stone-100 px-4 py-3 text-center">Garansi & Servis</a>
-                        <a href="{{ route('customer.dashboard') }}" class="rounded-xl bg-stone-100 px-4 py-3 text-center">Akun Saya</a>
-                    </div>
-                    <form method="POST" action="{{ route('logout') }}" class="mt-3">@csrf
-                        <button class="w-full rounded-xl border border-red-200 px-4 py-3 text-red-600">Keluar</button>
-                    </form>
-                @else
-                    <div class="grid grid-cols-2 gap-3">
-                        <a href="{{ route('login') }}" class="btn btn-outline !rounded-xl">Masuk</a>
-                        <a href="{{ route('register') }}" class="btn btn-primary !rounded-xl">Daftar</a>
-                    </div>
-                @endauth
-            </div>
+            <a href="{{ route('products.brands') }}" class="{{ $row }}">Merek</a>
+            <a href="{{ route('home') }}" class="{{ $row }}">Beranda</a>
+            <a href="{{ route('about') }}" class="{{ $row }}">Tentang Kami</a>
+            <a href="{{ route('faq') }}" class="{{ $row }}">Bantuan</a>
+            <a href="{{ route('contact.index') }}" class="{{ $row }}">Hubungi Kami</a>
         </nav>
-    </div>
+
+        <x-slot:footer>
+            @auth
+                <div class="grid grid-cols-2 gap-2 text-sm font-medium">
+                    <a href="{{ route('customer.dashboard') }}" class="col-span-2 flex min-h-11 items-center justify-center gap-2 rounded-xl bg-stone-100 px-3"><x-avatar :user="auth()->user()" :size="24" /> Akun Saya</a>
+                    <a href="{{ route('customer.orders.index') }}" class="flex min-h-11 items-center justify-center rounded-xl bg-stone-100 px-3">Pesanan</a>
+                    <a href="{{ route('customer.service.index') }}" class="flex min-h-11 items-center justify-center rounded-xl bg-stone-100 px-3">Garansi</a>
+                </div>
+                <form method="POST" action="{{ route('logout') }}" class="mt-2">@csrf
+                    <button class="flex min-h-11 w-full items-center justify-center rounded-xl border border-red-200 px-3 text-sm font-medium text-red-700">Keluar</button>
+                </form>
+            @else
+                <div class="grid grid-cols-2 gap-3">
+                    <a href="{{ route('login') }}" class="btn btn-outline !min-h-11 !rounded-xl">Masuk</a>
+                    <a href="{{ route('register') }}" class="btn btn-primary !min-h-11 !rounded-xl">Daftar</a>
+                </div>
+            @endauth
+        </x-slot:footer>
+    </x-mobile-drawer>
 </header>
