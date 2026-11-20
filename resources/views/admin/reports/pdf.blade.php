@@ -2,11 +2,11 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Laporan Penjualan - Roastery Supply</title>
+    <title>Laporan Penjualan - {{ \App\Models\Setting::get('site_name') }}</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: Arial, sans-serif;
+            font-family: DejaVu Sans, sans-serif;
             font-size: 11px;
             color: #333;
             padding: 20px;
@@ -14,13 +14,13 @@
         .header {
             text-align: center;
             margin-bottom: 20px;
-            border-bottom: 3px solid #f97316;
+            border-bottom: 3px solid #1c1917;
             padding-bottom: 12px;
         }
         .header h1 {
             margin: 0;
             font-size: 22px;
-            color: #f97316;
+            color: #1c1917;
             letter-spacing: 1px;
         }
         .header p {
@@ -61,7 +61,7 @@
             font-size: 14px;
             font-weight: bold;
             margin-top: 4px;
-            color: #f97316;
+            color: #1c1917;
         }
 
         /* Section title */
@@ -70,7 +70,7 @@
             color: #333;
             margin: 18px 0 8px;
             padding-bottom: 4px;
-            border-bottom: 2px solid #f97316;
+            border-bottom: 2px solid #1c1917;
         }
 
         /* Data table */
@@ -81,7 +81,7 @@
             font-size: 10px;
         }
         table.data thead th {
-            background: #f97316;
+            background: #1c1917;
             color: white;
             padding: 7px 6px;
             text-align: left;
@@ -121,13 +121,7 @@
 <body>
 
 {{-- HEADER --}}
-<div class="header">
-    <h1>ROASTERY SUPPLY</h1>
-    <p>Laporan Penjualan</p>
-    <p class="period">
-        Periode: {{ $startDate->format('d F Y') }} — {{ $endDate->format('d F Y') }}
-    </p>
-</div>
+@include('pdf._kop', ['title' => 'LAPORAN PENJUALAN', 'subtitle' => 'Periode: '.$startDate->format('d M Y').' s/d '.$endDate->format('d M Y')])
 
 {{-- STATS --}}
 <div class="stats">
@@ -151,7 +145,7 @@
 </div>
 
 {{-- TOP PRODUCTS --}}
-<h3>🏆 Produk Terlaris</h3>
+<h3>Produk Terlaris</h3>
 @if($topProducts->count())
     <table class="data">
         <thead>
@@ -180,7 +174,7 @@
 @endif
 
 {{-- DETAIL ORDERS --}}
-<h3>📋 Detail Pesanan</h3>
+<h3>Detail Pesanan</h3>
 @if($orders->count())
     <table class="data">
         <thead>
@@ -210,11 +204,11 @@
             @endforeach
         </tbody>
         <tfoot>
-            <tr style="background: #fef3e8;">
+            <tr style="background: #f5f5f4;">
                 <td colspan="4" class="text-right font-bold" style="padding: 8px;">
                     TOTAL:
                 </td>
-                <td class="text-right font-bold" style="padding: 8px; color: #f97316; font-size: 12px;">
+                <td class="text-right font-bold" style="padding: 8px; color: #1c1917; font-size: 12px;">
                     Rp {{ number_format($orders->sum('total'), 0, ',', '.') }}
                 </td>
                 <td></td>
@@ -228,7 +222,7 @@
 {{-- FOOTER --}}
 <div class="footer">
     <p>Dicetak pada: {{ now()->format('d F Y, H:i') }}</p>
-    <p style="margin-top: 4px;">© {{ date('Y') }} Roastery Supply — Laporan Penjualan</p>
+    <p style="margin-top: 4px;">© {{ date('Y') }} {{ \App\Models\Setting::get('site_name') }} — Laporan Penjualan</p>
 </div>
 
 </body>

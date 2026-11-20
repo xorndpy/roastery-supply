@@ -1,9 +1,16 @@
 <?php
 
-use App\Http\Controllers\Webhooks\MidtransWebhookController;
 use App\Http\Controllers\Web\ArticleController;
 use App\Http\Controllers\Admin\ArticleController as AdminArticleController;
 use App\Http\Controllers\Admin\MilestoneController;
+use App\Http\Controllers\Admin\FinanceController;
+use App\Http\Controllers\Admin\ExpenseController;
+use App\Http\Controllers\Admin\FinanceClosingController;
+use App\Http\Controllers\Admin\FlashSaleController;
+use App\Http\Controllers\Admin\ServiceTicketController;
+use App\Http\Controllers\Admin\TrackingController;
+use App\Http\Controllers\Admin\WarrantyController;
+use App\Http\Controllers\Web\ServiceController as CustomerServiceController;
 use App\Http\Controllers\Admin\HeroSlideController;
 use App\Http\Controllers\Web\OnlinePaymentController;
 use Illuminate\Support\Facades\Route;
@@ -73,6 +80,8 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/katalog', [KatalogController::class, 'index'])->name('products.index');
 Route::get('/merek', [KatalogController::class, 'brands'])->name('products.brands');
 Route::get('/produk/{slug}', [KatalogController::class, 'show'])->name('products.show');
+Route::post('/produk/{slug}/penawaran', [\App\Http\Controllers\Web\QuoteController::class, 'store'])->middleware('throttle:5,10')->name('products.quote');
+Route::post('/produk/{slug}/ulasan', [\App\Http\Controllers\Web\ReviewController::class, 'store'])->middleware(['auth', 'throttle:10,1'])->name('products.review');
 Route::get('/tentang', [HomeController::class, 'about'])->name('about');
 Route::get('/faq', [HomeController::class, 'faq'])->name('faq');
 Route::get('/kontak', [ContactController::class, 'index'])->name('contact.index');
@@ -86,7 +95,7 @@ Route::get('/cabang', [HomeController::class, 'branches'])->name('branches.index
 Route::get('/dashboard', function () {
     $user = auth()->user();
 
-    if ($user && $user->hasAnyRole(['super_admin', 'admin', 'staff', 'gudang'])) {
+    if ($user && $user->hasAnyRole(['super_admin', 'admin', 'staff', 'gudang', 'keuangan'])) {
         return redirect()->route('admin.dashboard');
     }
 
@@ -142,6 +151,17 @@ Route::prefix('customer')
             Route::post('/{orderNumber}/testimonial', [CustomerTestimonialController::class, 'store'])->name('testimonial');
         });
 
+        // Garansi & servis
+        Route::prefix('service')->as('service.')->group(function () {
+            Route::get('/', [CustomerServiceController::class, 'index'])->name('index');
+            Route::get('/baru', [CustomerServiceController::class, 'create'])->name('create');
+            Route::post('/', [CustomerServiceController::class, 'store'])->middleware('throttle:10,1')->name('store');
+            Route::get('/{number}', [CustomerServiceController::class, 'show'])->name('show');
+            Route::post('/{number}/cancel', [CustomerServiceController::class, 'cancel'])->name('cancel');
+            Route::post('/{number}/respond', [CustomerServiceController::class, 'respond'])->name('respond');
+            Route::get('/{number}/photo/{n}', [CustomerServiceController::class, 'photo'])->whereNumber('n')->name('photo');
+        });
+
         // Pengajuan Retur
         Route::prefix('returns')->as('returns.')->group(function () {
             Route::get('/', [CustomerReturnController::class, 'index'])->name('index');
@@ -167,7 +187,7 @@ Route::prefix('customer')
 // =========================================================================
 Route::prefix('admin')
     ->as('admin.')
-    ->middleware(['auth', 'role:staff|admin|super_admin|gudang', '2fa'])
+    ->middleware(['auth', 'role:staff|admin|super_admin|gudang|keuangan'])
     ->group(function () {
 
         // Resource dengan izin terpisah per aksi. create harus terdaftar sebelum {param}.
@@ -184,6 +204,7 @@ Route::prefix('admin')
         // Dashboard
         Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard.alt');
+        Route::get('/dashboard/calendar', [AdminDashboardController::class, 'calendar'])->name('dashboard.calendar')->middleware('can:view_orders');
 
         // Katalog
         $crud('products', ProductController::class, 'products');
@@ -208,11 +229,14 @@ Route::prefix('admin')
             Route::get('/', [AdminOrderController::class, 'index'])->name('index')->middleware('can:view_orders');
             Route::get('/{order}', [AdminOrderController::class, 'show'])->name('show')->middleware('can:view_orders');
             Route::post('/{order}/confirm-payment', [AdminOrderController::class, 'confirmPayment'])->name('confirm-payment')->middleware('can:verify_payments');
+            Route::post('/{order}/track', [TrackingController::class, 'sync'])->name('track')->middleware('can:ship_orders');
             Route::post('/{order}/process', [AdminOrderController::class, 'process'])->name('process')->middleware('can:process_orders');
-            Route::post('/{order}/ship', [AdminOrderController::class, 'ship'])->name('ship')->middleware('can:manage_shipments');
+            Route::post('/{order}/prepare-shipment', [AdminOrderController::class, 'prepareShipment'])->name('prepare-shipment')->middleware('can:manage_shipments');
+            Route::post('/{order}/ship', [AdminOrderController::class, 'ship'])->name('ship')->middleware('can:ship_orders');
             Route::post('/{order}/complete', [AdminOrderController::class, 'complete'])->name('complete')->middleware('can:complete_orders');
             Route::post('/{order}/cancel', [AdminOrderController::class, 'cancel'])->name('cancel')->middleware('can:cancel_orders');
             Route::get('/{order}/invoice', [AdminOrderController::class, 'invoice'])->name('invoice')->middleware('can:download_invoices');
+            Route::get('/{order}/surat-jalan', [AdminOrderController::class, 'deliveryNote'])->name('delivery-note')->middleware('can:view_orders');
         });
 
         // Penjualan - Payments
@@ -261,8 +285,39 @@ Route::prefix('admin')
             Route::get('/{customer}', [CustomerController::class, 'show'])->name('show')->middleware('can:view_customers');
         });
 
+        // Keuangan (laba rugi, HPP, biaya operasional)
+        Route::prefix('keuangan')->as('finance.')->group(function () {
+            Route::get('/laba-rugi', [FinanceController::class, 'profit'])->name('profit')->middleware('can:view_profit');
+            Route::get('/laba-rugi/export', [FinanceController::class, 'profitExport'])->name('profit.export')->middleware(['can:view_profit', 'can:export_reports']);
+            Route::get('/laba-rugi/pdf', [FinanceController::class, 'profitPdf'])->name('profit.pdf')->middleware(['can:view_profit', 'can:export_reports']);
+            Route::get('/laba-rugi/xlsx', [FinanceController::class, 'profitXlsx'])->name('profit.xlsx')->middleware(['can:view_profit', 'can:export_reports']);
+            Route::get('/hpp', [FinanceController::class, 'costs'])->name('costs')->middleware('can:view_costs');
+            Route::put('/hpp', [FinanceController::class, 'updateCosts'])->name('costs.update')->middleware('can:manage_costs');
+            Route::get('/tutup-buku', [FinanceClosingController::class, 'index'])->name('closings')->middleware('can:view_profit');
+            Route::post('/tutup-buku', [FinanceClosingController::class, 'store'])->name('closings.store')->middleware('can:close_finance');
+            Route::delete('/tutup-buku/{closing}', [FinanceClosingController::class, 'reopen'])->name('closings.reopen')->middleware('can:close_finance');
+        });
+        Route::get('expenses/{expense}/attachment', [ExpenseController::class, 'attachment'])->name('expenses.attachment')->middleware('can:view_expenses');
+        Route::post('expenses/copy-recurring', [ExpenseController::class, 'copyRecurring'])->name('expenses.copy-recurring')->middleware('can:create_expenses');
+        $crud('expenses', ExpenseController::class, 'expenses', ['show']);
+
+        // Purna jual: tiket servis & garansi
+        Route::prefix('service')->as('service.')->group(function () {
+            Route::get('/', [ServiceTicketController::class, 'index'])->name('index')->middleware('can:view_service');
+            Route::get('/{ticket}', [ServiceTicketController::class, 'show'])->whereNumber('ticket')->name('show')->middleware('can:view_service');
+            Route::put('/{ticket}', [ServiceTicketController::class, 'update'])->whereNumber('ticket')->name('update')->middleware('can:manage_service');
+            Route::post('/{ticket}/pay', [ServiceTicketController::class, 'pay'])->whereNumber('ticket')->name('pay')->middleware('can:manage_service');
+            Route::get('/{ticket}/photo/{n}', [ServiceTicketController::class, 'photo'])->whereNumber(['ticket', 'n'])->name('photo')->middleware('can:view_service');
+        });
+        Route::prefix('warranties')->as('warranties.')->group(function () {
+            Route::get('/', [WarrantyController::class, 'index'])->name('index')->middleware('can:view_warranties');
+            Route::put('/{warranty}', [WarrantyController::class, 'update'])->whereNumber('warranty')->name('update')->middleware('can:manage_warranties');
+            Route::post('/{warranty}/void', [WarrantyController::class, 'void'])->whereNumber('warranty')->name('void')->middleware('can:manage_warranties');
+        });
+
         // Pemasaran
         $crud('vouchers', VoucherController::class, 'vouchers', ['show']);
+        $crud('flash-sales', FlashSaleController::class, 'flash_sales', ['show']);
         $crud('banners', BannerController::class, 'banners', ['show']);
         Route::post('banners/reorder', [BannerController::class, 'reorder'])->name('banners.reorder')->middleware('can:edit_banners');
         Route::prefix('testimonials')->as('testimonials.')->group(function () {
@@ -335,5 +390,5 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 
-// Notifikasi payment gateway (publik; keaslian dijamin tanda tangan, bukan sesi login).
-Route::post('/webhooks/midtrans', MidtransWebhookController::class)->middleware('throttle:600,1')->name('webhooks.midtrans');
+// Webhook Midtrans (POST /webhooks/midtrans) didaftarkan di bootstrap/app.php, di luar grup 'web',
+// supaya tidak kena CSRF/sesi. Jangan didaftarkan lagi di sini (nama route ganda + kena CSRF).
