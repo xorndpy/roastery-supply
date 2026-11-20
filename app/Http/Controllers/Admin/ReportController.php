@@ -38,7 +38,10 @@ class ReportController extends Controller
         // Statistik pembayaran
         $paymentStats = $this->getPaymentStats($startDate, $endDate);
 
+        $analytics = $this->getAnalytics($startDate, $endDate, $stats);
+
         return view('admin.reports.index', compact(
+            'analytics',
             'period',
             'startDate',
             'endDate',
@@ -182,6 +185,63 @@ class ReportController extends Controller
             'new_customers' => $newCustomers,
             'total_products_sold' => $totalProductsSold,
             'pending_orders' => $pendingOrders,
+        ];
+    }
+
+    /**
+     * Analisis tambahan: laba vs pendapatan, kategori, produk, bulanan, refund/diskon, pembanding periode.
+     */
+    protected function getAnalytics($startDate, $endDate, array $stats): array
+    {
+        $paid = ['dikonfirmasi', 'diproses', 'dikirim', 'selesai'];
+        $profit = app(\App\Services\ProfitLossService::class)->report($startDate->toDateString(), $endDate->toDateString());
+
+        // Periode pembanding: rentang sama panjang tepat sebelum periode ini.
+        $length = $startDate->diffInDays($endDate) + 1;
+        $prevEnd = $startDate->copy()->subDay()->endOfDay();
+        $prevStart = $prevEnd->copy()->subDays($length - 1)->startOfDay();
+        $prev = $this->getStats($prevStart, $prevEnd);
+        $change = fn ($now, $before) => $before > 0 ? round(($now - $before) / $before * 100, 1) : null;
+
+        $items = fn () => DB::table('order_items')
+            ->join('orders', 'orders.id', '=', 'order_items.order_id')
+            ->whereNull('order_items.deleted_at')->whereNull('orders.deleted_at')
+            ->whereIn('orders.status', $paid);
+
+        $byCategory = $items()->whereBetween('orders.created_at', [$startDate, $endDate])
+            ->leftJoin('products', 'products.id', '=', 'order_items.product_id')
+            ->leftJoin('categories', 'categories.id', '=', 'products.category_id')
+            ->groupBy('categories.name')
+            ->selectRaw("COALESCE(categories.name, 'Tanpa kategori') as name, SUM(order_items.quantity) as qty, "
+                . 'SUM(order_items.subtotal) as revenue, SUM(COALESCE(order_items.cost_price, 0) * order_items.quantity) as cogs')
+            ->orderByDesc('revenue')->get();
+
+        $monthly = $items()->where('orders.created_at', '>=', now()->subMonths(11)->startOfMonth())
+            ->groupByRaw("DATE_FORMAT(orders.created_at, '%Y-%m')")
+            ->selectRaw("DATE_FORMAT(orders.created_at, '%Y-%m') as label, SUM(order_items.subtotal) as revenue, "
+                . 'SUM(COALESCE(order_items.cost_price, 0) * order_items.quantity) as cogs, COUNT(DISTINCT orders.id) as orders')
+            ->orderBy('label')->get();
+
+        $voucherOrders = Order::whereIn('status', $paid)->whereNotNull('voucher_id')
+            ->whereBetween('created_at', [$startDate, $endDate])->count();
+
+        $createdOrders = Order::whereBetween('created_at', [$startDate, $endDate])->count();
+
+        return [
+            'profit' => $profit,
+            'compare' => [
+                'revenue' => $change($stats['total_revenue'], $prev['total_revenue']),
+                'orders' => $change($stats['total_orders'], $prev['total_orders']),
+                'aov' => $change($stats['avg_order_value'], $prev['avg_order_value']),
+                'prev_revenue' => $prev['total_revenue'],
+                'prev_orders' => $prev['total_orders'],
+                'prev_label' => $prevStart->format('d M') . ' - ' . $prevEnd->format('d M Y'),
+            ],
+            'by_category' => $byCategory,
+            'monthly' => $monthly,
+            'top_revenue' => array_slice($profit['products'], 0, 10),
+            'voucher_orders' => $voucherOrders,
+            'conversion' => $createdOrders > 0 ? round($stats['total_orders'] / $createdOrders * 100, 1) : null,
         ];
     }
 

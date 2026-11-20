@@ -26,7 +26,11 @@
         @can('view_expenses')<a href="{{ route('admin.expenses.index', ['from' => $from, 'to' => $to]) }}" class="border border-stone-300 px-4 py-2 rounded-lg text-sm hover:bg-stone-50">Biaya operasional</a>@endcan
         <a href="{{ route('admin.finance.closings') }}" class="border border-stone-300 px-4 py-2 rounded-lg text-sm hover:bg-stone-50">Tutup buku</a>
         @can('view_costs')<a href="{{ route('admin.finance.costs') }}" class="border border-stone-300 px-4 py-2 rounded-lg text-sm hover:bg-stone-50">HPP produk</a>@endcan
-        @can('export_reports')<a href="{{ route('admin.finance.profit.export', ['from' => $from, 'to' => $to]) }}" class="bg-stone-900 text-white px-4 py-2 rounded-lg text-sm">Unduh CSV</a>@endcan
+        @can('export_reports')
+            <a href="{{ route('admin.finance.profit.pdf', ['from' => $from, 'to' => $to]) }}" class="bg-stone-900 text-white px-4 py-2 rounded-lg text-sm">Unduh PDF</a>
+            <a href="{{ route('admin.finance.profit.xlsx', ['from' => $from, 'to' => $to]) }}" class="bg-stone-900 text-white px-4 py-2 rounded-lg text-sm">Unduh Excel</a>
+            <a href="{{ route('admin.finance.profit.export', ['from' => $from, 'to' => $to]) }}" class="border border-stone-300 text-stone-700 px-4 py-2 rounded-lg text-sm">CSV</a>
+        @endcan
     </div>
 </div>
 
