@@ -68,6 +68,13 @@
     } else {
         $kpis[] = ['icon' => 'archive', 'label' => 'Produk aktif', 'value' => number_format($totalProducts), 'delta' => null, 'sub' => $lowStockProducts > 0 ? $lowStockProducts . ' stok menipis' : 'Stok aman'];
     }
+    if (($profitNet ?? null) !== null) {
+        $kpis[] = ['icon' => 'coins', 'label' => 'Laba bersih', 'value' => $rpKpi($profitNet), 'full' => $rp($profitNet), 'delta' => $profitDelta, 'sub' => 'setelah HPP dan biaya'];
+    }
+    if ($canFinance) {
+        $kpis[] = ['icon' => 'receipt', 'label' => 'Total refund', 'value' => $rpKpi($refundPeriod ?? 0), 'full' => $rp($refundPeriod ?? 0), 'delta' => null, 'sub' => 'retur disetujui pada periode'];
+    }
+    $kpis[] = ['icon' => 'bag', 'label' => 'Konversi pesanan', 'value' => $conversion !== null ? number_format($conversion, 1, ',', '.') . '%' : '-', 'delta' => $conversionDelta, 'sub' => $createdOrders > 0 ? $paidOrders . ' dibayar dari ' . $createdOrders . ' pesanan' : 'Belum ada pesanan'];
     $kpis[] = ['icon' => 'users', 'label' => 'Pelanggan baru', 'value' => number_format($newBuyers), 'delta' => null, 'sub' => $buyers > 0 ? $buyers . ' pembeli · ' . $repeatPct . '% repeat' : 'Belum ada pembeli'];
 
     // Donut status
@@ -391,6 +398,41 @@
                 </div>
             @endif
         </section>
+
+        {{-- ============ Target penjualan bulan ini ============ --}}
+        @if($canFinance)
+        <section class="td-card td-c4" aria-labelledby="target-title">
+            <div class="td-head"><div><h2 id="target-title">Target penjualan</h2><p class="td-sub">Bulan {{ now('Asia/Jakarta')->locale('id')->translatedFormat('F Y') }}</p></div></div>
+            @if($salesTarget > 0)
+                <p class="td-knum">{{ $rp($monthRevenue) }}</p>
+                <p class="td-sub">dari target {{ $rp($salesTarget) }} ({{ $targetPct }}%)</p>
+                <div class="mt-3 h-2.5 rounded-full bg-stone-100 overflow-hidden" role="progressbar" aria-valuenow="{{ min(100, $targetPct) }}" aria-valuemin="0" aria-valuemax="100">
+                    <div class="h-full rounded-full {{ $targetPct >= $targetPace ? 'bg-green-500' : 'bg-amber-500' }}" style="width: {{ min(100, $targetPct) }}%"></div>
+                </div>
+                <p class="td-sub mt-2">{{ $targetPct >= $targetPace ? 'Sesuai atau di atas laju target.' : 'Di bawah laju target (' . $targetPace . '% bulan berjalan).' }}</p>
+            @else
+                <p class="td-sub">Target belum diatur.</p>
+            @endif
+            <form method="POST" action="{{ route('admin.dashboard.target') }}" class="mt-3 flex gap-2">
+                @csrf
+                <input type="number" name="target" min="0" step="1000000" value="{{ (int) $salesTarget ?: '' }}" placeholder="Target omzet per bulan (Rp)" class="flex-1 border border-stone-200 rounded-lg px-3 py-2 text-sm" aria-label="Target omzet per bulan">
+                <button class="bg-stone-900 text-white rounded-lg px-3 py-2 text-sm">Simpan</button>
+            </form>
+        </section>
+
+        {{-- ============ Sumber penjualan (metode pembayaran) ============ --}}
+        <section class="td-card td-c8" aria-labelledby="source-title">
+            <div class="td-head"><div><h2 id="source-title">Sumber penjualan</h2><p class="td-sub">Pembayaran terverifikasi menurut jalur bayar · {{ $rangeLabel }}</p></div></div>
+            @forelse($salesSources as $src)
+                <div class="mb-3">
+                    <div class="flex justify-between text-sm"><span class="font-medium">{{ $src['label'] }} <span class="text-stone-400 font-normal">· {{ $src['count'] }} transaksi</span></span><span>{{ $rp($src['amount']) }} ({{ $src['pct'] }}%)</span></div>
+                    <div class="mt-1 h-2 rounded-full bg-stone-100 overflow-hidden"><div class="h-full rounded-full bg-stone-800" style="width: {{ $src['pct'] }}%"></div></div>
+                </div>
+            @empty
+                <p class="td-sub">Belum ada pembayaran terverifikasi pada periode ini.</p>
+            @endforelse
+        </section>
+        @endif
 
         {{-- ============ Pesanan terbaru ============ --}}
         <section class="td-card td-c8" aria-labelledby="orders-title">

@@ -63,6 +63,14 @@ use App\Http\Controllers\Web\TestimonialController as CustomerTestimonialControl
 |--------------------------------------------------------------------------
 | Web Routes - Roastery Supply E-Commerce
 |--------------------------------------------------------------------------
+|
+| Struktur:
+| 1. Rute Publik (Guest & Umum)
+| 2. Dashboard Redirector
+| 3. Rute Customer (Portal Pelanggan)
+| 4. Rute Admin & Staff (Admin Panel)
+| 5. Breeze Authentication & Profile
+|
 */
 
 // =========================================================================
@@ -110,6 +118,7 @@ Route::prefix('customer/cart')->as('customer.cart.')->group(function () {
 
 // =========================================================================
 // 3. RUTE CUSTOMER (Portal Pelanggan)
+// Middleware: auth
 // =========================================================================
 Route::prefix('customer')
     ->as('customer.')
@@ -172,6 +181,9 @@ Route::prefix('customer')
 
 // =========================================================================
 // 4. RUTE ADMIN & STAFF (Admin Panel)
+// Pintu masuk: role staff/admin/super_admin. Setiap fitur dijaga permission
+// (can:<permission>) sehingga matriks Role & Hak Akses (menu Role) benar-benar berlaku.
+// Super Admin lolos semua lewat Gate::before di AppServiceProvider.
 // =========================================================================
 Route::prefix('admin')
     ->as('admin.')
