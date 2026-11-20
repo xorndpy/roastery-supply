@@ -63,14 +63,6 @@ use App\Http\Controllers\Web\TestimonialController as CustomerTestimonialControl
 |--------------------------------------------------------------------------
 | Web Routes - Roastery Supply E-Commerce
 |--------------------------------------------------------------------------
-|
-| Struktur:
-| 1. Rute Publik (Guest & Umum)
-| 2. Dashboard Redirector
-| 3. Rute Customer (Portal Pelanggan)
-| 4. Rute Admin & Staff (Admin Panel)
-| 5. Breeze Authentication & Profile
-|
 */
 
 // =========================================================================
@@ -118,7 +110,6 @@ Route::prefix('customer/cart')->as('customer.cart.')->group(function () {
 
 // =========================================================================
 // 3. RUTE CUSTOMER (Portal Pelanggan)
-// Middleware: auth
 // =========================================================================
 Route::prefix('customer')
     ->as('customer.')
@@ -181,9 +172,6 @@ Route::prefix('customer')
 
 // =========================================================================
 // 4. RUTE ADMIN & STAFF (Admin Panel)
-// Pintu masuk: role staff/admin/super_admin. Setiap fitur dijaga permission
-// (can:<permission>) sehingga matriks Role & Hak Akses (menu Role) benar-benar berlaku.
-// Super Admin lolos semua lewat Gate::before di AppServiceProvider.
 // =========================================================================
 Route::prefix('admin')
     ->as('admin.')
@@ -205,10 +193,7 @@ Route::prefix('admin')
         Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard.alt');
         Route::get('/dashboard/calendar', [AdminDashboardController::class, 'calendar'])->name('dashboard.calendar')->middleware('can:view_orders');
-<<<<<<< HEAD
-=======
         Route::post('/dashboard/target', [AdminDashboardController::class, 'setTarget'])->name('dashboard.target')->middleware('can:view_finance');
->>>>>>> 8cb27942c0254ce59e4832ef162728433526881f
 
         // Katalog
         $crud('products', ProductController::class, 'products');
@@ -295,11 +280,8 @@ Route::prefix('admin')
         Route::prefix('keuangan')->as('finance.')->group(function () {
             Route::get('/laba-rugi', [FinanceController::class, 'profit'])->name('profit')->middleware('can:view_profit');
             Route::get('/laba-rugi/export', [FinanceController::class, 'profitExport'])->name('profit.export')->middleware(['can:view_profit', 'can:export_reports']);
-<<<<<<< HEAD
-=======
             Route::get('/laba-rugi/pdf', [FinanceController::class, 'profitPdf'])->name('profit.pdf')->middleware(['can:view_profit', 'can:export_reports']);
             Route::get('/laba-rugi/xlsx', [FinanceController::class, 'profitXlsx'])->name('profit.xlsx')->middleware(['can:view_profit', 'can:export_reports']);
->>>>>>> 8cb27942c0254ce59e4832ef162728433526881f
             Route::get('/hpp', [FinanceController::class, 'costs'])->name('costs')->middleware('can:view_costs');
             Route::put('/hpp', [FinanceController::class, 'updateCosts'])->name('costs.update')->middleware('can:manage_costs');
             Route::get('/tutup-buku', [FinanceClosingController::class, 'index'])->name('closings')->middleware('can:view_profit');
