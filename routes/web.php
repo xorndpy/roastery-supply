@@ -205,6 +205,7 @@ Route::prefix('admin')
         Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard.alt');
         Route::get('/dashboard/calendar', [AdminDashboardController::class, 'calendar'])->name('dashboard.calendar')->middleware('can:view_orders');
+        Route::post('/dashboard/target', [AdminDashboardController::class, 'setTarget'])->name('dashboard.target')->middleware('can:view_finance');
 
         // Katalog
         $crud('products', ProductController::class, 'products');
@@ -227,6 +228,8 @@ Route::prefix('admin')
         // Penjualan - Orders
         Route::prefix('orders')->as('orders.')->group(function () {
             Route::get('/', [AdminOrderController::class, 'index'])->name('index')->middleware('can:view_orders');
+            Route::get('/export', [AdminOrderController::class, 'export'])->name('export')->middleware(['can:view_orders', 'can:export_reports']);
+            Route::post('/bulk', [AdminOrderController::class, 'bulk'])->name('bulk')->middleware('can:view_orders');
             Route::get('/{order}', [AdminOrderController::class, 'show'])->name('show')->middleware('can:view_orders');
             Route::post('/{order}/confirm-payment', [AdminOrderController::class, 'confirmPayment'])->name('confirm-payment')->middleware('can:verify_payments');
             Route::post('/{order}/track', [TrackingController::class, 'sync'])->name('track')->middleware('can:ship_orders');
