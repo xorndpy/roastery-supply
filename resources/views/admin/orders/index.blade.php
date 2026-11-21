@@ -125,10 +125,13 @@
             <option value="">Pilih aksi</option>
             @can('process_orders')<option value="process">Tandai diproses</option>@endcan
             @can('complete_orders')<option value="complete">Tandai selesai</option>@endcan
+            @can('ship_orders')<option value="ship">Kirim (resi sudah terisi)</option>@endcan
             @can('cancel_orders')<option value="cancel">Batalkan</option>@endcan
         </select>
-        <input type="text" name="reason" placeholder="Alasan (untuk pembatalan)" class="bg-white border border-stone-300 rounded-lg px-3 py-1.5 text-sm text-stone-900">
-        <button type="submit" onclick="return confirm('Jalankan aksi untuk pesanan yang dipilih?')" class="bg-stone-900 hover:bg-stone-800 text-white rounded-lg px-4 py-1.5 font-medium">Jalankan</button>
+        <input type="text" name="reason" id="bulkReason" placeholder="Alasan pembatalan" hidden class="bg-white border border-stone-300 rounded-lg px-3 py-1.5 text-sm text-stone-900">
+        <button type="submit" class="bg-stone-900 hover:bg-stone-800 text-white rounded-lg px-4 py-1.5 font-medium">Jalankan</button>
+        <button type="button" id="bulkPrint" data-url="{{ route('admin.orders.bulk-delivery-notes') }}" class="border border-stone-300 bg-white hover:bg-stone-50 text-stone-800 rounded-lg px-4 py-1.5 font-medium">Cetak surat jalan</button>
+        <button type="button" id="bulkClear" class="ml-auto text-stone-500 hover:text-stone-800 underline underline-offset-2">Batal pilih</button>
     </div>
 
     {{-- Tabel --}}
@@ -197,7 +200,7 @@
     const rows = () => Array.from(document.querySelectorAll('.row-check'));
     function sync() {
         const n = rows().filter(c => c.checked).length;
-        cnt.textContent = n; bar.classList.toggle('hidden', n === 0);
+        cnt.textContent = n; bar.classList.toggle('hidden', n === 0); mode();
         all.checked = n > 0 && n === rows().length;
     }
     // Seluruh baris bisa diklik; klik pada link, checkbox, atau tombol tidak ikut memicu.
@@ -205,6 +208,27 @@
         if (e.target.closest('a, input, button, label, select') || window.getSelection().toString()) return;
         window.location = tr.dataset.href;
     }));
+    const act = document.querySelector('#bulkBar select[name=action]'), reason = document.getElementById('bulkReason');
+    const form = document.getElementById('bulkForm');
+    // Aksi ringan: tunda 5 detik dengan tombol Urungkan. Aksi berisiko (kirim, batalkan): dialog konfirmasi.
+    function mode() {
+        const n = rows().filter(c => c.checked).length, a = act.value;
+        reason.hidden = a !== 'cancel';
+        ['undo', 'confirmTitle', 'confirmText', 'confirmOk', 'confirmTone'].forEach(k => delete form.dataset[k]);
+        if (a === 'process') form.dataset.undo = n + ' pesanan ditandai diproses…';
+        else if (a === 'complete') form.dataset.undo = n + ' pesanan ditandai selesai…';
+        else if (a === 'ship') Object.assign(form.dataset, { confirmTitle: 'Kirim ' + n + ' pesanan?', confirmText: 'Pelanggan akan diberi tahu. Pesanan yang resinya belum diisi dilewati.', confirmOk: 'Ya, kirim' });
+        else if (a === 'cancel') Object.assign(form.dataset, { confirmTitle: 'Batalkan ' + n + ' pesanan?', confirmText: 'Stok dikembalikan bila sudah terpotong. Aksi ini tidak bisa diurungkan.', confirmOk: 'Ya, batalkan', confirmTone: 'danger' });
+    }
+    act.addEventListener('change', mode);
+    document.getElementById('bulkPrint').addEventListener('click', (e) => {
+        // submit() programatik tidak memicu event submit, jadi lolos dari kunci/konfirmasi.
+        const oldAction = form.action, oldTarget = form.target, oldAct = act.disabled;
+        act.disabled = true; form.action = e.currentTarget.dataset.url; form.target = '_blank';
+        HTMLFormElement.prototype.submit.call(form);
+        form.action = oldAction; form.target = oldTarget; act.disabled = oldAct;
+    });
+    document.getElementById('bulkClear').addEventListener('click', () => { rows().forEach(c => c.checked = false); sync(); });
     all.addEventListener('change', () => { rows().forEach(c => c.checked = all.checked); sync(); });
     rows().forEach(c => c.addEventListener('change', sync));
 })();

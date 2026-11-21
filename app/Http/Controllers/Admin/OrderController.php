@@ -18,15 +18,6 @@ class OrderController extends Controller
     /**
      * Query daftar pesanan dengan seluruh filter (dipakai halaman daftar dan export).
      */
-    /** Pesanan yang menunggu tindakan admin/gudang: sudah dibayar belum diproses, sedang diproses, atau bukti bayar menunggu verifikasi. */
-    protected function needsAction($query)
-    {
-        return $query->where(function ($q) {
-            $q->whereIn('status', ['dikonfirmasi', 'diproses'])
-              ->orWhere(fn ($w) => $w->where('status', 'menunggu_bayar')->whereHas('payments', fn ($p) => $p->where('status', 'pending')));
-        });
-    }
-
     protected function filteredQuery(Request $request)
     {
         $query = Order::with(['customer', 'items', 'payment', 'shipment']);
@@ -36,7 +27,7 @@ class OrderController extends Controller
         if ($status === 'terlambat') {
             $query->late();
         } elseif ($status === 'perlu') {
-            $this->needsAction($query);
+            $query->needsAction();
         } elseif ($status !== 'all') {
             $query->where('status', $status);
         }
@@ -105,7 +96,7 @@ class OrderController extends Controller
         $orders = $this->filteredQuery($request)->paginate($perPage)->withQueryString();
 
         $stats = [
-            'perlu' => $this->needsAction(Order::query())->count(),
+            'perlu' => Order::needsAction()->count(),
             'all' => Order::count(),
             'menunggu_bayar' => Order::where('status', 'menunggu_bayar')->count(),
             'dikonfirmasi' => Order::where('status', 'dikonfirmasi')->count(),
@@ -131,21 +122,22 @@ class OrderController extends Controller
         $data = $request->validate([
             'ids' => 'required|array|min:1|max:100',
             'ids.*' => 'integer',
-            'action' => 'required|in:process,complete,cancel',
+            'action' => 'required|in:process,complete,cancel,ship',
             'reason' => 'nullable|string|max:255',
         ]);
 
-        $permission = ['process' => 'process_orders', 'complete' => 'complete_orders', 'cancel' => 'cancel_orders'][$data['action']];
+        $permission = ['process' => 'process_orders', 'complete' => 'complete_orders', 'cancel' => 'cancel_orders', 'ship' => 'ship_orders'][$data['action']];
         abort_unless($request->user()->can($permission), 403);
 
         $ok = 0;
         $failed = [];
-        foreach (Order::whereIn('id', $data['ids'])->get() as $order) {
+        foreach (Order::with('shipment')->whereIn('id', $data['ids'])->get() as $order) {
             try {
                 match ($data['action']) {
                     'process' => $this->orders->process($order),
                     'complete' => $this->orders->complete($order),
                     'cancel' => $this->orders->cancel($order, $data['reason'] ?? 'Dibatalkan massal', auth()->id()),
+                    'ship' => $this->shipFromDraft($order),
                 };
                 $ok++;
             } catch (DomainException $e) {
@@ -153,12 +145,44 @@ class OrderController extends Controller
             }
         }
 
-        $msg = "{$ok} pesanan berhasil diproses.";
+        $verb = ['process' => 'diproses', 'complete' => 'diselesaikan', 'cancel' => 'dibatalkan', 'ship' => 'dikirim'][$data['action']];
+        $msg = "{$ok} pesanan berhasil {$verb}.";
         if ($failed) {
             return back()->with('success', $ok ? $msg : null)->with('error', count($failed) . ' gagal: ' . implode('; ', array_slice($failed, 0, 5)));
         }
 
         return back()->with('success', $msg);
+    }
+
+    /** Kirim memakai kurir & resi yang sudah disimpan gudang. Pesanan tanpa resi dilewati dengan alasan. */
+    private function shipFromDraft(Order $order): void
+    {
+        $d = $order->shipment;
+        if ($order->status !== 'diproses') {
+            throw new DomainException('belum berstatus diproses');
+        }
+        if (! $d || $d->status !== 'pending' || ! $d->tracking_number) {
+            throw new DomainException('kurir & resi belum diisi');
+        }
+        $this->orders->ship($order, ['courier' => $d->courier, 'service' => $d->service, 'tracking_number' => $d->tracking_number]);
+    }
+
+    /** Satu PDF berisi surat jalan banyak pesanan (satu pesanan per halaman). */
+    public function bulkDeliveryNotes(Request $request)
+    {
+        $ids = $request->validate(['ids' => 'required|array|min:1|max:100', 'ids.*' => 'integer'])['ids'];
+        $orders = Order::with(['customer', 'items'])
+            ->whereIn('id', $ids)
+            ->whereIn('status', ['dikonfirmasi', 'diproses', 'dikirim', 'selesai'])
+            ->oldest()->get();
+
+        if ($orders->isEmpty()) {
+            return back()->with('error', 'Surat jalan hanya tersedia untuk pesanan yang sudah dibayar.');
+        }
+
+        return Pdf::loadView('pdf.surat-jalan-batch', compact('orders'))
+            ->setPaper('a4')
+            ->stream('surat-jalan-' . now()->format('Ymd-His') . '.pdf');
     }
 
     /**

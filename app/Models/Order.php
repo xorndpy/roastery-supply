@@ -157,6 +157,15 @@ class Order extends Model
     /**
      * Pesanan yang melewati batas waktu proses (lihat config/orders.php).
      */
+    /** Pesanan yang menunggu tindakan: sudah dibayar belum selesai dikemas/kirim, atau bukti bayar menunggu verifikasi. */
+    public function scopeNeedsAction(Builder $query): Builder
+    {
+        return $query->where(function ($q) {
+            $q->whereIn('status', ['dikonfirmasi', 'diproses'])
+              ->orWhere(fn ($w) => $w->where('status', 'menunggu_bayar')->whereHas('payments', fn ($p) => $p->where('status', 'pending')));
+        });
+    }
+
     public function scopeLate(Builder $query): Builder
     {
         $sla = config('orders.sla_hours');

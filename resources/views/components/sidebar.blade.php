@@ -105,6 +105,9 @@
     $navBadges = [
         'admin.messages.index' => $unreadMessages,
         'admin.payments.index' => auth()->user()->can('verify_payments') ? \App\Models\Payment::needsAttention()->count() : 0,
+        'admin.orders.index' => auth()->user()->can('view_orders') ? \App\Models\Order::needsAction()->count() : 0,
+        'admin.shipments.index' => auth()->user()->can('manage_shipments') ? \App\Models\Order::whereIn('status', ['dikonfirmasi', 'diproses'])->count() : 0,
+        'admin.returns.index' => auth()->user()->can('view_returns') ? \App\Models\ReturnOrder::where('status', 'pending')->count() : 0,
     ];
 
     $menus = collect($menus)
@@ -154,7 +157,7 @@
                         :aria-expanded="open.toString()" aria-controls="nav-{{ $slug }}"
                         class="flex w-full items-center justify-between rounded-md px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-stone-500 transition hover:text-stone-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-500">
                     <span class="flex items-center gap-2">{{ $menu['group'] }}
-                        @if($groupBadge > 0)<span x-show="!open" class="h-1.5 w-1.5 rounded-full bg-copper-500" aria-hidden="true"></span>@endif
+                        @if($groupBadge > 0)<span x-show="!open" class="h-1.5 w-1.5 rounded-full bg-stone-900" aria-hidden="true"></span>@endif
                     </span>
                     <svg class="h-3.5 w-3.5 transition-transform duration-150" :class="open ? '' : '-rotate-90'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
                 </button>
@@ -172,7 +175,7 @@
                             <svg class="h-[18px] w-[18px] shrink-0 {{ $isActive ? 'text-copper-600' : 'text-stone-400 group-hover:text-stone-600' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $icons[$item['icon']] ?? '' !!}</svg>
                             <span class="truncate">{{ $item['label'] }}</span>
                             @if($badge > 0)
-                                <span class="ml-auto min-w-[1.375rem] rounded-full bg-copper-500 px-1.5 py-0.5 text-center text-[11px] font-semibold leading-none text-white tabular-nums" aria-label="{{ $badge }} menunggu">{{ $badge }}</span>
+                                <span class="ml-auto min-w-[1.375rem] rounded-full bg-stone-900 px-1.5 py-0.5 text-center text-[11px] font-semibold leading-none text-white tabular-nums" aria-label="{{ $badge }} menunggu">{{ $badge }}</span>
                             @endif
                         </a>
                     @endforeach

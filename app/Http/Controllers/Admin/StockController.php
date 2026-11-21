@@ -67,10 +67,10 @@ class StockController extends Controller
         ]);
 
         if ($validated['type'] !== 'in' && blank($validated['note'] ?? null)) {
-            return back()->withInput()->with('error', 'Alasan wajib diisi untuk stok keluar dan stock opname.');
+            return $this->fail($request, 'Alasan wajib diisi untuk stok keluar dan stock opname.');
         }
         if ($validated['type'] !== 'set' && (int) $validated['quantity'] < 1) {
-            return back()->withInput()->with('error', 'Jumlah minimal 1.');
+            return $this->fail($request, 'Jumlah minimal 1.');
         }
 
         try {
@@ -109,10 +109,22 @@ class StockController extends Controller
                 return $product;
             });
         } catch (DomainException $e) {
-            return back()->withInput()->with('error', $e->getMessage());
+            return $this->fail($request, $e->getMessage());
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json(['ok' => true, 'stock' => (int) $product->stock, 'message' => "Stok {$product->name} menjadi {$product->stock}."]);
         }
 
         return back()->with('success', "Stok {$product->name} diperbarui menjadi {$product->stock}.");
+    }
+
+    /** Gagal: JSON untuk edit inline, redirect + flash untuk dialog biasa. */
+    private function fail(Request $request, string $message)
+    {
+        return $request->expectsJson()
+            ? response()->json(['message' => $message], 422)
+            : back()->withInput()->with('error', $message);
     }
 
     /**

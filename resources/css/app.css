@@ -375,6 +375,15 @@
     .pay-flag h2 { font-size: 1.05rem; }
     .pay-flag p { margin-top: .25rem; font-size: 13.5px; line-height: 1.55; color: #5f5046; }
     /* Tombol aksi baris tabel (Edit / Hapus): seragam, bergaris tipis */
+    /* Toast "Urungkan" & tombol sibuk */
+    .undo-toast { position: fixed; left: 50%; bottom: 1.5rem; z-index: 9000; display: flex; align-items: center; gap: 1rem; overflow: hidden; padding: .7rem 1rem .85rem 1.1rem; border-radius: .6rem; background: theme('colors.stone.900'); color: #fff; font-size: .875rem; box-shadow: 0 10px 30px rgb(0 0 0 / .25); transform: translateX(-50%); }
+    .undo-toast button { padding: .15rem .6rem; border: 1px solid rgb(255 255 255 / .35); border-radius: .375rem; font-weight: 600; }
+    .undo-toast button:hover { background: rgb(255 255 255 / .12); }
+    .undo-toast i { position: absolute; left: 0; bottom: 0; height: 3px; width: 100%; background: rgb(255 255 255 / .55); transform-origin: left; animation: undo-bar linear forwards; }
+    @keyframes undo-bar { to { transform: scaleX(0); } }
+    .is-pending { pointer-events: none; opacity: .6; }
+    .is-busy { cursor: wait; opacity: .65; }
+    @media (prefers-reduced-motion: reduce) { .undo-toast i { animation: none; } }
     .row-btn { display: inline-flex; align-items: center; padding: .25rem .65rem; border: 1px solid theme('colors.stone.300'); border-radius: .375rem; background: #fff; font-size: 12.5px; font-weight: 500; line-height: 1.25; color: theme('colors.stone.700'); transition: background-color .15s, border-color .15s; }
     .row-btn:hover { background: theme('colors.stone.50'); border-color: theme('colors.stone.400'); }
     .row-btn:focus-visible { outline: 2px solid theme('colors.stone.500'); outline-offset: 2px; }

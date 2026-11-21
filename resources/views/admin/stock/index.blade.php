@@ -64,28 +64,42 @@
             </thead>
             <tbody class="divide-y divide-stone-100">
             @forelse($products as $p)
-                @php $state = $p->stock <= 0 ? 'out' : ($p->stock <= $p->stock_threshold ? 'low' : 'ok'); @endphp
-                <tr>
+                <tr x-data="inlineStock({ id: {{ $p->id }}, name: @js($p->name), stock: {{ (int) $p->stock }}, threshold: {{ (int) $p->stock_threshold }}, url: @js(route('admin.stock.adjust')) })">
                     <td class="px-4 py-3">
                         <div class="font-medium">{{ $p->name }}</div>
                         <div class="text-xs text-stone-500">{{ $p->category->name ?? '-' }} · {{ $p->brand->name ?? '-' }}</div>
                     </td>
                     <td class="px-4 py-3 font-mono text-xs">{{ $p->sku }}</td>
-                    <td class="px-4 py-3 text-right font-bold">{{ $p->stock }}</td>
+                    <td class="px-4 py-3 text-right">
+                        @can('manage_stock')
+                            <button type="button" x-show="!editing" @click="start()" title="Klik untuk ubah stok"
+                                    class="font-bold tabular-nums underline decoration-dotted decoration-stone-400 underline-offset-4 hover:decoration-stone-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 rounded" x-text="stock">{{ $p->stock }}</button>
+                            <form x-show="editing" x-cloak @submit.prevent="save()" @keydown.escape.stop="cancel()" class="inline-flex flex-wrap items-center justify-end gap-1.5" data-no-lock>
+                                <input x-ref="n" type="number" min="0" inputmode="numeric" x-model="val" aria-label="Stok baru {{ $p->name }}"
+                                       class="w-20 rounded-lg border border-stone-300 px-2 py-1 text-right text-sm">
+                                <select x-model="reason" aria-label="Alasan" class="rounded-lg border border-stone-300 px-2 py-1 text-xs">
+                                    <optgroup label="Stok bertambah"><option>Restock dari supplier</option><option>Retur pelanggan</option></optgroup>
+                                    <optgroup label="Stok berkurang"><option>Rusak</option><option>Sampel</option><option>Hilang</option><option>Retur ke supplier</option></optgroup>
+                                    <optgroup label="Koreksi"><option>Stock opname</option><option>Koreksi hitungan</option></optgroup>
+                                </select>
+                                <button type="submit" :disabled="saving" class="row-btn">Simpan</button>
+                                <button type="button" @click="cancel()" class="text-xs text-stone-500 hover:text-stone-800">Batal</button>
+                            </form>
+                            <p x-show="error" x-cloak x-text="error" class="mt-1 text-xs text-red-700" role="alert"></p>
+                        @else
+                            <span class="font-bold">{{ $p->stock }}</span>
+                        @endcan
+                    </td>
                     <td class="px-4 py-3 text-right text-stone-500">{{ $p->stock_threshold }}</td>
                     <td class="px-4 py-3">
-                        @if($state === 'out')
-                            <span class="px-2 py-0.5 rounded bg-red-100 text-red-700 text-xs">Habis</span>
-                        @elseif($state === 'low')
-                            <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-700 text-xs">Menipis</span>
-                        @else
-                            <span class="px-2 py-0.5 rounded bg-green-100 text-green-700 text-xs">Aman</span>
-                        @endif
+                        <span x-show="state === 'out'" @if($p->stock > 0) x-cloak @endif class="px-2 py-0.5 rounded bg-red-100 text-red-700 text-xs">Habis</span>
+                        <span x-show="state === 'low'" @if(! ($p->stock > 0 && $p->stock <= $p->stock_threshold)) x-cloak @endif class="px-2 py-0.5 rounded bg-amber-100 text-amber-700 text-xs">Menipis</span>
+                        <span x-show="state === 'ok'" @if($p->stock <= $p->stock_threshold) x-cloak @endif class="px-2 py-0.5 rounded bg-stone-100 text-stone-700 text-xs">Aman</span>
                     </td>
                     @can('manage_stock')
                     <td class="px-4 py-3 text-right">
                         <button type="button"
-                                @click="openFor({ id: {{ $p->id }}, name: @js($p->name), stock: {{ (int) $p->stock }} })"
+                                @click="openFor({ id: id, name: name, stock: stock })"
                                 class="border border-stone-300 hover:border-copper-500 hover:text-copper-700 px-3 py-1.5 rounded-lg text-xs font-medium transition">
                             Atur stok
                         </button>
@@ -175,6 +189,38 @@
 
 @push('scripts')
 <script>
+function inlineStock(c) {
+    // kind: in = stok bertambah, out = stok berkurang, set = koreksi/opname (stok diganti)
+    const kinds = { 'Restock dari supplier': 'in', 'Retur pelanggan': 'in', 'Rusak': 'out', 'Sampel': 'out', 'Hilang': 'out', 'Retur ke supplier': 'out' };
+    return {
+        ...c, editing: false, val: '', reason: 'Stock opname', saving: false, error: '',
+        get state() { return this.stock <= 0 ? 'out' : (this.stock <= this.threshold ? 'low' : 'ok'); },
+        start() { this.error = ''; this.val = this.stock; this.reason = 'Stock opname'; this.editing = true; this.$nextTick(() => { this.$refs.n.focus(); this.$refs.n.select(); }); },
+        cancel() { this.editing = false; this.error = ''; },
+        async save() {
+            const n = parseInt(this.val, 10);
+            if (isNaN(n) || n < 0) { this.error = 'Isi angka stok 0 atau lebih.'; return; }
+            const d = n - this.stock;
+            if (d === 0) { this.cancel(); return; }
+            // Arah perubahan menentukan jenis mutasi; bila tidak cocok dengan alasan, dicatat sebagai koreksi.
+            let type = 'set', quantity = n; const k = kinds[this.reason];
+            if (k === 'in' && d > 0) { type = 'in'; quantity = d; } else if (k === 'out' && d < 0) { type = 'out'; quantity = -d; }
+            this.saving = true; this.error = '';
+            try {
+                const r = await fetch(this.url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content },
+                    body: JSON.stringify({ product_id: this.id, type, quantity, note: this.reason }),
+                });
+                const j = await r.json().catch(() => ({}));
+                if (r.ok) { this.stock = j.stock; this.editing = false; }
+                else this.error = j.message || (j.errors && Object.values(j.errors)[0][0]) || 'Gagal menyimpan.';
+            } catch (e) { this.error = 'Koneksi bermasalah. Coba lagi.'; }
+            this.saving = false;
+        },
+    };
+}
+
 function stockModal() {
     return {
         open: false,

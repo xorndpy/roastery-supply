@@ -4,9 +4,12 @@
 
 @section('content')
 
-<div class="mb-6">
-    <h1 class="text-2xl font-bold text-stone-900">Pengiriman</h1>
-    <p class="text-sm text-stone-500 mt-1">Antrean kirim, pesanan dalam perjalanan, dan yang sudah sampai.</p>
+<div class="mb-6 flex flex-wrap items-start justify-between gap-3">
+    <div>
+        <h1 class="text-2xl font-bold text-stone-900">Pengiriman</h1>
+        <p class="text-sm text-stone-500 mt-1">Antrean kirim, pesanan dalam perjalanan, dan yang sudah sampai.</p>
+    </div>
+    <a href="{{ route('admin.shipments.quick') }}" class="rounded-lg bg-stone-900 px-4 py-2 text-sm font-medium text-white hover:bg-stone-800">Input resi cepat</a>
 </div>
 
 @php
@@ -64,7 +67,7 @@
                     @if($o->status === 'dikonfirmasi')
                         <div class="text-xs text-stone-500">Menunggu gudang mengemas.</div>
                         @can('process_orders')
-                            <form method="POST" action="{{ route('admin.orders.process', $o->id) }}" class="mt-2">
+                            <form method="POST" action="{{ route('admin.orders.process', $o->id) }}" data-undo="Memulai proses pesanan…" class="mt-2">
                                 @csrf
                                 <button type="submit" class="rounded border border-stone-300 px-2.5 py-1 text-xs font-medium text-stone-800 hover:bg-stone-50">Tandai dikemas</button>
                             </form>
@@ -74,9 +77,9 @@
                         @include('admin.orders._ship-form', ['order' => $o, 'compact' => true])
                         @can('ship_orders')
                             @if($hasResi)
-                                <form method="POST" action="{{ route('admin.orders.ship', $o->id) }}" class="mt-2">
+                                <form method="POST" action="{{ route('admin.orders.ship', $o->id) }}" data-undo="Mengirim pesanan…" class="mt-2">
                                     @csrf
-                                    <button type="submit" class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm">Kirim Pesanan</button>
+                                    <button type="submit" class="bg-stone-900 hover:bg-stone-800 text-white px-4 py-2 rounded-lg text-sm">Kirim Pesanan</button>
                                 </form>
                             @else
                                 <div class="mt-2 text-xs text-amber-800">Menunggu gudang mengisi kurir &amp; resi.</div>

@@ -1,5 +1,6 @@
 import './bootstrap';
 import './inline-validation';
+import './admin-ux';
 
 import Alpine from 'alpinejs';
 

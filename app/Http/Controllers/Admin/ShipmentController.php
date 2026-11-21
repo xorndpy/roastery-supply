@@ -5,10 +5,55 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Shipment;
+use App\Services\OrderService;
+use App\Support\Couriers;
+use DomainException;
 use Illuminate\Http\Request;
 
 class ShipmentController extends Controller
 {
+    public function __construct(private OrderService $orders)
+    {
+    }
+
+    /** Input resi cepat untuk gudang: satu baris per pesanan yang sudah dikemas, Enter menyimpan. */
+    public function quick()
+    {
+        $orders = Order::with(['customer', 'shipment'])->where('status', 'diproses')->oldest()->get();
+        $waiting = Order::where('status', 'dikonfirmasi')->count();
+
+        return view('admin.shipments.quick', compact('orders', 'waiting'));
+    }
+
+    /** Simpan kurir & resi satu pesanan (AJAX dari halaman input cepat). Belum mengirim. */
+    public function quickSave(Request $request, Order $order)
+    {
+        if ($order->status !== 'diproses') {
+            return response()->json(['message' => 'Pesanan ini tidak lagi berstatus diproses.'], 422);
+        }
+
+        $data = $request->validate([
+            'courier' => 'required|string|max:100',
+            'tracking_number' => 'required|string|max:100',
+        ], ['courier.required' => 'Pilih kurir dulu.', 'tracking_number.required' => 'Resi kosong.']);
+
+        $resi = Couriers::normalizeResi($data['tracking_number']);
+        if (! Couriers::validResi($resi)) {
+            return response()->json(['message' => 'Resi tidak valid: huruf/angka saja, 4-40 karakter.'], 422);
+        }
+        if ($used = Couriers::usedByOtherOrder($data['courier'], $resi, $order->id)) {
+            return response()->json(['message' => "Resi ini sudah dipakai di pesanan {$used}."], 422);
+        }
+
+        try {
+            $this->orders->prepareShipment($order, ['courier' => $data['courier'], 'service' => $order->shipment?->service, 'tracking_number' => $resi]);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+
+        return response()->json(['ok' => true, 'resi' => $resi]);
+    }
+
     /**
      * Antrean pengiriman: perlu dikirim / dalam perjalanan / sudah sampai.
      */

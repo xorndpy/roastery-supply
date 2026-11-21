@@ -189,7 +189,7 @@
             @if($st === 'menunggu_bayar')
                 @if($order->payment && $order->payment->status === 'pending')
                     @can('verify_payments')
-                        <form method="POST" action="{{ route('admin.orders.confirm-payment', $order->id) }}">@csrf
+                        <form method="POST" action="{{ route('admin.orders.confirm-payment', $order->id) }}" data-undo="Mengonfirmasi pembayaran…">@csrf
                             <button type="submit" class="{{ $btnPrimary }}">Konfirmasi pembayaran</button>
                         </form>
                     @else
@@ -203,7 +203,7 @@
 
             @elseif($st === 'dikonfirmasi')
                 @can('process_orders')
-                    <form method="POST" action="{{ route('admin.orders.process', $order->id) }}">@csrf
+                    <form method="POST" action="{{ route('admin.orders.process', $order->id) }}" data-undo="Memulai proses pesanan…">@csrf
                         <button type="submit" class="{{ $btnPrimary }}">Mulai proses</button>
                     </form>
                     <p class="mt-2 text-xs text-stone-500">Setelah dikemas, isi kurir &amp; resi, lalu kirim.</p>
@@ -218,7 +218,7 @@
                 @endcan
                 @can('ship_orders')
                     @if($hasResi)
-                        <form method="POST" action="{{ route('admin.orders.ship', $order->id) }}">@csrf
+                        <form method="POST" action="{{ route('admin.orders.ship', $order->id) }}" data-undo="Mengirim pesanan…">@csrf
                             <button type="submit" class="{{ $btnPrimary }}">Kirim pesanan</button>
                         </form>
                     @else
@@ -231,7 +231,7 @@
 
             @elseif($st === 'dikirim')
                 @can('complete_orders')
-                    <form method="POST" action="{{ route('admin.orders.complete', $order->id) }}">@csrf
+                    <form method="POST" action="{{ route('admin.orders.complete', $order->id) }}" data-undo="Menandai pesanan selesai…">@csrf
                         <button type="submit" class="{{ $btnPrimary }}">Tandai selesai</button>
                     </form>
                 @else

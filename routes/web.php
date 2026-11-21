@@ -233,6 +233,7 @@ Route::prefix('admin')
             Route::get('/', [AdminOrderController::class, 'index'])->name('index')->middleware('can:view_orders');
             Route::get('/export', [AdminOrderController::class, 'export'])->name('export')->middleware(['can:view_orders', 'can:export_reports']);
             Route::post('/bulk', [AdminOrderController::class, 'bulk'])->name('bulk')->middleware('can:view_orders');
+            Route::post('/bulk-surat-jalan', [AdminOrderController::class, 'bulkDeliveryNotes'])->name('bulk-delivery-notes')->middleware('can:view_orders');
             Route::get('/{order}', [AdminOrderController::class, 'show'])->name('show')->middleware('can:view_orders');
             Route::post('/{order}/confirm-payment', [AdminOrderController::class, 'confirmPayment'])->name('confirm-payment')->middleware('can:verify_payments');
             Route::post('/{order}/track', [TrackingController::class, 'sync'])->name('track')->middleware('can:ship_orders');
@@ -259,6 +260,8 @@ Route::prefix('admin')
 
         // Penjualan - Shipments
         Route::get('/shipments', [ShipmentController::class, 'index'])->name('shipments.index')->middleware('can:manage_shipments');
+        Route::get('/shipments/input-cepat', [ShipmentController::class, 'quick'])->name('shipments.quick')->middleware('can:manage_shipments');
+        Route::post('/shipments/input-cepat/{order}', [ShipmentController::class, 'quickSave'])->name('shipments.quick-save')->middleware('can:manage_shipments');
         Route::patch('/shipments/{shipment}', [ShipmentController::class, 'update'])->name('shipments.update')->middleware('can:manage_shipments');
 
         // Tarif pengiriman per wilayah
