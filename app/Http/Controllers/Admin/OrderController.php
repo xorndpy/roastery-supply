@@ -18,12 +18,27 @@ class OrderController extends Controller
     /**
      * Query daftar pesanan dengan seluruh filter (dipakai halaman daftar dan export).
      */
+    /** Pesanan yang menunggu tindakan admin/gudang: sudah dibayar belum diproses, sedang diproses, atau bukti bayar menunggu verifikasi. */
+    protected function needsAction($query)
+    {
+        return $query->where(function ($q) {
+            $q->whereIn('status', ['dikonfirmasi', 'diproses'])
+              ->orWhere(fn ($w) => $w->where('status', 'menunggu_bayar')->whereHas('payments', fn ($p) => $p->where('status', 'pending')));
+        });
+    }
+
     protected function filteredQuery(Request $request)
     {
         $query = Order::with(['customer', 'items', 'payment', 'shipment']);
 
-        if ($request->filled('status')) {
-            $request->status === 'terlambat' ? $query->late() : $query->where('status', $request->status);
+        // Default: "perlu" (antrean tindakan). Kalau sedang mencari, default ke semua pesanan.
+        $status = $request->input('status') ?: ($request->filled('search') ? 'all' : 'perlu');
+        if ($status === 'terlambat') {
+            $query->late();
+        } elseif ($status === 'perlu') {
+            $this->needsAction($query);
+        } elseif ($status !== 'all') {
+            $query->where('status', $status);
         }
 
         if ($request->filled('search')) {
@@ -90,6 +105,7 @@ class OrderController extends Controller
         $orders = $this->filteredQuery($request)->paginate($perPage)->withQueryString();
 
         $stats = [
+            'perlu' => $this->needsAction(Order::query())->count(),
             'all' => Order::count(),
             'menunggu_bayar' => Order::where('status', 'menunggu_bayar')->count(),
             'dikonfirmasi' => Order::where('status', 'dikonfirmasi')->count(),

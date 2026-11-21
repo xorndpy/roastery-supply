@@ -90,6 +90,18 @@
 @endphp
 
 <style>
+    .td-queue { margin-top: 1.25rem; }
+    .td-queue-h { display: flex; align-items: center; gap: .5rem; margin-bottom: .6rem; font-size: .9375rem; font-weight: 600; }
+    .td-queue-h .dash-pill { background: #18181b; }
+    .td-queue-list { display: grid; gap: .75rem; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+    .td-queue-item { display: flex; align-items: center; gap: .85rem; padding: .8rem 1rem; border: 1px solid #e4e4e7; border-radius: 12px; background: #fff; transition: border-color .15s, background-color .15s; }
+    .td-queue-item:hover { border-color: #a1a1aa; background: #fafafa; }
+    .td-queue-item:focus-visible { outline: 2px solid #18181b; outline-offset: 2px; }
+    .td-queue-n { min-width: 2ch; font-size: 1.5rem; font-weight: 600; line-height: 1; text-align: center; font-variant-numeric: tabular-nums; }
+    .td-queue-item b { display: block; font-size: 13.5px; font-weight: 500; line-height: 1.3; }
+    .td-queue-item small { display: block; margin-top: 2px; font-size: 12px; color: #71717a; }
+    .td-queue-item small.is-late { color: #b42318; font-weight: 500; }
+    .td-queue-item:hover .dash-task-chev { transform: translateX(2px); color: #52525b; }
     .td-grid { display: grid; gap: 1.25rem; grid-template-columns: minmax(0, 1fr); margin-top: 1.25rem; }
     @media (min-width: 1180px) {
         .td-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
@@ -307,6 +319,27 @@
         </div>
     </header>
 
+    {{-- ============ Antrean kerja (hanya tampil bila ada) ============ --}}
+    @if($tasks->isNotEmpty())
+        <section class="td-queue" aria-labelledby="queue-title">
+            <h2 id="queue-title" class="td-queue-h">Perlu diproses <span class="dash-pill" aria-label="{{ $taskTotal }} hal">{{ $taskTotal }}</span></h2>
+            <ul class="td-queue-list">
+                @foreach($tasks as $t)
+                    <li>
+                        <a href="{{ $t['href'] }}" class="td-queue-item">
+                            <span class="td-queue-n">{{ $t['count'] }}</span>
+                            <span class="min-w-0 flex-1">
+                                <b>{{ $t['label'] }}</b>
+                                <small class="{{ str_contains($t['hint'], 'lewat') ? 'is-late' : '' }}">{{ $t['hint'] }}</small>
+                            </span>
+                            <svg class="dash-task-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+        </section>
+    @endif
+
     {{-- ============ KPI ============ --}}
     <section class="td-kpis" aria-label="Ringkasan {{ $rangeLabel }}">
         @foreach($kpis as $k)
@@ -368,32 +401,6 @@
                 <thead><tr><th>Tanggal</th><th>Pesanan</th>@if($canFinance)<th>Pendapatan</th>@endif</tr></thead>
                 <tbody>@foreach($chartDates as $i => $d)<tr><td>{{ $d }}</td><td>{{ $chartOrders[$i] }}</td>@if($canFinance)<td>{{ $rp($chartData[$i]) }}</td>@endif</tr>@endforeach</tbody>
             </table>
-        </section>
-
-        {{-- ============ Perlu tindakan ============ --}}
-        <section class="td-card td-c4" aria-labelledby="queue-title">
-            <div class="td-head">
-                <h2 id="queue-title">Perlu tindakan</h2>
-                @if($taskTotal > 0)<span class="dash-pill" aria-label="{{ $taskTotal }} hal">{{ $taskTotal }}</span>@endif
-            </div>
-
-            @if($tasks->isNotEmpty())
-                <ul class="dash-tasks">
-                    @foreach($tasks->take(5) as $t)
-                        <li>
-                            <a href="{{ $t['href'] }}" class="dash-task">
-                                <span class="dash-task-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $ico[$t['icon']] !!}</svg></span>
-                                <span class="dash-task-text"><b>{{ $t['label'] }}</b><small>{{ $t['hint'] }}</small></span>
-                                <span class="dash-task-count">{{ $t['count'] }}</span>
-                                <svg class="dash-task-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
-                            </a>
-                        </li>
-                    @endforeach
-                </ul>
-                @if($tasks->count() > 5)<p class="td-sub" style="margin-top:.75rem">+{{ $tasks->count() - 5 }} antrean lainnya</p>@endif
-            @else
-                <p class="text-sm text-stone-500">Tidak ada antrean tindakan.</p>
-            @endif
         </section>
 
         {{-- ============ Target penjualan bulan ini ============ --}}

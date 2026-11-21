@@ -48,7 +48,7 @@
                     <button type="button" @click="$dispatch('open-palette')"
                             class="group hidden h-9 w-full max-w-sm items-center gap-2.5 rounded-md border border-stone-200 bg-stone-50 px-3 text-left text-sm text-stone-500 transition hover:border-stone-300 hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-500 lg:flex">
                         <svg class="h-4 w-4 shrink-0 text-stone-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg>
-                        <span class="flex-1">Cari menu atau halaman…</span>
+                        <span class="flex-1">Cari menu, pesanan, produk…</span>
                         <span class="flex items-center gap-1"><kbd class="rounded border border-stone-300 bg-white px-1.5 py-0.5 font-sans text-[10px] text-stone-600">Ctrl</kbd><kbd class="rounded border border-stone-300 bg-white px-1.5 py-0.5 font-sans text-[10px] text-stone-600">K</kbd></span>
                     </button>
 
@@ -116,22 +116,23 @@
                 <div class="flex items-center gap-3 border-b border-stone-200 px-4">
                     <svg class="h-5 w-5 shrink-0 text-stone-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg>
                     <input x-ref="q" x-model="q" @keydown="onKey($event)" type="text" role="combobox" aria-expanded="true" aria-controls="palette-list" :aria-activedescendant="results.length ? 'pal-' + active : null"
-                           placeholder="Ketik nama menu, mis. pesanan, stok, voucher…" autocomplete="off" spellcheck="false"
+                           placeholder="Cari menu, no. pesanan, nama, resi, SKU…" autocomplete="off" spellcheck="false"
                            class="h-14 w-full border-0 bg-transparent px-0 text-[15px] text-stone-900 placeholder:text-stone-500 focus:ring-0">
                     <kbd class="rounded border border-stone-300 px-1.5 py-0.5 font-sans text-[10px] text-stone-600">Esc</kbd>
                 </div>
                 <ul id="palette-list" role="listbox" class="max-h-[50vh] overflow-y-auto p-2">
-                    <template x-for="(r, i) in results" :key="r.href">
+                    <template x-for="(r, i) in results" :key="r.group + r.href">
                         <li :id="'pal-' + i" role="option" :aria-selected="(i === active).toString()">
                             <a :href="r.href" @mousemove="active = i"
                                :class="i === active ? 'bg-stone-100 text-stone-900' : 'text-stone-700'"
                                class="flex items-center justify-between rounded-lg px-3 py-2.5 text-sm">
-                                <span x-text="r.label" class="font-medium"></span>
-                                <span x-text="r.group" class="text-xs text-stone-500"></span>
+                                <span x-text="r.label" class="truncate font-medium"></span>
+                                <span x-text="r.group" class="ml-3 shrink-0 text-xs text-stone-500"></span>
                             </a>
                         </li>
                     </template>
-                    <li x-show="!results.length" class="px-3 py-8 text-center text-sm text-stone-500">Tidak ada menu yang cocok.</li>
+                    <li x-show="loading && !results.length" class="px-3 py-8 text-center text-sm text-stone-500">Mencari…</li>
+                    <li x-show="!loading && !results.length" class="px-3 py-8 text-center text-sm text-stone-500">Tidak ada yang cocok.</li>
                 </ul>
             </div>
         </div>
@@ -140,14 +141,32 @@
     <script>
         function adminPalette() {
             return {
-                open: false, q: '', active: 0, items: [],
+                open: false, q: '', active: 0, items: [], data: [], loading: false, _t: null, _ctl: null,
                 get results() {
                     const q = this.q.trim().toLowerCase();
-                    return !q ? this.items : this.items.filter(i => (i.label + ' ' + i.group).toLowerCase().includes(q));
+                    const menu = !q ? this.items : this.items.filter(i => (i.label + ' ' + i.group).toLowerCase().includes(q));
+                    return q.length >= 2 ? menu.concat(this.data) : menu;
+                },
+                init() {
+                    this.$watch('q', (v) => {
+                        clearTimeout(this._t); this._ctl?.abort(); this.data = [];
+                        const q = v.trim();
+                        if (q.length < 2) { this.loading = false; return; }
+                        this.loading = true;
+                        this._t = setTimeout(() => this.fetchData(q), 220);
+                    });
+                },
+                async fetchData(q) {
+                    this._ctl = new AbortController();
+                    try {
+                        const r = await fetch(@js(route('admin.search')) + '?q=' + encodeURIComponent(q), { headers: { Accept: 'application/json' }, signal: this._ctl.signal });
+                        if (r.ok) this.data = await r.json();
+                    } catch (e) { if (e.name === 'AbortError') return; }
+                    this.loading = false;
                 },
                 show() {
                     this.items = [...document.querySelectorAll('aside [data-nav]')].map(a => ({ label: a.dataset.navLabel, group: a.dataset.navGroup, href: a.href }));
-                    this.q = ''; this.active = 0; this.open = true;
+                    this.q = ''; this.data = []; this.active = 0; this.open = true;
                     this.$nextTick(() => this.$refs.q.focus());
                 },
                 close() { this.open = false; },

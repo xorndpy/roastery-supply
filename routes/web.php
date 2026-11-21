@@ -42,6 +42,7 @@ use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\ShipmentController;
 use App\Http\Controllers\Admin\ReturnController as AdminReturnController;
 use App\Http\Controllers\Admin\CustomerController;
+use App\Http\Controllers\Admin\SearchController as AdminSearchController;
 use App\Http\Controllers\Admin\VoucherController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\TestimonialController;
@@ -206,6 +207,8 @@ Route::prefix('admin')
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard.alt');
         Route::get('/dashboard/calendar', [AdminDashboardController::class, 'calendar'])->name('dashboard.calendar')->middleware('can:view_orders');
         Route::post('/dashboard/target', [AdminDashboardController::class, 'setTarget'])->name('dashboard.target')->middleware('can:view_finance');
+
+        Route::get('/search', AdminSearchController::class)->name('search');
 
         // Katalog
         $crud('products', ProductController::class, 'products');

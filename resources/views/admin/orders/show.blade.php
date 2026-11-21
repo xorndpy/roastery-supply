@@ -151,103 +151,97 @@
     {{-- Right Column - Actions --}}
     <div class="lg:col-span-1 space-y-4">
 
-        {{-- Action Buttons --}}
+        {{-- Aksi: satu tombol utama sesuai status; sisanya di menu ⋯ --}}
+        @php
+            $st = $order->status;
+            $btnPrimary = 'w-full rounded-lg bg-stone-900 py-3 font-medium text-white transition hover:bg-stone-800';
+            $btnDisabled = 'w-full cursor-not-allowed rounded-lg bg-stone-200 py-3 font-medium text-stone-500';
+            $hasResi = $order->shipment && $order->shipment->status === 'pending' && $order->shipment->tracking_number;
+            $canCancel = in_array($st, ['menunggu_bayar', 'dikonfirmasi', 'diproses']) && auth()->user()->can('cancel_orders');
+            $canNote = in_array($st, ['dikonfirmasi', 'diproses', 'dikirim', 'selesai']);
+            $canInvoice = auth()->user()->can('download_invoices');
+        @endphp
         <div class="bg-white p-6 rounded-lg border border-stone-200 sticky top-24">
-            <h3 class="font-bold mb-4">Aksi</h3>
+            <div class="mb-4 flex items-center justify-between">
+                <h3 class="font-bold">Aksi</h3>
+                @if($canCancel || $canNote || $canInvoice)
+                    <div x-data="{ open: false }" @keydown.escape="open = false" @click.outside="open = false" class="relative">
+                        <button type="button" @click="open = !open" :aria-expanded="open.toString()" aria-haspopup="menu" aria-label="Aksi lainnya"
+                                class="flex h-8 w-8 items-center justify-center rounded-md text-stone-600 hover:bg-stone-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400">
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>
+                        </button>
+                        <div x-show="open" x-cloak role="menu" class="absolute right-0 z-20 mt-1 w-52 overflow-hidden rounded-lg border border-stone-200 bg-white py-1 shadow-lg">
+                            @if($canNote)<a href="{{ route('admin.orders.delivery-note', $order->id) }}" target="_blank" role="menuitem" class="block px-4 py-2 text-sm text-stone-700 hover:bg-stone-50">Cetak surat jalan</a>@endif
+                            @if($canInvoice)<a href="{{ route('admin.orders.invoice', $order->id) }}" target="_blank" role="menuitem" class="block px-4 py-2 text-sm text-stone-700 hover:bg-stone-50">Cetak invoice</a>@endif
+                            @if($canCancel)
+                                <form method="POST" action="{{ route('admin.orders.cancel', $order->id) }}" class="border-t border-stone-100">
+                                    @csrf
+                                    <button type="submit" role="menuitem"
+                                            data-confirm-title="Batalkan pesanan {{ $order->order_number }}?" data-confirm-text="Status berubah menjadi dibatalkan. Jika stok sudah terpotong, stok dikembalikan. Aksi ini tidak bisa diurungkan." data-confirm-ok="Ya, batalkan pesanan" data-confirm-cancel="Kembali" data-confirm-tone="danger"
+                                            class="w-full px-4 py-2 text-left text-sm text-red-700 hover:bg-red-50">Batalkan pesanan</button>
+                                </form>
+                            @endif
+                        </div>
+                    </div>
+                @endif
+            </div>
 
-            {{-- Konfirmasi Pembayaran --}}
-            @can('verify_payments')
-            @if($order->status === 'menunggu_bayar' && $order->payment && $order->payment->status === 'pending')
-                <form method="POST" action="{{ route('admin.orders.confirm-payment', $order->id) }}" class="mb-3">
-                    @csrf
-                    <button type="submit"
-                            class="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-medium transition">
-                        Konfirmasi Pembayaran
-                    </button>
-                </form>
-            @endif
-            @endcan
+            @if($st === 'menunggu_bayar')
+                @if($order->payment && $order->payment->status === 'pending')
+                    @can('verify_payments')
+                        <form method="POST" action="{{ route('admin.orders.confirm-payment', $order->id) }}">@csrf
+                            <button type="submit" class="{{ $btnPrimary }}">Konfirmasi pembayaran</button>
+                        </form>
+                    @else
+                        <button type="button" disabled class="{{ $btnDisabled }}">Konfirmasi pembayaran</button>
+                        <p class="mt-2 text-xs text-stone-500">Hanya petugas verifikasi pembayaran yang bisa mengonfirmasi.</p>
+                    @endcan
+                @else
+                    <button type="button" disabled class="{{ $btnDisabled }}">Konfirmasi pembayaran</button>
+                    <p class="mt-2 text-xs text-stone-500">Belum ada bukti pembayaran dari pelanggan.</p>
+                @endif
 
-            {{-- Proses --}}
-            @can('process_orders')
-            @if($order->status === 'dikonfirmasi')
-                <form method="POST" action="{{ route('admin.orders.process', $order->id) }}" class="mb-3">
-                    @csrf
-                    <button type="submit"
-                            class="w-full bg-purple-500 hover:bg-purple-600 text-white py-3 rounded-lg font-medium transition">
-                        Mulai Proses
-                    </button>
-                </form>
-            @endif
-            @endcan
-
-            {{-- Kirim: gudang mengemas & mengisi resi dulu, admin yang menekan Kirim --}}
-            @if($order->status === 'dikonfirmasi')
-                @can('manage_shipments')
-                    <p class="mb-3 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-xs text-stone-600">Menunggu gudang mengemas pesanan (Mulai Proses). Kurir &amp; resi diisi setelah dikemas.</p>
+            @elseif($st === 'dikonfirmasi')
+                @can('process_orders')
+                    <form method="POST" action="{{ route('admin.orders.process', $order->id) }}">@csrf
+                        <button type="submit" class="{{ $btnPrimary }}">Mulai proses</button>
+                    </form>
+                    <p class="mt-2 text-xs text-stone-500">Setelah dikemas, isi kurir &amp; resi, lalu kirim.</p>
+                @else
+                    <button type="button" disabled class="{{ $btnDisabled }}">Mulai proses</button>
+                    <p class="mt-2 text-xs text-stone-500">Menunggu gudang memulai proses pengemasan.</p>
                 @endcan
-            @elseif($order->status === 'diproses')
-                @php $hasResi = $order->shipment && $order->shipment->status === 'pending' && $order->shipment->tracking_number; @endphp
+
+            @elseif($st === 'diproses')
                 @can('manage_shipments')
-                    <p class="mb-2 text-xs text-stone-500">Gudang mengisi kurir &amp; resi. Admin yang menekan Kirim.</p>
                     @include('admin.orders._ship-form', ['order' => $order])
                 @endcan
                 @can('ship_orders')
                     @if($hasResi)
-                        <form method="POST" action="{{ route('admin.orders.ship', $order->id) }}" class="mb-3">
-                            @csrf
-                            <button type="submit" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-3 rounded-lg font-medium transition">Kirim Pesanan</button>
+                        <form method="POST" action="{{ route('admin.orders.ship', $order->id) }}">@csrf
+                            <button type="submit" class="{{ $btnPrimary }}">Kirim pesanan</button>
                         </form>
                     @else
-                        <p class="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">Belum bisa dikirim: gudang belum mengisi kurir &amp; resi.</p>
+                        <button type="button" disabled class="{{ $btnDisabled }}">Kirim pesanan</button>
+                        <p class="mt-2 text-xs text-stone-500">Isi kurir &amp; resi dulu. Tombol ini aktif setelah resi tersimpan.</p>
                     @endif
                 @else
-                    @if($hasResi)<p class="mb-3 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-xs text-green-800">Resi tersimpan. Menunggu admin menekan Kirim.</p>@endif
+                    <p class="text-xs text-stone-500">{{ $hasResi ? 'Resi tersimpan. Menunggu admin menekan Kirim.' : 'Isi kurir & resi, lalu admin yang menekan Kirim.' }}</p>
                 @endcan
-            @endif
 
-            {{-- Complete --}}
-            @can('complete_orders')
-            @if($order->status === 'dikirim')
-                <form method="POST" action="{{ route('admin.orders.complete', $order->id) }}" class="mb-3">
-                    @csrf
-                    <button type="submit"
-                            class="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-medium transition">
-                        Tandai Selesai
-                    </button>
-                </form>
-            @endif
-            @endcan
-
-            {{-- Cancel --}}
-            @if(in_array($order->status, ['menunggu_bayar', 'dikonfirmasi', 'diproses']))
-                @can('cancel_orders')
-                <form method="POST" action="{{ route('admin.orders.cancel', $order->id) }}">
-                    @csrf
-                    <button type="submit"
-                            data-confirm-title="Batalkan pesanan {{ $order->order_number }}?" data-confirm-text="Status berubah menjadi dibatalkan. Jika stok sudah terpotong, stok dikembalikan. Aksi ini tidak bisa diurungkan." data-confirm-ok="Ya, batalkan pesanan" data-confirm-cancel="Kembali" data-confirm-tone="danger"
-                            class="w-full border border-red-300 text-red-600 hover:bg-red-50 py-3 rounded-lg font-medium transition">
-                        Batalkan Pesanan
-                    </button>
-                </form>
+            @elseif($st === 'dikirim')
+                @can('complete_orders')
+                    <form method="POST" action="{{ route('admin.orders.complete', $order->id) }}">@csrf
+                        <button type="submit" class="{{ $btnPrimary }}">Tandai selesai</button>
+                    </form>
+                @else
+                    <button type="button" disabled class="{{ $btnDisabled }}">Tandai selesai</button>
+                    <p class="mt-2 text-xs text-stone-500">Hanya admin yang bisa menandai selesai.</p>
                 @endcan
-            @endif
 
-            {{-- Surat jalan (tanpa harga) untuk gudang; invoice hanya untuk yang berhak --}}
-            @if(in_array($order->status, ['dikonfirmasi', 'diproses', 'dikirim', 'selesai']))
-                <a href="{{ route('admin.orders.delivery-note', $order->id) }}"
-                   target="_blank"
-                   class="block mt-3 text-center border border-stone-300 hover:bg-stone-50 py-2 rounded-lg text-sm">
-                    Cetak Surat Jalan
-                </a>
+            @else
+                <p class="text-sm text-stone-500">Tidak ada aksi untuk pesanan ini.</p>
             @endif
-            @can('download_invoices')
-            <a href="{{ route('admin.orders.invoice', $order->id) }}"
-               target="_blank"
-               class="block mt-3 text-center border border-stone-300 hover:bg-stone-50 py-2 rounded-lg text-sm">
-                Cetak Invoice
-            </a>
-            @endcan
         </div>
     </div>
 </div>
