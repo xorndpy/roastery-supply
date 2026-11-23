@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Models\Setting;
 use App\View\Composers\ShopNavComposer;
+use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
@@ -24,6 +26,22 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Email atur ulang password berbahasa Indonesia, dikirim ke email akun yang bersangkutan.
+        ResetPassword::toMailUsing(function ($notifiable, string $token) {
+            $url = url(route('password.reset', ['token' => $token, 'email' => $notifiable->getEmailForPasswordReset()], false));
+            $minutes = (int) config('auth.passwords.' . config('auth.defaults.passwords') . '.expire', 60);
+            $site = Setting::get('site_name', config('app.name'));
+
+            return (new MailMessage)
+                ->subject("Atur ulang password {$site}")
+                ->greeting('Halo ' . ($notifiable->name ?: '') . ',')
+                ->line('Kami menerima permintaan untuk mengatur ulang password akun Anda.')
+                ->action('Atur ulang password', $url)
+                ->line("Tautan ini berlaku {$minutes} menit dan hanya bisa dipakai sekali.")
+                ->line('Jika Anda tidak merasa memintanya, abaikan email ini. Password Anda tidak berubah.')
+                ->salutation("Salam, {$site}");
+        });
+
         // Paksa HTTPS di production (buat fix Mixed Content)
         if (config('app.env') === 'production') {
             URL::forceScheme('https');

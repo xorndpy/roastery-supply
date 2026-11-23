@@ -8,30 +8,32 @@ use Throwable;
 
 class MailTest extends Command
 {
-    protected $signature = 'mail:test {email : Alamat tujuan}';
+    protected $signature = 'mail:test {email : Alamat tujuan email uji}';
 
-    protected $description = 'Kirim email percobaan untuk memastikan pengaturan SMTP benar.';
+    protected $description = 'Kirim email uji untuk memastikan pengaturan SMTP (MAIL_*) di .env sudah benar.';
 
     public function handle(): int
     {
-        $mailer = config('mail.default');
-        $this->line("Mailer: {$mailer}" . ($mailer === 'smtp' ? ' (' . config('mail.mailers.smtp.host') . ':' . config('mail.mailers.smtp.port') . ')' : ''));
+        $to = $this->argument('email');
+        $this->line('Mailer : ' . config('mail.default'));
+        $this->line('Host   : ' . config('mail.mailers.' . config('mail.default') . '.host', '-') . ':' . config('mail.mailers.' . config('mail.default') . '.port', '-'));
+        $this->line('Dari   : ' . config('mail.from.address'));
 
-        if (in_array($mailer, ['log', 'array'], true)) {
-            $this->warn("MAIL_MAILER={$mailer}: email TIDAK dikirim sungguhan (hanya ditulis ke storage/logs). Ubah ke smtp di .env.");
+        if (config('mail.default') === 'log') {
+            $this->warn('MAIL_MAILER=log: email hanya ditulis ke storage/logs/laravel.log, tidak benar-benar terkirim. Ubah ke smtp di .env.');
         }
 
         try {
-            Mail::raw('Tes email dari ' . config('app.name') . '. Kalau kamu menerima ini, SMTP sudah benar.', function ($m) {
-                $m->to($this->argument('email'))->subject('Tes SMTP ' . config('app.name'));
+            Mail::raw('Ini email uji dari ' . config('app.name') . '. Kalau Anda menerimanya, pengaturan email sudah benar.', function ($m) use ($to) {
+                $m->to($to)->subject('Tes email ' . config('app.name'));
             });
         } catch (Throwable $e) {
-            $this->error('Gagal: ' . $e->getMessage());
+            $this->error('Gagal mengirim: ' . $e->getMessage());
 
             return self::FAILURE;
         }
 
-        $this->info('Terkirim ke ' . $this->argument('email') . '.');
+        $this->info("Terkirim ke {$to}. Cek kotak masuk dan folder spam.");
 
         return self::SUCCESS;
     }
