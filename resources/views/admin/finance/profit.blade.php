@@ -112,7 +112,7 @@
             <tr>
                 <td class="px-4 py-2.5 whitespace-nowrap"><a class="hover:underline" href="{{ route('admin.finance.profit', ['from' => $t['from'], 'to' => $t['to']]) }}">{{ $t['label'] }}</a></td>
                 <td class="px-4 py-2.5">
-                    <div class="flex items-center gap-3"><div class="h-2.5 rounded bg-copper-400" style="width: {{ max(0, round($t['revenue'] / $trendMax * 100)) }}%; min-width: 2px"></div><span class="text-xs text-stone-600 whitespace-nowrap">{{ $rp($t['revenue']) }}</span></div>
+                    <div class="flex items-center gap-3"><div class="h-2.5 rounded bg-stone-700" style="width: {{ max(0, round($t['revenue'] / $trendMax * 100)) }}%; min-width: 2px"></div><span class="text-xs text-stone-600 whitespace-nowrap">{{ $rp($t['revenue']) }}</span></div>
                 </td>
                 <td class="px-4 py-2.5 text-right">{{ $rp($t['gross_profit']) }}</td>
                 <td class="px-4 py-2.5 text-right font-medium {{ $t['net_profit'] < 0 ? 'text-red-600' : 'text-green-700' }}">{{ $rp($t['net_profit']) }}</td>

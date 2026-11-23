@@ -102,10 +102,10 @@
     .td-queue-item small { display: block; margin-top: 2px; font-size: 12px; color: #71717a; }
     .td-queue-item small.is-late { color: #b42318; font-weight: 500; }
     .td-queue-item:hover .dash-task-chev { transform: translateX(2px); color: #52525b; }
-    .td-grid { display: grid; gap: 1.25rem; grid-template-columns: minmax(0, 1fr); margin-top: 1.25rem; }
+    .td-grid { display: grid; grid-auto-flow: dense; gap: 1.25rem; grid-template-columns: minmax(0, 1fr); margin-top: 1.25rem; }
     @media (min-width: 1180px) {
         .td-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
-        .td-c4 { grid-column: span 4; } .td-c8 { grid-column: span 8; }
+        .td-c4 { grid-column: span 4; } .td-c6 { grid-column: span 6; } .td-c8 { grid-column: span 8; } .td-c12 { grid-column: span 12; }
     }
     .td-card { min-width: 0; border: 1px solid var(--rule); border-radius: 16px; background: #fff; padding: 1.25rem; box-shadow: 0 1px 2px rgb(16 24 40 / .04); }
     .td-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
@@ -556,7 +556,7 @@
             $showAttention = $lowStockList->isNotEmpty() || $showFollowUp;
         @endphp
         @if($showAttention)
-        <section class="td-card td-c4" aria-labelledby="attn-title">
+        <section class="td-card td-c6" aria-labelledby="attn-title">
             <div class="td-head"><h2 id="attn-title">Perlu perhatian</h2></div>
 
             @if($lowStockList->isNotEmpty())
@@ -603,7 +603,7 @@
         @endif
 
         {{-- ============ Pelanggan ============ --}}
-        <section class="td-card td-c4" aria-labelledby="cust-title">
+        <section class="td-card {{ $showAttention ? 'td-c6' : 'td-c12' }}" aria-labelledby="cust-title">
             <div class="td-head"><div><h2 id="cust-title">Pelanggan</h2><p class="td-sub">{{ number_format($totalCustomers) }} terdaftar</p></div></div>
             <div class="td-people">
                 <div><b>{{ number_format($buyers) }}</b><span>Pembeli</span></div>
