@@ -319,6 +319,8 @@
         </div>
     </header>
 
+    <div class="mt-5"><x-hpp-warning /></div>
+
     {{-- ============ Antrean kerja (hanya tampil bila ada) ============ --}}
     @if($tasks->isNotEmpty())
         <section class="td-queue" aria-labelledby="queue-title">

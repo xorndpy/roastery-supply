@@ -172,7 +172,7 @@
                            @if($isActive) aria-current="page" @endif
                            class="group flex items-center gap-3 rounded-lg px-3 py-2 text-[13.5px] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-500
                                   {{ $isActive ? 'bg-stone-100 font-medium text-stone-900' : 'text-stone-600 hover:bg-stone-50 hover:text-stone-900' }}">
-                            <svg class="h-[18px] w-[18px] shrink-0 {{ $isActive ? 'text-copper-600' : 'text-stone-400 group-hover:text-stone-600' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $icons[$item['icon']] ?? '' !!}</svg>
+                            <svg class="h-[18px] w-[18px] shrink-0 {{ $isActive ? 'text-stone-900' : 'text-stone-400 group-hover:text-stone-600' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $icons[$item['icon']] ?? '' !!}</svg>
                             <span class="truncate">{{ $item['label'] }}</span>
                             @if($badge > 0)
                                 <span class="ml-auto min-w-[1.375rem] rounded-full bg-stone-900 px-1.5 py-0.5 text-center text-[11px] font-semibold leading-none text-white tabular-nums" aria-label="{{ $badge }} menunggu">{{ $badge }}</span>

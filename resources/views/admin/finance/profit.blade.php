@@ -16,6 +16,7 @@
 @endphp
 
 @section('content')
+<x-hpp-warning />
 
 <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
     <div>

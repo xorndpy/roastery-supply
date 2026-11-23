@@ -49,7 +49,7 @@
     @if(request('sort'))<input type="hidden" name="sort" value="{{ request('sort') }}"><input type="hidden" name="dir" value="{{ request('dir') }}">@endif
     <div class="flex flex-wrap items-center gap-2">
         <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari no. pesanan, nama, atau telepon"
-               class="flex-1 min-w-[220px] bg-white border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:border-copper-500 focus:ring-0">
+               class="flex-1 min-w-[220px] bg-white border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:border-stone-500 focus:ring-0">
         <select name="payment_status" class="bg-white border border-stone-200 rounded-xl px-3 py-2.5 text-sm">
             <option value="">Status bayar</option>
             @foreach(['belum_bayar' => 'Belum bayar', 'pending' => 'Menunggu verifikasi', 'verified' => 'Lunas', 'rejected' => 'Ditolak'] as $k => $v)
@@ -65,7 +65,7 @@
             @foreach($couriers as $c)<option value="{{ $c }}" @selected(request('courier') === $c)>{{ strtoupper($c) }}</option>@endforeach
         </select>
         <button type="button" onclick="document.getElementById('moreFilters').classList.toggle('hidden')" class="bg-white border border-stone-200 rounded-xl px-3 py-2.5 text-sm">
-            Filter lain @if($filterCount)<span class="ml-1 text-xs bg-copper-500 text-white rounded-full px-1.5">{{ $filterCount }}</span>@endif
+            Filter lain @if($filterCount)<span class="ml-1 text-xs bg-stone-900 text-white rounded-full px-1.5">{{ $filterCount }}</span>@endif
         </button>
         <button class="bg-stone-900 text-white rounded-xl px-4 py-2.5 text-sm font-medium">Terapkan</button>
         <a href="{{ route('admin.orders.index') }}" class="text-sm text-stone-500 px-2">Reset</a>
@@ -97,7 +97,7 @@
 <div class="flex flex-wrap gap-x-6 gap-y-1 border-b border-stone-200 mb-3">
     @foreach($tabs as $key => $label)
         <a href="{{ route('admin.orders.index', array_merge(request()->except(['status', 'page']), ['status' => $key])) }}"
-           class="pb-3 text-sm font-medium border-b-2 -mb-px {{ $current === $key ? 'border-copper-500 text-copper-600' : 'border-transparent text-stone-500 hover:text-stone-800' }}">
+           class="pb-3 text-sm font-medium border-b-2 -mb-px {{ $current === $key ? 'border-stone-900 text-stone-900' : 'border-transparent text-stone-500 hover:text-stone-800' }}">
             {{ $label }}
             <span class="ml-1 text-xs rounded-md px-1.5 py-0.5 {{ $key === 'terlambat' && $stats[$key] > 0 ? 'bg-red-100 text-red-700' : 'bg-stone-100 text-stone-600' }}">{{ $stats[$key] }}</span>
         </a>
@@ -110,7 +110,7 @@
     <form method="GET" class="flex items-center gap-2">
         @foreach(request()->except(['per_page', 'page']) as $k => $v)@if(is_scalar($v))<input type="hidden" name="{{ $k }}" value="{{ $v }}">@endif @endforeach
         <label for="per_page">Per halaman</label>
-        <select id="per_page" name="per_page" onchange="this.form.submit()" class="border border-stone-200 rounded-lg px-2 py-1 text-sm bg-white">
+        <select id="per_page" name="per_page" onchange="this.form.submit()" class="border border-stone-200 rounded-lg pl-2 pr-8 py-1 text-sm bg-white">
             @foreach(config('orders.per_page_options') as $n)<option value="{{ $n }}" @selected((int) request('per_page') === $n)>{{ $n }}</option>@endforeach
         </select>
     </form>
