@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Setting;
 use App\View\Composers\ShopNavComposer;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL;
@@ -26,6 +27,21 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Email verifikasi akun baru berbahasa Indonesia.
+        VerifyEmail::toMailUsing(function ($notifiable, string $url) {
+            $site = Setting::get('site_name', config('app.name'));
+            $minutes = (int) config('auth.verification.expire', 60);
+
+            return (new MailMessage)
+                ->subject("Verifikasi email {$site}")
+                ->greeting('Halo ' . ($notifiable->name ?: '') . ',')
+                ->line("Terima kasih sudah mendaftar di {$site}. Klik tombol di bawah untuk memastikan email ini milik Anda.")
+                ->action('Verifikasi email', $url)
+                ->line("Tautan berlaku {$minutes} menit.")
+                ->line('Jika Anda tidak merasa mendaftar, abaikan email ini.')
+                ->salutation("Salam, {$site}");
+        });
+
         // Email atur ulang password berbahasa Indonesia, dikirim ke email akun yang bersangkutan.
         ResetPassword::toMailUsing(function ($notifiable, string $token) {
             $url = url(route('password.reset', ['token' => $token, 'email' => $notifiable->getEmailForPasswordReset()], false));

@@ -18,6 +18,8 @@
                               :value="old('email')" :invalid="$errors->has('email')" :messages="$errors->get('email')"
                               required autocomplete="username" inputmode="email" />
 
+                <x-turnstile />
+
                 <button type="submit" class="auth-btn group" :disabled="loading" :aria-busy="loading.toString()">
                     <span x-text="loading ? 'Mengirim…' : 'Kirim tautan atur ulang'">Kirim tautan atur ulang</span>
                 </button>

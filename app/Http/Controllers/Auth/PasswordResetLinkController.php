@@ -23,7 +23,7 @@ class PasswordResetLinkController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate(
-            ['email' => ['required', 'email']],
+            ['email' => ['required', 'email'], 'cf-turnstile-response' => [new \App\Rules\Turnstile]],
             ['email.required' => 'Email wajib diisi.', 'email.email' => 'Format email tidak valid. Contoh: nama@gmail.com'],
         );
 
