@@ -25,7 +25,7 @@
         <div>{{ $customer->email }}</div>
         <div>{{ $customer->phone ?: '-' }}</div>
         <div class="text-stone-600 pt-2">{{ $customer->address ?: '-' }}</div>
-        <div class="text-stone-600">{{ collect([$customer->city, $customer->province, $customer->postal_code])->filter()->implode(', ') }}</div>
+        <div class="text-stone-600">{{ collect([$customer->city?->name, $customer->province?->name, $customer->postal_code])->filter()->implode(', ') }}</div>
         <div class="text-xs text-stone-400 pt-2">Terdaftar {{ $customer->created_at->format('d M Y') }}</div>
     </div>
 

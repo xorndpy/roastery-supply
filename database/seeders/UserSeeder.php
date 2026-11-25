@@ -55,8 +55,8 @@ class UserSeeder extends Seeder
             'email' => $customerUser->email,
             'phone' => $customerUser->phone,
             'address' => 'Jl. Kopi Specialty No. 10, Kebayoran',
-            'city' => 'Jakarta Selatan',
-            'province' => 'DKI Jakarta',
+            'city_id' => \App\Models\City::where('name', 'like', '%Jakarta Selatan%')->value('id'),
+            'province_id' => \App\Models\Province::where('name', 'like', '%Jakarta%')->value('id'),
             'postal_code' => '12190',
         ]);
     }

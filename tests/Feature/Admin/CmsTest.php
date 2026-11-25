@@ -398,7 +398,7 @@ class CmsTest extends TestCase
     private function customerWithOrders(string $name, array $orders, ?string $registered = null): Customer
     {
         $user = User::factory()->create(['name' => $name, 'email' => strtolower(str_replace(' ', '', $name)) . '@test.com']);
-        $c = Customer::unguarded(fn () => Customer::create(['user_id' => $user->id, 'name' => $name, 'email' => $user->email, 'city' => 'Bandung']));
+        $c = Customer::unguarded(fn () => Customer::create(['user_id' => $user->id, 'name' => $name, 'email' => $user->email]));
         if ($registered) {
             $c->forceFill(['created_at' => $registered])->save();
         }

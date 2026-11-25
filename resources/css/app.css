@@ -5,6 +5,9 @@
 @layer base {
     [x-cloak] { display: none !important; }
     html { -webkit-font-smoothing: antialiased; }
+    /* Toko: elemen dekoratif/slider yang melebar tidak boleh membuat halaman bisa di-zoom-out atau geser ke samping.
+       clip (bukan hidden) tidak membuat scroll container, jadi navbar sticky tetap aman. */
+    html:has(body.shop-site), body.shop-site { overflow-x: clip; }
 }
 
 @layer components {

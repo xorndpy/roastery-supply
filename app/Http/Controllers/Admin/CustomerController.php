@@ -69,7 +69,7 @@ class CustomerController extends Controller
 
             foreach ($rows as $c) {
                 fputcsv($out, array_map([$this, 'safeCell'], [
-                    $c->name, $c->email, $c->phone, $c->city, $c->province,
+                    $c->name, $c->email, $c->phone, $c->city?->name, $c->province?->name,
                     (int) $c->paid_orders_count,
                     (int) $c->total_spent,
                     $c->last_order_at ? \Illuminate\Support\Carbon::parse($c->last_order_at)->format('Y-m-d') : '',
@@ -86,6 +86,7 @@ class CustomerController extends Controller
     private function query(Request $request): Builder
     {
         $query = Customer::query()
+            ->with(['city:id,name', 'province:id,name'])
             ->withCount(['orders as paid_orders_count' => fn ($q) => $q->whereIn('status', self::PAID)])
             ->withSum(['orders as total_spent' => fn ($q) => $q->whereIn('status', self::PAID)], 'total')
             ->withMax(['orders as last_order_at' => fn ($q) => $q->whereIn('status', self::PAID)], 'created_at')

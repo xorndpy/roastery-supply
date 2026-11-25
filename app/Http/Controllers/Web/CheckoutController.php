@@ -224,8 +224,6 @@ class CheckoutController extends Controller
                 'address' => $data['address'],
                 'province_id' => $province->id,
                 'city_id' => $city->id,
-                'city' => $city->name,
-                'province' => $province->name,
                 'postal_code' => $data['postal_code'],
             ]
         );

@@ -243,7 +243,7 @@ class ShippingTest extends TestCase
         $c = $user->customer;
         $this->assertSame($city->id, $c->city_id);
         $this->assertSame($prov->id, $c->province_id);
-        $this->assertSame('Kota Bandung', $c->city);
+        $this->assertSame('Kota Bandung', $c->city->name);
 
         $this->actingAs($user)->get(route('customer.orders.show', $o->order_number))->assertOk()->assertSee('Kargo Reguler')->assertSee('2-4 hari')->assertSee('6.100.000');
     }
@@ -372,8 +372,8 @@ class ShippingTest extends TestCase
         $this->actingAs($user)->patch(route('customer.profile.update'), $base + ['province_id' => $prov->id, 'city_id' => $city->id, 'postal_code' => '40111'])->assertSessionHasNoErrors();
         $c = $user->fresh()->customer;
         $this->assertSame($city->id, $c->city_id);
-        $this->assertSame('Kota Bandung', $c->city);
-        $this->assertSame('Jawa Barat', $c->province);
+        $this->assertSame('Kota Bandung', $c->city->name);
+        $this->assertSame('Jawa Barat', $c->province->name);
 
         $this->actingAs($user)->patch(route('customer.profile.update'), $base + ['province_id' => $otherProv->id, 'city_id' => $city->id])->assertSessionHasErrors('city_id');
         $this->actingAs($user)->patch(route('customer.profile.update'), $base + ['postal_code' => '12'])->assertSessionHasErrors('postal_code');

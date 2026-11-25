@@ -4,7 +4,7 @@
 
 @section('content')
 <x-page-header plain title="Checkout" :crumbs="[['Beranda', route('home')], ['Checkout']]" />
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 pb-28 lg:pb-12">
 
     @if(session('error'))
         <div class="mb-6 p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg">{{ session('error') }}</div>
@@ -21,11 +21,11 @@
         @csrf
         <input type="hidden" name="idempotency_key" value="{{ $idempotencyKey }}">
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
             
             {{-- Form Alamat --}}
-            <div class="lg:col-span-2 space-y-6">
-                <div class="bg-white p-6 rounded-lg border border-stone-200">
+            <div class="min-w-0 lg:col-span-2 space-y-5 sm:space-y-6">
+                <div class="bg-white p-4 sm:p-6 rounded-lg border border-stone-200">
                     <h2 class="text-xl font-bold mb-4">Alamat Pengiriman</h2>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -72,7 +72,7 @@
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-lg border border-stone-200">
+                <div class="bg-white p-4 sm:p-6 rounded-lg border border-stone-200">
                     <h2 class="text-xl font-bold mb-4">Layanan Pengiriman</h2>
 
                     <template x-if="!configured">
@@ -117,7 +117,7 @@
                     </template>
                 </div>
 
-                <div class="bg-white p-6 rounded-lg border border-stone-200">
+                <div class="bg-white p-4 sm:p-6 rounded-lg border border-stone-200">
                     <h2 class="text-xl font-bold mb-4">Metode Pembayaran</h2>
                     @if(app(\App\Services\Payments\MidtransService::class)->configured())
                         <div class="bg-copper-50 border border-copper-200 p-4 rounded-lg">
@@ -140,19 +140,18 @@
             </div>
 
             {{-- Summary --}}
-            <div class="lg:col-span-1">
-                <div class="bg-white p-6 rounded-lg border border-stone-200 sticky top-24">
+            <div class="min-w-0 lg:col-span-1">
+                <div class="bg-white p-4 sm:p-6 rounded-lg border border-stone-200 lg:sticky lg:top-24">
                     <h2 class="text-xl font-bold mb-4">Ringkasan Pesanan</h2>
 
                     <div class="space-y-3 mb-4">
                         @foreach($cart as $item)
-                            <div class="flex justify-between text-sm">
-                                <span class="text-stone-600">
-                                    {{ $item['name'] }} <span class="text-stone-400">×{{ $item['quantity'] }}</span>
-                                </span>
-                                <span class="font-medium">
-                                    Rp {{ number_format($item['price'] * $item['quantity'], 0, ',', '.') }}
-                                </span>
+                            <div class="flex items-start justify-between gap-3 text-sm">
+                                <div class="min-w-0 flex-1">
+                                    <p class="break-words font-medium text-stone-800">{{ $item['name'] }}</p>
+                                    <p class="mt-0.5 text-xs text-stone-500">{{ $item['quantity'] }} &times; Rp {{ number_format($item['price'], 0, ',', '.') }}</p>
+                                </div>
+                                <span class="shrink-0 whitespace-nowrap font-medium">Rp {{ number_format($item['price'] * $item['quantity'], 0, ',', '.') }}</span>
                             </div>
                         @endforeach
                     </div>
@@ -171,7 +170,7 @@
                                        value="{{ old('code') }}" placeholder="Masukkan kode"
                                        class="flex-1 min-w-0 border border-stone-300 rounded-lg px-3 py-2 text-sm uppercase">
                                 <button type="submit" form="voucher-form"
-                                        class="border border-stone-300 hover:bg-stone-50 px-4 py-2 rounded-lg text-sm">Pakai</button>
+                                        class="shrink-0 border border-stone-300 hover:bg-stone-50 px-4 py-2 rounded-lg text-sm">Pakai</button>
                             </div>
                             @if(session('voucher_error'))<p class="text-red-600 text-xs mt-1.5">{{ session('voucher_error') }}</p>@endif
                             @error('code')<p class="text-red-600 text-xs mt-1.5">{{ $message }}</p>@enderror
@@ -205,17 +204,17 @@
                     </div>
 
                     <div class="border-t border-stone-200 pt-4 mb-6 space-y-2 text-sm">
-                        <div class="flex justify-between"><span class="text-stone-600">Subtotal</span><span>Rp {{ number_format($total, 0, ',', '.') }}</span></div>
+                        <div class="flex justify-between gap-3"><span class="text-stone-600">Subtotal</span><span class="whitespace-nowrap">Rp {{ number_format($total, 0, ',', '.') }}</span></div>
                         @if($discount > 0)
-                            <div class="flex justify-between text-green-700"><span>Diskon</span><span>− Rp {{ number_format($discount, 0, ',', '.') }}</span></div>
+                            <div class="flex justify-between gap-3 text-green-700"><span>Diskon</span><span class="whitespace-nowrap">− Rp {{ number_format($discount, 0, ',', '.') }}</span></div>
                         @endif
-                        <div class="flex justify-between">
+                        <div class="flex justify-between gap-3">
                             <span class="text-stone-600">Ongkir</span>
-                            <span x-text="!configured ? 'Dikonfirmasi admin' : (selected ? (selected.free ? 'Gratis' : rp(selected.cost)) : '-')"></span>
+                            <span class="text-right" x-text="!configured ? 'Dikonfirmasi admin' : (selected ? (selected.free ? 'Gratis' : rp(selected.cost)) : '-')"></span>
                         </div>
-                        <div class="flex justify-between text-base pt-2">
+                        <div class="flex items-baseline justify-between gap-3 text-base pt-2">
                             <span class="font-bold">Total</span>
-                            <span class="font-bold text-copper-500" x-text="rp(total)">Rp {{ number_format($grandTotal, 0, ',', '.') }}</span>
+                            <span class="whitespace-nowrap text-lg font-bold text-copper-500" x-text="rp(total)">Rp {{ number_format($grandTotal, 0, ',', '.') }}</span>
                         </div>
                     </div>
 

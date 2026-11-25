@@ -46,7 +46,7 @@
                     <a href="{{ route('admin.customers.show', $c->id) }}" class="font-medium text-copper-600 hover:underline">{{ $c->name }}</a>
                     <div class="text-xs text-stone-500">{{ $c->email }}{{ $c->phone ? ' · ' . $c->phone : '' }}</div>
                 </td>
-                <td class="px-4 py-3 text-stone-600">{{ $c->city ?: '-' }}</td>
+                <td class="px-4 py-3 text-stone-600">{{ $c->city?->name ?: '-' }}</td>
                 <td class="px-4 py-3 text-right">{{ $c->paid_orders_count }}×</td>
                 <td class="px-4 py-3 text-right font-medium">{{ number_format((int) $c->total_spent, 0, ',', '.') }}</td>
                 <td class="px-4 py-3 text-stone-500">{{ $c->last_order_at ? \Illuminate\Support\Carbon::parse($c->last_order_at)->format('d M Y') : '-' }}</td>

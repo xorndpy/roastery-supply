@@ -12,12 +12,12 @@
     </div>
     <div class="flex gap-2">
         <a href="{{ route('admin.reports.export-excel', ['period' => $period]) }}"
-           class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+           class="bg-stone-900 hover:bg-stone-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
             Export Excel
         </a>
         <a href="{{ route('admin.reports.export-pdf', ['period' => $period]) }}"
            target="_blank"
-           class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+           class="border border-stone-300 bg-white hover:bg-stone-50 text-stone-800 px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
             Export PDF
         </a>
     </div>
@@ -40,7 +40,7 @@
         @foreach($periods as $key => $label)
             <a href="{{ route('admin.reports.index', ['period' => $key]) }}"
                class="px-3 py-1.5 rounded-lg text-sm font-medium transition
-                      {{ $period === $key ? 'bg-copper-500 text-white' : 'bg-stone-100 text-stone-600 hover:bg-stone-200' }}">
+                      {{ $period === $key ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-600 hover:bg-stone-200' }}">
                 {{ $label }}
             </a>
         @endforeach
@@ -103,7 +103,7 @@
         <div class="flex items-center justify-between mb-2">
             <div class="text-xs text-stone-500 uppercase">Menunggu Bayar</div>
         </div>
-        <div class="text-2xl font-bold text-copper-500">
+        <div class="text-2xl font-bold text-stone-900">
             {{ number_format($stats['pending_orders']) }}
         </div>
     </div>
@@ -141,7 +141,7 @@
                                 <td class="py-3 text-stone-500">{{ $i + 1 }}</td>
                                 <td class="py-3 font-medium">{{ $product->product_name }}</td>
                                 <td class="py-3 text-right">
-                                    <span class="bg-copper-100 text-copper-800 text-xs px-2 py-1 rounded-full font-medium">
+                                    <span class="bg-stone-100 text-stone-700 text-xs px-2 py-1 rounded-full font-medium">
                                         {{ $product->total_sold }}x
                                     </span>
                                 </td>
@@ -164,12 +164,12 @@
 
         @php
             $statusLabels = [
-                'menunggu_bayar' => ['label' => 'Menunggu Bayar', 'color' => 'yellow'],
-                'dikonfirmasi' => ['label' => 'Dikonfirmasi', 'color' => 'blue'],
-                'diproses' => ['label' => 'Diproses', 'color' => 'purple'],
-                'dikirim' => ['label' => 'Dikirim', 'color' => 'indigo'],
-                'selesai' => ['label' => 'Selesai', 'color' => 'green'],
-                'batal' => ['label' => 'Batal', 'color' => 'red'],
+                'menunggu_bayar' => ['label' => 'Menunggu Bayar', 'dot' => 'bg-amber-500'],
+                'dikonfirmasi' => ['label' => 'Dikonfirmasi', 'dot' => 'bg-sky-500'],
+                'diproses' => ['label' => 'Diproses', 'dot' => 'bg-violet-500'],
+                'dikirim' => ['label' => 'Dikirim', 'dot' => 'bg-indigo-500'],
+                'selesai' => ['label' => 'Selesai', 'dot' => 'bg-emerald-600'],
+                'batal' => ['label' => 'Batal', 'dot' => 'bg-red-500'],
             ];
         @endphp
 
@@ -177,7 +177,7 @@
             @foreach($statusLabels as $key => $info)
                 <div class="flex justify-between items-center">
                     <div class="flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-{{ $info['color'] }}-500"></span>
+                        <span class="w-2 h-2 rounded-full {{ $info['dot'] }}"></span>
                         <span class="text-sm">{{ $info['label'] }}</span>
                     </div>
                     <span class="text-sm font-bold">{{ $orderStatusStats[$key] ?? 0 }}</span>
@@ -218,11 +218,11 @@
             datasets: [{
                 label: 'Pendapatan (Rp)',
                 data: @json($salesChart->pluck('total')),
-                borderColor: '#f97316',
-                backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                borderColor: '#18181b',
+                backgroundColor: 'rgba(24, 24, 27, 0.07)',
                 tension: 0.4,
                 fill: true,
-                pointBackgroundColor: '#f97316',
+                pointBackgroundColor: '#18181b',
                 pointRadius: 5,
                 pointHoverRadius: 7,
             }]

@@ -41,14 +41,15 @@
             <tbody class="divide-y divide-stone-100">
             @forelse($products as $p)
                 @php $margin = $p->cost_price !== null && $p->price > 0 ? round(($p->price - $p->cost_price) / $p->price * 100, 1) : null; @endphp
-                <tr>
+                <tr data-hpp-row data-price="{{ (float) $p->price }}">
                     <td class="px-4 py-2.5"><div class="font-medium">{{ $p->name }}</div><div class="text-xs text-stone-500">{{ $p->sku }}</div></td>
-                    <td class="px-4 py-2.5 text-right">{{ $rp($p->price) }}</td>
+                    <td class="px-4 py-2.5 text-right whitespace-nowrap">{{ $rp($p->price) }}</td>
                     <td class="px-4 py-2.5">
                         <input type="text" inputmode="numeric" data-rupiah name="costs[{{ $p->id }}]" value="{{ old('costs.' . $p->id, $p->cost_price !== null ? (float) $p->cost_price : '') }}" placeholder="belum diisi"
                                @cannot('manage_costs') readonly @endcannot class="w-40 border border-stone-300 rounded-lg px-3 py-1.5">
+                        <p data-hpp-warn class="mt-1 hidden max-w-[16rem] text-xs text-amber-700" role="status"></p>
                     </td>
-                    <td class="px-4 py-2.5 text-right {{ $margin !== null && $margin < 0 ? 'text-red-600' : '' }}">{{ $margin === null ? '-' : number_format($margin, 1, ',', '.') . '%' }}</td>
+                    <td data-hpp-margin class="px-4 py-2.5 text-right whitespace-nowrap {{ $margin !== null && $margin < 0 ? 'text-red-600' : '' }}">{{ $margin === null ? '-' : number_format($margin, 1, ',', '.') . '%' }}</td>
                     <td class="px-4 py-2.5 text-right">{{ (int) $p->qty_no_cost > 0 ? (int) $p->qty_no_cost : '-' }}</td>
                 </tr>
             @empty
@@ -64,10 +65,38 @@
                 <input type="checkbox" name="apply_to_past" value="1" class="rounded border-stone-300">
                 Terapkan juga ke pesanan lama yang belum punya HPP
             </label>
-            <button class="bg-copper-500 hover:bg-copper-600 text-white px-6 py-2.5 rounded-lg font-medium">Simpan HPP</button>
+            <button class="bg-stone-900 hover:bg-stone-800 text-white px-6 py-2.5 rounded-lg font-medium">Simpan HPP</button>
         </div>
     @endcan
 </form>
 
 <div class="mt-4">{{ $products->links() }}</div>
 @endsection
+
+@push('scripts')
+<script>
+(function () {
+    // Peringatan lunak (tidak memblokir simpan): HPP janggal biasanya salah ketik.
+    function check(row) {
+        const input = row.querySelector('input[data-rupiah]'), warn = row.querySelector('[data-hpp-warn]'), cell = row.querySelector('[data-hpp-margin]');
+        const price = parseFloat(row.dataset.price), digits = input.value.replace(/\D/g, '');
+        let msg = '';
+        if (digits === '') { cell.textContent = '-'; cell.classList.remove('text-red-600'); }
+        else {
+            const cost = parseInt(digits, 10), margin = price > 0 ? (price - cost) / price * 100 : null;
+            cell.textContent = margin === null ? '-' : margin.toFixed(1).replace('.', ',') + '%';
+            cell.classList.toggle('text-red-600', margin !== null && margin < 0);
+            if (cost === 0) msg = 'HPP 0: pastikan memang gratis.';
+            else if (cost > price) msg = 'HPP lebih besar dari harga jual, margin minus.';
+            else if (cost < price * 0.1) msg = 'HPP di bawah 10% harga jual. Cek lagi, mungkin kurang nol.';
+        }
+        warn.textContent = msg; warn.classList.toggle('hidden', msg === '');
+        input.classList.toggle('border-amber-400', msg !== ''); input.classList.toggle('border-stone-300', msg === '');
+    }
+    document.querySelectorAll('tr[data-hpp-row]').forEach(function (row) {
+        row.querySelector('input[data-rupiah]').addEventListener('input', function () { check(row); });
+        check(row);
+    });
+})();
+</script>
+@endpush

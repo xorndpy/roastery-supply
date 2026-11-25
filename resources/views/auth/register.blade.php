@@ -61,6 +61,8 @@
                     </p>
                 </x-auth-input>
 
+                <x-turnstile />
+
                 <button type="submit" class="auth-btn group" :disabled="loading" :aria-busy="loading.toString()">
                     <svg x-show="loading" x-cloak class="auth-spin h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9"/></svg>
                     <span x-text="loading ? 'Membuat akun…' : 'Daftar'">Daftar</span>

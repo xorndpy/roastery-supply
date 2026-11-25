@@ -35,6 +35,7 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'cf-turnstile-response' => [new \App\Rules\Turnstile],
         ]);
 
         $user = User::create([
@@ -46,7 +47,12 @@ class RegisteredUserController extends Controller
         // findOrCreate: pendaftaran tidak boleh gagal hanya karena seeder role belum dijalankan.
         $user->assignRole(Role::findOrCreate('customer', 'web'));
 
-        event(new Registered($user));
+        // Email verifikasi dikirim lewat event. Bila SMTP bermasalah, pendaftaran tetap berhasil (bisa kirim ulang dari halaman verifikasi).
+        try {
+            event(new Registered($user));
+        } catch (\Throwable $e) {
+            report($e);
+        }
 
         Auth::login($user);
 

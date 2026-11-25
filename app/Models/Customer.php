@@ -18,8 +18,6 @@ class Customer extends Model
         'email',
         'phone',
         'address',
-        'city',
-        'province',
         'province_id',
         'city_id',
         'postal_code',
@@ -46,5 +44,15 @@ class Customer extends Model
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function city(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(City::class);
+    }
+
+    public function province(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Province::class);
     }
 }

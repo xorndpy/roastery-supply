@@ -130,7 +130,8 @@ Route::prefix('customer')
         Route::get('/dashboard', [CustomerDashboardController::class, 'index'])->name('dashboard');
 
         // Checkout
-        Route::prefix('checkout')->as('checkout.')->group(function () {
+        // Checkout butuh email terverifikasi (middleware 'verified'): notifikasi pesanan harus sampai ke email aktif.
+        Route::prefix('checkout')->as('checkout.')->middleware('verified')->group(function () {
             Route::get('/', [CheckoutController::class, 'index'])->name('index');
             Route::post('/', [CheckoutController::class, 'store'])->name('store');
             Route::get('/shipping', [CheckoutController::class, 'shippingOptions'])->middleware('throttle:60,1')->name('shipping');

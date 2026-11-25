@@ -83,8 +83,6 @@ class ProfileController extends Controller
                 'address' => $validated['address'] ?? null,
                 'province_id' => $province?->id,
                 'city_id' => $city?->id,
-                'city' => $city?->name,
-                'province' => $province?->name,
                 'postal_code' => $validated['postal_code'] ?? null,
             ]
         );
