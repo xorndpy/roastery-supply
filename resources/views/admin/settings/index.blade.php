@@ -8,6 +8,8 @@
     $tabs = [
         'profil'   => ['Profil Usaha', 'Nama, logo, kontak, media sosial', ['Umum', 'Kontak', 'Media Sosial']],
         'bayar'    => ['Pembayaran & Pengiriman', 'Midtrans, transfer manual, ongkir', ['Rekening Pembayaran', 'Pengiriman', 'Cicilan']],
+        'keuangan' => ['Keuangan & Invoice', 'PPN, NPWP, tampilan invoice', ['Keuangan', 'Invoice (PDF)']],
+        'layanan'  => ['Servis & Notifikasi', 'Garansi bawaan, WhatsApp', ['Servis & Garansi', 'WhatsApp']],
         'tampilan' => ['Tampilan Toko', 'Kartu produk dan teks beranda', ['Tampilan Produk', 'Beranda']],
         'header'   => ['Header Halaman', 'Foto latar tiap halaman', ['Header Halaman']],
         'tentang'  => ['Halaman Tentang', 'Profil usaha dan foto', ['Halaman Tentang']],
