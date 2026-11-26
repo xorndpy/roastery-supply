@@ -37,7 +37,7 @@ return [
         'Keuangan' => [
             'tax_enabled' => ['label' => 'PPN', 'type' => 'select', 'options' => ['0' => 'Tidak dipakai', '1' => 'Harga sudah termasuk PPN'], 'default' => '0', 'help' => 'Bila aktif, laba rugi memisahkan PPN keluaran dari pendapatan dan invoice menampilkan bagian PPN. Total pesanan tidak berubah.'],
             'company_npwp' => ['label' => 'NPWP', 'type' => 'text', 'max' => 30, 'help' => 'Tampil di invoice. Kosongkan bila belum PKP.'],
-            'tax_rate' => ['label' => 'Tarif PPN (%)', 'type' => 'number', 'default' => '11', 'help' => 'Dipakai bila PPN aktif. Perkiraan biaya payment gateway diatur di config/finance.php.'],
+            'tax_rate' => ['label' => 'Tarif PPN (%)', 'type' => 'number', 'default' => '11', 'max' => 100, 'help' => 'Dipakai bila PPN aktif. Perkiraan biaya payment gateway diatur di config/finance.php.'],
         ],
         'Servis & Garansi' => [
             'warranty_default_months' => ['label' => 'Masa garansi bawaan (bulan)', 'type' => 'number', 'default' => '12', 'max' => 120, 'help' => 'Dipakai untuk produk yang masa garansinya tidak diisi. Isi 0 di produk bila tanpa garansi.'],
@@ -52,7 +52,7 @@ return [
             'invoice_slogan' => ['label' => 'Slogan Footer', 'type' => 'text', 'max' => 60, 'help' => 'Teks kecil di kanan bawah invoice, mis. BREW BETTER. LIVE BETTER. Kosongkan untuk menyembunyikan.'],
         ],
         'Pengiriman' => [
-            'free_shipping_min' => ['label' => 'Gratis ongkir untuk belanja minimal (Rp)', 'type' => 'number', 'max' => 1000000000,
+            'free_shipping_min' => ['label' => 'Gratis ongkir untuk belanja minimal (Rp)', 'type' => 'number', 'max' => 1000000000, 'step' => 1000,
                 'help' => 'Kosongkan atau 0 untuk menonaktifkan. Dihitung dari belanja setelah diskon voucher.'],
         ],
         'Cicilan' => [

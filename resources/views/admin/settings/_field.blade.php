@@ -44,7 +44,7 @@
         </div>
 
     @else
-        <input id="f-{{ $key }}" type="{{ in_array($type, ['url', 'email', 'number']) ? $type : 'text' }}" @if($type === 'number') min="0" step="1000" inputmode="numeric" @endif
+        <input id="f-{{ $key }}" type="{{ in_array($type, ['url', 'email', 'number']) ? $type : 'text' }}" @if($type === 'number') min="0" @if(isset($def['max'])) max="{{ $def['max'] }}" @endif step="{{ $def['step'] ?? 1 }}" inputmode="numeric" @endif
                name="{{ $key }}" value="{{ $val }}" maxlength="{{ $def['max'] ?? 255 }}" class="{{ $inputCls }}">
     @endif
 
