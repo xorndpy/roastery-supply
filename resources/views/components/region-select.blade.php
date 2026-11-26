@@ -3,7 +3,7 @@
 
 {{-- Dropdown Provinsi -> Kota/Kabupaten. Data dikirim sekali sebagai JSON (tanpa request tambahan).
      Mengirim event "city-changed" (detail = id kota) agar induknya bisa menghitung ongkir. --}}
-<div x-data="regionSelect(@js($picker), @js($provinceId), @js($cityId))" x-init="notify()" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div x-data="regionSelect(@js($picker), @js($provinceId), @js($cityId))" x-init="notify()" @address-selected.window="provinceId = String($event.detail.province_id || ''); cityId = String($event.detail.city_id || ''); notify()" class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <div>
         <label class="block text-sm font-medium mb-2" for="province_id">Provinsi {{ $required ? '*' : '' }}</label>
         <select id="province_id" name="province_id" x-model="provinceId" @change="cityId = ''; notify()" {{ $required ? 'required' : '' }}

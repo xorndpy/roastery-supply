@@ -19,8 +19,14 @@
     $paid = $order->payment && $order->payment->status === 'verified';
     $rp = fn ($n) => 'Rp ' . number_format($n, 0, ',', '.');
     $phone = $order->shipping_phone ?: ($order->customer->phone ?? '');
-    $taxRate = (string) $s('tax_enabled') === '1' ? ((float) $s('tax_rate') ?: (float) config('finance.default_tax_rate', 11)) : null;
-    $ppnIncluded = $taxRate ? round($order->subtotal - $order->discount) * $taxRate / (100 + $taxRate) : 0;
+    // PPN memakai snapshot saat pesanan dibuat. Pesanan lama (belum ada snapshot) memakai pengaturan saat ini.
+    if ($order->tax_rate !== null) {
+        $taxRate = (float) $order->tax_rate > 0 ? (float) $order->tax_rate : null;
+        $ppnIncluded = $taxRate ? (float) $order->tax_amount : 0;
+    } else {
+        $taxRate = (string) $s('tax_enabled') === '1' ? ((float) $s('tax_rate') ?: (float) config('finance.default_tax_rate', 11)) : null;
+        $ppnIncluded = $taxRate ? round($order->subtotal - $order->discount) * $taxRate / (100 + $taxRate) : 0;
+    }
 @endphp
 <style>
     /* dompdf: tanpa flex/grid, pakai tabel. Footer tetap di tiap halaman lewat position: fixed di area margin bawah. */
@@ -71,7 +77,8 @@
         <td class="right contact">
             @if($s('contact_address')){!! nl2br(e($s('contact_address'))) !!}<br>@endif
             @if($s('contact_email')){{ $s('contact_email') }}<br>@endif
-            @if($s('contact_phone')){{ $s('contact_phone') }}@endif
+            @if($s('contact_phone')){{ $s('contact_phone') }}<br>@endif
+            @if($s('company_npwp'))NPWP {{ $s('company_npwp') }}@endif
         </td>
     </tr>
 </table>

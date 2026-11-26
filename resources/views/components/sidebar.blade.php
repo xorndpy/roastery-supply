@@ -25,6 +25,8 @@
             ['label' => 'Kategori', 'route' => 'admin.categories.index', 'icon' => 'tag'],
             ['label' => 'Merek', 'route' => 'admin.brands.index', 'icon' => 'bookmark'],
             ['label' => 'Stok', 'route' => 'admin.stock.index', 'icon' => 'archive'],
+            ['label' => 'Pembelian', 'route' => 'admin.purchases.index', 'icon' => 'box'],
+            ['label' => 'Supplier', 'route' => 'admin.suppliers.index', 'icon' => 'users'],
         ]],
         ['group' => 'Pelanggan', 'items' => [
             ['label' => 'Pelanggan', 'route' => 'admin.customers.index', 'icon' => 'users'],
@@ -56,7 +58,7 @@
     // Hanya tampilkan menu yang boleh diakses user ini (permission sama dengan yang menjaga route-nya).
     $menuPermissions = [
         'admin.products.index' => 'view_products', 'admin.categories.index' => 'view_categories',
-        'admin.brands.index' => 'view_brands', 'admin.stock.index' => 'view_stock',
+        'admin.brands.index' => 'view_brands', 'admin.stock.index' => 'view_stock', 'admin.purchases.index' => 'view_stock', 'admin.suppliers.index' => 'view_stock',
         'admin.orders.index' => 'view_orders', 'admin.payments.index' => 'verify_payments',
         'admin.shipments.index' => 'manage_shipments', 'admin.shipping.index' => 'view_shipping_rates', 'admin.returns.index' => 'view_returns',
         'admin.customers.index' => 'view_customers', 'admin.vouchers.index' => 'view_vouchers', 'admin.flash-sales.index' => 'view_flash_sales',
@@ -105,6 +107,7 @@
     $navBadges = [
         'admin.messages.index' => $unreadMessages,
         'admin.payments.index' => auth()->user()->can('verify_payments') ? \App\Models\Payment::needsAttention()->count() : 0,
+        'admin.purchases.index' => auth()->user()->can('view_stock') ? rescue(fn () => \App\Models\PurchaseOrder::awaiting()->count(), 0, false) : 0,
         'admin.orders.index' => auth()->user()->can('view_orders') ? \App\Models\Order::needsAction()->count() : 0,
         'admin.shipments.index' => auth()->user()->can('manage_shipments') ? \App\Models\Order::whereIn('status', ['dikonfirmasi', 'diproses'])->count() : 0,
         'admin.returns.index' => auth()->user()->can('view_returns') ? \App\Models\ReturnOrder::where('status', 'pending')->count() : 0,

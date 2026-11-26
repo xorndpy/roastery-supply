@@ -22,6 +22,7 @@
     </main>
 
     <x-footer />
+    <x-compare-bar />
     <x-whatsapp-float />
     <x-cart-toast />
 

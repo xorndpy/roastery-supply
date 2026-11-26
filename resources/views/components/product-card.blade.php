@@ -44,6 +44,24 @@
             {{ $soldOut ? 'Stok habis' : ($low ? 'Sisa ' . $product->stock : 'Stok tersedia') }}
         </p>
 
+        @php $inCompare = in_array($product->id, array_map('intval', (array) session('compare', [])), true); @endphp
+        <label x-data="{ on: {{ $inCompare ? 'true' : 'false' }}, busy: false, err: '',
+                async flip() {
+                    if (this.busy) return; this.busy = true; this.err = '';
+                    try {
+                        const r = await fetch(@js(route('compare.toggle', $product->slug)), { method: 'POST', headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content } });
+                        const j = await r.json().catch(() => ({}));
+                        if (r.ok) { this.on = j.selected; window.dispatchEvent(new CustomEvent('compare:changed', { detail: { count: j.count } })); }
+                        else { this.err = j.message || 'Gagal.'; }
+                    } catch (e) { this.err = 'Koneksi bermasalah.'; }
+                    this.busy = false;
+                } }"
+               class="mt-3 flex cursor-pointer items-center gap-2 text-xs text-stone-600 select-none">
+            <input type="checkbox" class="h-4 w-4 rounded border-stone-300" :checked="on" @click.prevent="flip()" aria-label="Bandingkan {{ $product->name }}">
+            <span>Bandingkan</span>
+            <span x-show="err" x-text="err" x-cloak class="text-red-700"></span>
+        </label>
+
         <form method="POST" action="{{ route('customer.cart.store') }}" class="mt-auto pt-3 sm:pt-5">
             @csrf
             <input type="hidden" name="product_id" value="{{ $product->id }}">

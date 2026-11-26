@@ -36,6 +36,7 @@ return [
         ],
         'Keuangan' => [
             'tax_enabled' => ['label' => 'PPN', 'type' => 'select', 'options' => ['0' => 'Tidak dipakai', '1' => 'Harga sudah termasuk PPN'], 'default' => '0', 'help' => 'Bila aktif, laba rugi memisahkan PPN keluaran dari pendapatan dan invoice menampilkan bagian PPN. Total pesanan tidak berubah.'],
+            'company_npwp' => ['label' => 'NPWP', 'type' => 'text', 'max' => 30, 'help' => 'Tampil di invoice. Kosongkan bila belum PKP.'],
             'tax_rate' => ['label' => 'Tarif PPN (%)', 'type' => 'number', 'default' => '11', 'help' => 'Dipakai bila PPN aktif. Perkiraan biaya payment gateway diatur di config/finance.php.'],
         ],
         'Servis & Garansi' => [

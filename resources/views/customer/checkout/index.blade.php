@@ -28,6 +28,39 @@
                 <div class="bg-white p-4 sm:p-6 rounded-lg border border-stone-200">
                     <h2 class="text-xl font-bold mb-4">Alamat Pengiriman</h2>
 
+                    @if($addresses->isNotEmpty())
+                        @php
+                            $addrJson = $addresses->map(fn ($a) => ['id' => $a->id, 'recipient_name' => $a->recipient_name, 'phone' => $a->phone, 'address' => $a->address, 'province_id' => $a->province_id, 'city_id' => $a->city_id, 'postal_code' => $a->postal_code])->values();
+                        @endphp
+                        <div x-data="{ list: @js($addrJson), sel: {{ $addresses->first(fn ($a) => old('address') !== null ? ($a->address === old('address') && (int) $a->city_id === (int) old('city_id')) : $a->is_default)?->id ?? 'null' }},
+                                pick(id) {
+                                    const a = this.list.find(x => x.id === id); if (!a) return; this.sel = id;
+                                    const f = this.$el.closest('form');
+                                    f.elements['name'].value = a.recipient_name; f.elements['phone'].value = a.phone; f.elements['address'].value = a.address;
+                                    f.elements['postal_code'].value = a.postal_code || '';
+                                    if (window.Alpine) Alpine.$data(f).postal = a.postal_code || '';
+                                    window.dispatchEvent(new CustomEvent('address-selected', { detail: a }));
+                                } }" class="mb-5">
+                            <div class="mb-2 flex items-center justify-between gap-3">
+                                <p class="text-sm font-medium">Pilih dari buku alamat</p>
+                                <a href="{{ route('customer.addresses.index') }}" class="text-xs text-stone-500 underline underline-offset-2 hover:text-stone-800">Kelola alamat</a>
+                            </div>
+                            <div class="grid gap-2">
+                                @foreach($addresses as $a)
+                                    <button type="button" @click="pick({{ $a->id }})" :class="sel === {{ $a->id }} ? 'border-brand ring-1 ring-brand' : 'border-stone-200 hover:border-stone-400'"
+                                            class="flex w-full items-start gap-3 rounded-lg border bg-white p-3 text-left text-sm">
+                                        <span class="mt-0.5 h-3.5 w-3.5 shrink-0 rounded-full border-2" :class="sel === {{ $a->id }} ? 'border-brand bg-brand' : 'border-stone-400'" aria-hidden="true"></span>
+                                        <span class="min-w-0">
+                                            <span class="block font-medium text-stone-900">{{ $a->label }} &middot; {{ $a->recipient_name }}@if($a->is_default) <span class="ml-1 rounded bg-stone-100 px-1.5 py-0.5 text-[11px] font-medium text-stone-600">Utama</span>@endif</span>
+                                            <span class="block break-words text-stone-600">{{ $a->address }}, {{ $a->regionLine() }}</span>
+                                        </span>
+                                    </button>
+                                @endforeach
+                            </div>
+                            <p class="mt-2 text-xs text-stone-500">Anda juga bisa mengubah isian di bawah untuk mengirim ke alamat lain.</p>
+                        </div>
+                    @endif
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium mb-2">Nama Lengkap *</label>
@@ -231,6 +264,28 @@
     <form id="voucher-pick-form" method="POST" action="{{ route('customer.checkout.voucher') }}">@csrf</form>
     <form id="voucher-remove-form" method="POST" action="{{ route('customer.checkout.voucher.remove') }}">@csrf @method('DELETE')</form>
 </div>
+<script>
+    // Pasang/lepas voucher memuat ulang halaman. Isian form (alamat, kota, kode pos, catatan, layanan kirim) dibawa serta
+    // lewat field draft[...] supaya tidak hilang.
+    document.addEventListener('DOMContentLoaded', function () {
+        var main = document.querySelector('form[action="{{ route('customer.checkout.store') }}"]');
+        if (!main) return;
+        ['voucher-form', 'voucher-pick-form', 'voucher-remove-form'].forEach(function (id) {
+            var f = document.getElementById(id);
+            if (!f) return;
+            f.addEventListener('submit', function () {
+                f.querySelectorAll('input[data-draft]').forEach(function (n) { n.remove(); });
+                ['name', 'phone', 'address', 'province_id', 'city_id', 'postal_code', 'note', 'shipping_method_id'].forEach(function (n) {
+                    var el = main.elements[n];
+                    if (!el) return;
+                    var h = document.createElement('input');
+                    h.type = 'hidden'; h.name = 'draft[' + n + ']'; h.value = el.value || ''; h.setAttribute('data-draft', '1');
+                    f.appendChild(h);
+                });
+            });
+        });
+    });
+</script>
 <script>
     window.checkoutForm = function (cfg) {
         return {

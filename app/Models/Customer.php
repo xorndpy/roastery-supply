@@ -46,6 +46,11 @@ class Customer extends Model
         return $this->hasMany(Order::class);
     }
 
+    public function addresses(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(CustomerAddress::class);
+    }
+
     public function city(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(City::class);

@@ -15,20 +15,20 @@
         <img src="{{ $cover }}" alt="" class="absolute inset-0 h-full w-full object-cover">
         <div class="absolute inset-0 bg-stone-900/65"></div>
     @endif
-    <div class="container-x relative flex items-center gap-4 py-7 sm:gap-5 sm:py-9">
-        <x-avatar :user="$user" :size="72" :ring="true" class="sm:!h-20 sm:!w-20" />
+    <div class="container-x relative flex items-center gap-3.5 py-5 sm:gap-5 sm:py-9">
+        <x-avatar :user="$user" :size="64" :ring="true" class="sm:!h-20 sm:!w-20" />
         <div class="min-w-0">
             <div class="eyebrow {{ $cover ? '!text-white/80' : '' }}">Akun Saya</div>
-            <h1 class="heading mt-1 truncate text-3xl sm:text-4xl">Halo, {{ \Illuminate\Support\Str::words($user->name, 1, '') }}</h1>
+            <h1 class="heading mt-0.5 truncate text-2xl sm:mt-1 sm:text-4xl">Halo, {{ \Illuminate\Support\Str::words($user->name, 1, '') }}</h1>
             <p class="mt-1 text-sm {{ $cover ? 'text-white/85' : 'text-stone-600' }}">
                 @if($stats['total'] > 0){{ $stats['total'] }} pesanan · {{ $stats['done'] }} selesai @else Belum ada pesanan @endif
-                · <a href="{{ route('customer.profile.edit') }}" class="underline underline-offset-4">Ubah foto &amp; profil</a>
+                <span class="max-sm:hidden">·</span> <a href="{{ route('customer.profile.edit') }}" class="underline underline-offset-4 max-sm:mt-0.5 max-sm:block">Ubah foto &amp; profil</a>
             </p>
         </div>
     </div>
 </div>
 
-<div class="container-x space-y-6 py-6 sm:space-y-8 sm:py-10">
+<div class="container-x space-y-5 pb-28 pt-5 sm:space-y-8 sm:pt-10 lg:pb-12">
 
     {{-- 1. Tindakan berikutnya --}}
     @if($action)
@@ -63,9 +63,9 @@
                     {{ $isNewMember && $vouchers->contains('is_new_member', true) ? 'Selamat datang! Ini voucher member baru untukmu' : 'Voucher untuk kamu' }}
                 </h2>
             </div>
-            <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <ul class="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3">
                 @foreach($vouchers as $v)
-                    <li x-data="{ done: false }" class="flex flex-col rounded-xl border border-dashed border-stone-400 bg-white p-4">
+                    <li x-data="{ done: false }" class="flex flex-col rounded-xl border border-dashed border-stone-400 bg-white p-4 max-sm:w-[82%] max-sm:max-w-[320px] max-sm:shrink-0 max-sm:snap-start">
                         <div class="flex items-center gap-2 text-xs text-stone-600">
                             <x-ui-icon name="ticket" class="h-4 w-4 text-copper-600" />
                             {{ $v['is_new_member'] ? 'Member baru' : 'Semua pelanggan' }}
@@ -94,8 +94,8 @@
     {{-- 3. Pesanan terakhir --}}
     <section aria-labelledby="pesanan-title" class="overflow-hidden rounded-xl border border-stone-200 bg-white">
         <div class="flex items-center justify-between gap-3 px-4 py-4 sm:px-6">
-            <h2 id="pesanan-title" class="heading text-lg">Pesanan Terakhir</h2>
-            <a href="{{ route('customer.orders.index') }}" class="text-sm text-copper-600 underline underline-offset-4 hover:decoration-2">Lihat semua pesanan</a>
+            <h2 id="pesanan-title" class="heading min-w-0 text-lg">Pesanan Terakhir</h2>
+            <a href="{{ route('customer.orders.index') }}" class="shrink-0 whitespace-nowrap text-sm text-copper-600 underline underline-offset-4 hover:decoration-2">Lihat semua<span class="max-sm:hidden"> pesanan</span></a>
         </div>
 
         @forelse($recentOrders as $order)
@@ -121,7 +121,7 @@
                 </div>
             </a>
         @empty
-            <div class="border-t border-stone-100 px-6 py-12 text-center">
+            <div class="border-t border-stone-100 px-6 py-8 text-center sm:py-12">
                 <p class="text-stone-600">Belum ada pesanan.</p>
                 <a href="{{ route('products.index') }}" class="btn btn-primary mt-4">Mulai Belanja</a>
             </div>
@@ -136,9 +136,9 @@
             ['shield', 'Garansi & Servis', route('customer.service.index')],
             ['chat', 'Bantuan', route('contact.index')],
         ] as [$icon, $label, $url])
-            <a href="{{ $url }}" class="group flex min-h-14 items-center gap-3 rounded-xl border border-stone-200 bg-white p-3.5 shadow-sm transition hover:-translate-y-0.5 hover:border-copper-500 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 sm:p-4">
-                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-copper-50 text-copper-600"><x-ui-icon :name="$icon" class="h-5 w-5" /></span>
-                <span class="text-sm font-medium">{{ $label }}</span>
+            <a href="{{ $url }}" class="group flex min-h-14 items-center gap-2.5 rounded-xl border border-stone-200 bg-white p-3 shadow-sm sm:gap-3 sm:p-3.5 transition hover:-translate-y-0.5 hover:border-copper-500 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 sm:p-4">
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-copper-50 text-copper-600 sm:h-10 sm:w-10"><x-ui-icon :name="$icon" class="h-5 w-5" /></span>
+                <span class="min-w-0 text-sm font-medium leading-tight">{{ $label }}</span>
             </a>
         @endforeach
     </nav>

@@ -21,7 +21,6 @@ class ProfileController extends Controller
     {
         $user = auth()->user();
 
-<<<<<<< HEAD
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
@@ -44,12 +43,6 @@ class ProfileController extends Controller
             'cover.mimes' => 'Foto sampul harus JPG, PNG, atau WebP.',
             'cover.max' => 'Ukuran foto sampul maksimal 4 MB.',
         ]);
-=======
-        $emailChanged = $user->isDirty('email');
-        if ($emailChanged) {
-            $user->email_verified_at = null;
-        }
->>>>>>> 6fdfbd80f05f5225f623e871e2adf7a770ccd2c7
 
         $province = isset($validated['province_id']) ? \App\Models\Province::find($validated['province_id']) : null;
         $city = isset($validated['city_id']) ? \App\Models\City::find($validated['city_id']) : null;
@@ -80,7 +73,6 @@ class ProfileController extends Controller
 
         $user->save();
 
-<<<<<<< HEAD
         // Update/bikin customer
         Customer::updateOrCreate(
             ['user_id' => $user->id],
@@ -96,17 +88,6 @@ class ProfileController extends Controller
         );
 
         return back()->with('success', 'Profil berhasil diupdate.');
-=======
-        if ($emailChanged) {
-            try {
-                $user->sendEmailVerificationNotification();
-            } catch (\Throwable $e) {
-                report($e);
-            }
-        }
-
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
->>>>>>> 6fdfbd80f05f5225f623e871e2adf7a770ccd2c7
     }
 
     /** Hanya file unggahan yang dihapus dari disk; URL foto Google dibiarkan. */

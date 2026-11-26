@@ -18,6 +18,8 @@ class Order extends Model
 
     protected $fillable = [
         'order_number',
+        'tax_rate',
+        'tax_amount',
         'idempotency_key',
         'customer_id',
         'user_id',

@@ -81,6 +81,9 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/katalog', [KatalogController::class, 'index'])->name('products.index');
 Route::get('/merek', [KatalogController::class, 'brands'])->name('products.brands');
 Route::get('/produk/{slug}', [KatalogController::class, 'show'])->name('products.show');
+Route::get('/bandingkan', [\App\Http\Controllers\Web\CompareController::class, 'index'])->name('compare.index');
+Route::post('/bandingkan/{slug}', [\App\Http\Controllers\Web\CompareController::class, 'toggle'])->middleware('throttle:60,1')->name('compare.toggle');
+Route::delete('/bandingkan', [\App\Http\Controllers\Web\CompareController::class, 'clear'])->name('compare.clear');
 Route::post('/produk/{slug}/penawaran', [\App\Http\Controllers\Web\QuoteController::class, 'store'])->middleware('throttle:5,10')->name('products.quote');
 Route::post('/produk/{slug}/ulasan', [\App\Http\Controllers\Web\ReviewController::class, 'store'])->middleware(['auth', 'throttle:10,1'])->name('products.review');
 Route::get('/tentang', [HomeController::class, 'about'])->name('about');
@@ -178,6 +181,17 @@ Route::prefix('customer')
             Route::get('/', [CustomerProfileController::class, 'edit'])->name('edit');
             Route::patch('/', [CustomerProfileController::class, 'update'])->name('update');
         });
+
+        // Buku alamat
+        Route::prefix('alamat')->as('addresses.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Web\AddressController::class, 'index'])->name('index');
+            Route::get('/baru', [\App\Http\Controllers\Web\AddressController::class, 'create'])->name('create');
+            Route::post('/', [\App\Http\Controllers\Web\AddressController::class, 'store'])->name('store');
+            Route::get('/{address}/ubah', [\App\Http\Controllers\Web\AddressController::class, 'edit'])->name('edit');
+            Route::put('/{address}', [\App\Http\Controllers\Web\AddressController::class, 'update'])->name('update');
+            Route::post('/{address}/utama', [\App\Http\Controllers\Web\AddressController::class, 'makeDefault'])->name('default');
+            Route::delete('/{address}', [\App\Http\Controllers\Web\AddressController::class, 'destroy'])->name('destroy');
+        });
     });
 
 
@@ -227,6 +241,29 @@ Route::prefix('admin')
             Route::get('/', [StockController::class, 'index'])->name('index')->middleware('can:view_stock');
             Route::get('/history', [StockController::class, 'history'])->name('history')->middleware('can:view_stock');
             Route::post('/adjust', [StockController::class, 'adjust'])->name('adjust')->middleware('can:manage_stock');
+        });
+
+        // Pembelian & Supplier
+        Route::prefix('pembelian')->as('purchases.')->group(function () {
+            $c = \App\Http\Controllers\Admin\PurchaseController::class;
+            Route::get('/', [$c, 'index'])->name('index')->middleware('can:view_stock');
+            Route::get('/baru', [$c, 'create'])->name('create')->middleware('can:manage_stock');
+            Route::post('/', [$c, 'store'])->name('store')->middleware('can:manage_stock');
+            Route::get('/{purchase}', [$c, 'show'])->name('show')->middleware('can:view_stock');
+            Route::get('/{purchase}/ubah', [$c, 'edit'])->name('edit')->middleware('can:manage_stock');
+            Route::put('/{purchase}', [$c, 'update'])->name('update')->middleware('can:manage_stock');
+            Route::post('/{purchase}/pesan', [$c, 'order'])->name('order')->middleware('can:manage_stock');
+            Route::post('/{purchase}/terima', [$c, 'receive'])->name('receive')->middleware('can:manage_stock');
+            Route::post('/{purchase}/batal', [$c, 'cancel'])->name('cancel')->middleware('can:manage_stock');
+        });
+        Route::prefix('supplier')->as('suppliers.')->group(function () {
+            $c = \App\Http\Controllers\Admin\SupplierController::class;
+            Route::get('/', [$c, 'index'])->name('index')->middleware('can:view_stock');
+            Route::get('/baru', [$c, 'create'])->name('create')->middleware('can:manage_stock');
+            Route::post('/', [$c, 'store'])->name('store')->middleware('can:manage_stock');
+            Route::get('/{supplier}/ubah', [$c, 'edit'])->name('edit')->middleware('can:manage_stock');
+            Route::put('/{supplier}', [$c, 'update'])->name('update')->middleware('can:manage_stock');
+            Route::delete('/{supplier}', [$c, 'destroy'])->name('destroy')->middleware('can:manage_stock');
         });
 
         // Penjualan - Orders

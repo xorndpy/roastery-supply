@@ -71,7 +71,16 @@ class CheckoutController extends Controller
         $availableVouchers = $this->vouchers->availableFor(auth()->user(), $total, 4)
             ->reject(fn ($v) => $voucher && $v['code'] === $voucher->code)->values();
 
-        return view('customer.checkout.index', compact('cart', 'total', 'customer', 'idempotencyKey', 'voucher', 'discount', 'grandTotal', 'shippingConfigured', 'afterDiscount', 'availableVouchers'));
+        // Buku alamat: alamat utama dipakai sebagai isian awal (hanya di memori, tidak disimpan).
+        $addresses = $customer ? $customer->addresses()->with(['city', 'province'])->orderByDesc('is_default')->orderBy('id')->get() : collect();
+        if ($customer && ($default = $addresses->firstWhere('is_default', true))) {
+            $customer->forceFill([
+                'phone' => $default->phone, 'address' => $default->address, 'province_id' => $default->province_id,
+                'city_id' => $default->city_id, 'postal_code' => $default->postal_code,
+            ]);
+        }
+
+        return view('customer.checkout.index', compact('cart', 'total', 'customer', 'idempotencyKey', 'voucher', 'discount', 'grandTotal', 'shippingConfigured', 'afterDiscount', 'availableVouchers', 'addresses'));
     }
 
     /**
@@ -118,19 +127,25 @@ class CheckoutController extends Controller
         try {
             $voucher = $this->vouchers->validate($code, $total, auth()->user());
         } catch (DomainException $e) {
-            return redirect()->route('customer.checkout.index')->with('voucher_error', $e->getMessage());
+            return redirect()->route('customer.checkout.index')->withInput($this->draft($request))->with('voucher_error', $e->getMessage());
         }
 
         session()->put('checkout_voucher', $voucher->code); // mengganti voucher sebelumnya (tidak digabung)
 
-        return redirect()->route('customer.checkout.index')->with('success', "Voucher {$voucher->code} dipakai.");
+        return redirect()->route('customer.checkout.index')->withInput($this->draft($request))->with('success', "Voucher {$voucher->code} dipakai.");
     }
 
-    public function removeVoucher()
+    public function removeVoucher(Request $request)
     {
         session()->forget('checkout_voucher');
 
-        return redirect()->route('customer.checkout.index')->with('success', 'Voucher dilepas.');
+        return redirect()->route('customer.checkout.index')->withInput($this->draft($request))->with('success', 'Voucher dilepas.');
+    }
+
+    /** Isian form checkout yang dibawa saat pasang/lepas voucher (halaman dimuat ulang), supaya alamat dll tidak hilang. */
+    private function draft(Request $request): array
+    {
+        return array_intersect_key((array) $request->input('draft', []), array_flip(['name', 'phone', 'address', 'province_id', 'city_id', 'postal_code', 'note', 'shipping_method_id']));
     }
 
     public function store(Request $request)
@@ -228,6 +243,14 @@ class CheckoutController extends Controller
             ]
         );
 
+        // Pelanggan yang belum punya buku alamat: alamat checkout pertama otomatis disimpan sebagai alamat utama.
+        if (! $customer->addresses()->exists()) {
+            $customer->addresses()->create([
+                'label' => 'Alamat utama', 'recipient_name' => $data['name'], 'phone' => $data['phone'], 'address' => $data['address'],
+                'province_id' => $province->id, 'city_id' => $city->id, 'postal_code' => $data['postal_code'], 'is_default' => true,
+            ]);
+        }
+
         // Kuota & harga promo diverifikasi ulang dengan baris item promo terkunci (aman dari checkout bersamaan).
         app(\App\Services\FlashSaleService::class)->reserve($cart);
 
@@ -251,6 +274,10 @@ class CheckoutController extends Controller
         }
         $shippingCost = $quote['cost'] ?? 0;
 
+        // Snapshot PPN (harga sudah termasuk PPN): 0 bila PPN tidak dipakai, supaya invoice lama tidak ikut berubah bila pengaturan diganti.
+        $taxRate = app(\App\Services\ProfitLossService::class)->taxRate() ?? 0.0;
+        $taxAmount = $taxRate > 0 ? round(($subtotal - $discount) * $taxRate / (100 + $taxRate), 2) : 0.0;
+
         $order = Order::create([
             'order_number' => Order::generateOrderNumber(),
             'idempotency_key' => $key,
@@ -259,6 +286,8 @@ class CheckoutController extends Controller
             'status' => 'menunggu_bayar',
             'subtotal' => $subtotal,
             'discount' => $discount,
+            'tax_rate' => $taxRate,
+            'tax_amount' => $taxAmount,
             'voucher_id' => $voucher?->id,
             'voucher_code' => $voucher?->code,
             'shipping_cost' => $shippingCost,

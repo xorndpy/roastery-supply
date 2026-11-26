@@ -95,7 +95,7 @@
         {{-- Address --}}
         @php $customer = auth()->user()->customer; @endphp
         <div class="bg-white p-6 rounded-lg border border-stone-200">
-            <h2 class="font-bold mb-4">Alamat Pengiriman</h2>
+            <div class="mb-4 flex items-center justify-between gap-3"><h2 class="font-bold">Alamat Pengiriman</h2><a href="{{ route('customer.addresses.index') }}" class="text-sm font-medium text-copper-700 hover:underline">Kelola buku alamat</a></div>
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium mb-1.5">Alamat Lengkap</label>
