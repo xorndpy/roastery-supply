@@ -100,6 +100,12 @@
                     <span>Total</span>
                     <span class="text-copper-500">Rp {{ number_format($order->total, 0, ',', '.') }}</span>
                 </div>
+                @if($order->ppn_rate)
+                    <div class="flex justify-between text-sm text-stone-600">
+                        <span>Sudah termasuk PPN {{ rtrim(rtrim(number_format($order->ppn_rate, 2, ',', ''), '0'), ',') }}%</span>
+                        <span>Rp {{ number_format($order->ppn_amount, 0, ',', '.') }}</span>
+                    </div>
+                @endif
             </div>
             @endcan
         </div>

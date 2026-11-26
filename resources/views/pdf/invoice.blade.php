@@ -146,7 +146,7 @@
                 <tr><td>Ongkir{{ $order->shipping_method ? ' (' . $order->shipping_method . ($order->shipping_etd ? ', ' . $order->shipping_etd : '') . ')' : '' }}</td><td class="right">{{ $rp($order->shipping_cost) }}</td></tr>
                 <tr class="grand"><td>Total</td><td class="right">{{ $rp($order->total) }}</td></tr>
                 @if($taxRate)
-                    <tr><td class="muted" style="font-size:9.5px;">Sudah termasuk PPN {{ rtrim(rtrim(number_format($taxRate, 2, ',', ''), '0'), ',') }}%</td><td class="right muted" style="font-size:9.5px;">{{ $rp($ppnIncluded) }}</td></tr>
+                    <tr><td style="font-size:10.5px;color:#44403c;padding-top:6px;">Sudah termasuk PPN {{ rtrim(rtrim(number_format($taxRate, 2, ',', ''), '0'), ',') }}%</td><td class="right" style="font-size:10.5px;color:#44403c;padding-top:6px;">{{ $rp($ppnIncluded) }}</td></tr>
                 @endif
             </table>
         </td>

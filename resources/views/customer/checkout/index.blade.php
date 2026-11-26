@@ -249,6 +249,13 @@
                             <span class="font-bold">Total</span>
                             <span class="whitespace-nowrap text-lg font-bold text-copper-500" x-text="rp(total)">Rp {{ number_format($grandTotal, 0, ',', '.') }}</span>
                         </div>
+                        @php
+                            $ppnRate = app(\App\Services\ProfitLossService::class)->taxRate();
+                            $ppnAmount = $ppnRate ? round(($total - $discount) * $ppnRate / (100 + $ppnRate), 2) : 0;
+                        @endphp
+                        @if($ppnRate)
+                            <div class="flex justify-between gap-3 text-sm text-stone-600"><span>Sudah termasuk PPN {{ rtrim(rtrim(number_format($ppnRate, 2, ',', ''), '0'), ',') }}%</span><span class="whitespace-nowrap">Rp {{ number_format($ppnAmount, 0, ',', '.') }}</span></div>
+                        @endif
                     </div>
 
                     <button type="submit"

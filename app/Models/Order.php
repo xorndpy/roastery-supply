@@ -254,6 +254,33 @@ class Order extends Model
      * Nomor invoice: INV/[YYYYMM]/[NUMBER], diturunkan dari nomor order
      * (ORD-20260115-0042 -> INV/202601/0042).
      */
+    /**
+     * Tarif PPN pesanan (harga sudah termasuk PPN). Memakai snapshot saat pesanan dibuat;
+     * pesanan lama tanpa snapshot memakai tarif pengaturan saat ini. Null bila PPN tidak dipakai.
+     */
+    public function getPpnRateAttribute(): ?float
+    {
+        if ($this->tax_rate !== null) {
+            return (float) $this->tax_rate > 0 ? (float) $this->tax_rate : null;
+        }
+
+        return app(\App\Services\ProfitLossService::class)->taxRate();
+    }
+
+    /** Nilai PPN yang sudah termasuk di dalam harga barang (setelah diskon). Ongkir tidak dihitung. */
+    public function getPpnAmountAttribute(): float
+    {
+        $rate = $this->ppn_rate;
+        if (! $rate) {
+            return 0.0;
+        }
+        if ($this->tax_rate !== null && $this->tax_amount !== null) {
+            return (float) $this->tax_amount;
+        }
+
+        return round(((float) $this->subtotal - (float) $this->discount) * $rate / (100 + $rate), 2);
+    }
+
     public function getInvoiceNumberAttribute(): string
     {
         $parts = explode('-', $this->order_number);
