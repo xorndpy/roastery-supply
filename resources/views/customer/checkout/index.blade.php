@@ -271,7 +271,7 @@
                             class="w-full bg-copper-500 hover:bg-copper-600 text-white py-3 rounded-lg font-medium transition">
                         Buat Pesanan
                     </button>
-                    <x-trust-badges variant="checkout" />
+                    <x-trust-badges />
                 </div>
             </div>
         </div>

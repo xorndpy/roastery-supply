@@ -75,8 +75,6 @@
         </div>
     </div>
 
-    <x-trust-badges />
-
     <div class="border-t border-stone-200">
         <div class="container-x flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-5 text-xs text-stone-600">
             <span>&copy; {{ date('Y') }} {{ $site['site_name'] }}. Seluruh hak cipta dilindungi.@if(!empty($site['company_npwp'])) <span class="whitespace-nowrap">&middot; NPWP {{ $site['company_npwp'] }}</span>@endif</span>

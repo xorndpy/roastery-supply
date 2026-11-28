@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Notifications\MailTestNotification;
-use App\Services\ReturnService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
@@ -38,12 +37,11 @@ class EmailAndTrustTest extends TestCase
         $this->assertStringContainsString('Uji pengiriman email', (new MailTestNotification)->toMail(new \Illuminate\Notifications\AnonymousNotifiable)->subject);
     }
 
-    public function test_footer_menampilkan_blok_kepercayaan(): void
+    public function test_footer_ringkas_tanpa_strip_tetap_menautkan_kebijakan(): void
     {
         $this->get(route('home'))
             ->assertOk()
-            ->assertSee('Garansi tercatat per unit')
-            ->assertSee('Retur ' . ReturnService::WINDOW_DAYS . ' hari')
-            ->assertSee('Pantau pengiriman');
+            ->assertDontSee('Garansi tercatat per unit')
+            ->assertSee(route('legal.returns'), false);
     }
 }
