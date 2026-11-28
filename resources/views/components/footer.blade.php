@@ -79,7 +79,7 @@
 
     <div class="border-t border-stone-200">
         <div class="container-x flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-5 text-xs text-stone-600">
-            <span>&copy; {{ date('Y') }} {{ $site['site_name'] }}. Seluruh hak cipta dilindungi.</span>
+            <span>&copy; {{ date('Y') }} {{ $site['site_name'] }}. Seluruh hak cipta dilindungi.@if(!empty($site['company_npwp'])) <span class="whitespace-nowrap">&middot; NPWP {{ $site['company_npwp'] }}</span>@endif</span>
             <nav aria-label="Kebijakan" class="flex flex-wrap gap-x-5 gap-y-1">
                 <a href="{{ route('legal.privacy') }}" class="hover:text-copper-600 hover:underline">Kebijakan Privasi</a>
                 <a href="{{ route('legal.terms') }}" class="hover:text-copper-600 hover:underline">Syarat &amp; Ketentuan</a>
