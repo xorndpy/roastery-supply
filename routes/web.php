@@ -92,7 +92,6 @@ Route::get('/tentang', [HomeController::class, 'about'])->name('about');
 Route::get('/faq', [HomeController::class, 'faq'])->name('faq');
 Route::get('/kebijakan-privasi', [LegalController::class, 'privacy'])->name('legal.privacy');
 Route::get('/syarat-ketentuan', [LegalController::class, 'terms'])->name('legal.terms');
-Route::get('/kebijakan-retur-garansi', [LegalController::class, 'returns'])->name('legal.returns');
 Route::get('/kontak', [ContactController::class, 'index'])->name('contact.index');
 Route::post('/kontak', [ContactController::class, 'store'])->middleware('throttle:5,10')->name('contact.send');
 Route::get('/cabang', [HomeController::class, 'branches'])->name('branches.index');

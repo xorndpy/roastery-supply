@@ -38,7 +38,6 @@ class SitemapController extends Controller
         $add(route('branches.index'), null, 'monthly', '0.4');
         $add(route('legal.privacy'), null, 'yearly', '0.2');
         $add(route('legal.terms'), null, 'yearly', '0.2');
-        $add(route('legal.returns'), null, 'yearly', '0.2');
 
         // Kategori yang punya produk aktif
         Category::query()->active()

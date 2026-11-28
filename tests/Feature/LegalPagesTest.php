@@ -13,8 +13,9 @@ class LegalPagesTest extends TestCase
     public function test_halaman_kebijakan_dapat_dibuka(): void
     {
         $this->get(route('legal.privacy'))->assertOk()->assertSee('Kebijakan Privasi')->assertSee('Hak Anda');
-        $this->get(route('legal.terms'))->assertOk()->assertSee('Syarat &amp; Ketentuan', false)->assertSee('24 jam');
-        $this->get(route('legal.returns'))->assertOk()->assertSee('Kebijakan Retur')->assertSee(ReturnService::WINDOW_DAYS . ' hari');
+        $this->get(route('legal.terms'))->assertOk()->assertSee('Syarat &amp; Ketentuan', false)->assertSee('24 jam')
+            ->assertSee('Retur, garansi, dan servis')->assertSee(ReturnService::WINDOW_DAYS . ' hari');
+        $this->get('/kebijakan-retur-garansi')->assertNotFound();
     }
 
     public function test_footer_menautkan_ke_halaman_kebijakan(): void
@@ -22,8 +23,7 @@ class LegalPagesTest extends TestCase
         $this->get(route('home'))
             ->assertOk()
             ->assertSee(route('legal.privacy'), false)
-            ->assertSee(route('legal.terms'), false)
-            ->assertSee(route('legal.returns'), false);
+            ->assertSee(route('legal.terms'), false);
     }
 
     public function test_pendaftaran_wajib_menyetujui_syarat(): void

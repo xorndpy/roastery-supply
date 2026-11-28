@@ -42,6 +42,6 @@ class EmailAndTrustTest extends TestCase
         $this->get(route('home'))
             ->assertOk()
             ->assertDontSee('Garansi tercatat per unit')
-            ->assertSee(route('legal.returns'), false);
+            ->assertSee(route('legal.terms'), false);
     }
 }

@@ -18,12 +18,7 @@ class LegalController extends Controller
 
     public function terms()
     {
-        return view('customer.legal.terms', ['updated' => self::UPDATED]);
-    }
-
-    public function returns()
-    {
-        return view('customer.legal.returns', [
+        return view('customer.legal.terms', [
             'updated' => self::UPDATED,
             'returnDays' => ReturnService::WINDOW_DAYS,
         ]);

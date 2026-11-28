@@ -18,8 +18,7 @@
 @if($npwp)<p style="margin: 0 0 4px; font-size: 12px;">NPWP: {{ $npwp }}</p>@endif
 <p style="margin: 10px 0 0; font-size: 12px;">
 <a href="{{ route('legal.privacy') }}">Kebijakan Privasi</a> &middot;
-<a href="{{ route('legal.terms') }}">Syarat &amp; Ketentuan</a> &middot;
-<a href="{{ route('legal.returns') }}">Retur &amp; Garansi</a>
+<a href="{{ route('legal.terms') }}">Syarat &amp; Ketentuan</a>
 </p>
 <p style="margin: 10px 0 0; font-size: 11px;">Email ini dikirim otomatis terkait akun atau pesanan Anda di {{ $siteName }}.</p>
 </td>

@@ -4,8 +4,9 @@
 @section('description', 'Ketentuan penggunaan situs, pemesanan, pembayaran, dan pengiriman di ' . ($site['site_name'] ?? '') . '.')
 
 @section('content')
+@php $warrantyMonths = (int) ($site['warranty_default_months'] ?? 12); @endphp
 <x-legal-page title="Syarat & Ketentuan" :updated="$updated"
-    lead="Dengan mendaftar, masuk, atau memesan di situs ini, Anda menyatakan telah membaca dan menyetujui syarat berikut, serta Kebijakan Privasi dan Kebijakan Retur & Garansi kami."
+    lead="Dengan mendaftar, masuk, atau memesan di situs ini, Anda menyatakan telah membaca dan menyetujui syarat berikut, serta Kebijakan Privasi kami."
     :toc="['akun' => 'Akun', 'harga' => 'Produk, harga, dan PPN', 'pesanan' => 'Pemesanan dan pembayaran', 'pengiriman' => 'Pengiriman', 'purnajual' => 'Retur, garansi, dan servis', 'penggunaan' => 'Penggunaan situs', 'hki' => 'Hak kekayaan intelektual', 'tanggung' => 'Batasan tanggung jawab', 'perubahan' => 'Perubahan syarat', 'hukum' => 'Hukum dan penyelesaian sengketa']">
 
     <h2 id="akun">1. Akun</h2>
@@ -42,7 +43,25 @@
     </ul>
 
     <h2 id="purnajual">5. Retur, garansi, dan servis</h2>
-    <p>Ketentuan lengkapnya ada di <a href="{{ route('legal.returns') }}">Kebijakan Retur &amp; Garansi</a>, dan menjadi bagian dari syarat ini.</p>
+    <h3>Retur</h3>
+    <div class="legal-note">Pengajuan retur dibuka <strong>{{ $returnDays }} hari</strong> sejak pesanan berstatus Selesai, dan hanya satu kali per pesanan.</div>
+    <ul>
+        <li>Alasan yang dapat diajukan: barang rusak saat diterima, tidak sesuai pesanan, cacat atau tidak berfungsi, atau alasan lain yang kami tinjau satu per satu.</li>
+        <li>Cara mengajukan: masuk ke akun, buka menu <strong>Retur</strong>, pilih pesanan, tulis alasan (minimal 10 karakter), unggah 1 sampai 3 foto bukti (JPG, PNG, atau WebP, maksimal 4 MB per foto), lalu isi rekening tujuan pengembalian dana. Foto disimpan privat.</li>
+        <li>Hasil tinjauan kami sampaikan lewat email dan notifikasi di akun. Bila disetujui, dana dikembalikan ke rekening yang Anda isi sesuai nilai yang disetujui, dan kami dapat meminta barang dikembalikan untuk diperiksa. Bila ditolak, kami sertakan alasannya.</li>
+    </ul>
+
+    <h3>Garansi</h3>
+    <ul>
+        <li>Setiap unit pada pesanan yang selesai otomatis dicatat garansinya di menu <strong>Garansi &amp; Servis</strong> pada akun Anda.</li>
+        <li>Masa garansi dihitung sejak tanggal pesanan selesai dan mengikuti produknya. Bila tidak ditentukan khusus, masa garansi bawaan adalah <strong>{{ $warrantyMonths }} bulan</strong>. Produk yang tidak bergaransi ditandai pada halaman produknya.</li>
+    </ul>
+
+    <h3>Servis</h3>
+    <p>Ajukan tiket servis dari menu <strong>Garansi &amp; Servis</strong>, jelaskan keluhannya, lalu pantau perkembangannya di halaman tiket. Bila masa garansi sudah habis atau kerusakan di luar cakupan garansi, servis dapat dikenakan biaya yang kami sampaikan sebelum pekerjaan dimulai.</p>
+
+    <h3>Hal yang tidak ditanggung</h3>
+    <p>Retur dan garansi tidak berlaku bila pengajuan melewati batas waktu, kerusakan disebabkan pemakaian tidak wajar, kelalaian, atau kecelakaan setelah barang diterima, unit dibongkar atau diperbaiki pihak lain tanpa sepengetahuan kami, atau kerusakan berasal dari kondisi di luar spesifikasi pemakaian (misalnya tegangan listrik atau kualitas air yang tidak sesuai).</p>
 
     <h2 id="penggunaan">6. Penggunaan situs</h2>
     <ul>

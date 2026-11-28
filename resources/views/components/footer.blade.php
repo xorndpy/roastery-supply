@@ -81,7 +81,6 @@
             <nav aria-label="Kebijakan" class="flex flex-wrap gap-x-5 gap-y-1">
                 <a href="{{ route('legal.privacy') }}" class="hover:text-copper-600 hover:underline">Kebijakan Privasi</a>
                 <a href="{{ route('legal.terms') }}" class="hover:text-copper-600 hover:underline">Syarat &amp; Ketentuan</a>
-                <a href="{{ route('legal.returns') }}" class="hover:text-copper-600 hover:underline">Retur &amp; Garansi</a>
                 <button type="button" data-koff-open hidden class="hover:text-copper-600 hover:underline">Pengaturan cookie</button>
             </nav>
         </div>
