@@ -210,7 +210,7 @@ class OrderFlowTest extends TestCase
     private function checkoutPayload(string $key): array
     {
         return [
-            'idempotency_key' => $key, 'name' => 'Budi', 'phone' => '0812', 'address' => 'Jl. Kopi 1',
+            'terms' => '1', 'idempotency_key' => $key, 'name' => 'Budi', 'phone' => '0812', 'address' => 'Jl. Kopi 1',
             'province_id' => $this->region()[0]->id, 'city_id' => $this->region()[1]->id, 'postal_code' => '40111',
         ];
     }

@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Order;
+use App\Models\Setting;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -24,25 +25,40 @@ class OrderPlaced extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         $order = $this->order->loadMissing('items');
-        $mail = (new MailMessage)
+        $rp = fn ($n) => 'Rp ' . number_format((float) $n, 0, ',', '.');
+        // Tanda | dan baris baru dibuang dari nama produk supaya tabel markdown tidak rusak.
+        $clean = fn ($t) => trim(str_replace(['|', "\r", "\n"], ['/', ' ', ' '], (string) $t));
+
+        $items = $order->items->map(fn ($i) => [
+            'name' => $clean($i->product_name),
+            'qty' => (int) $i->quantity,
+            'subtotal' => $rp($i->subtotal),
+        ])->all();
+
+        $totals = [['Subtotal', $rp($order->subtotal)]];
+        if ((float) $order->discount > 0) {
+            $totals[] = ['Diskon', '- ' . $rp($order->discount)];
+        }
+        $totals[] = ['Ongkos kirim' . ($order->shipping_method ? ' (' . $clean($order->shipping_method) . ')' : ''), $rp($order->shipping_cost)];
+        $totals[] = ['**Total**', '**' . $rp($order->total) . '**'];
+        if ($order->ppn_rate) {
+            $rate = rtrim(rtrim(number_format($order->ppn_rate, 2, ',', ''), '0'), ',');
+            $totals[] = ["Sudah termasuk PPN {$rate}%", $rp($order->ppn_amount)];
+        }
+
+        return (new MailMessage)
             ->subject("[{$order->order_number}] Pesanan diterima")
-            ->greeting('Halo ' . ($notifiable->name ?? '') . ',')
-            ->line('Terima kasih, pesanan kamu sudah kami terima.')
-            ->line('Nomor pesanan: ' . $order->order_number);
-
-        foreach ($order->items->take(10) as $item) {
-            $mail->line('• ' . $item->product_name . ' × ' . $item->quantity);
-        }
-        if ($order->items->count() > 10) {
-            $mail->line('dan ' . ($order->items->count() - 10) . ' produk lainnya.');
-        }
-
-        $mail->line('Total: Rp ' . number_format($order->total, 0, ',', '.'));
-
-        if ($order->payment_deadline) {
-            $mail->line('Mohon selesaikan pembayaran sebelum ' . wib($order->payment_deadline, 'd M Y, H:i', true) . '.');
-        }
-
-        return $mail->action('Lihat pesanan', route('customer.orders.show', $order->order_number));
+            ->markdown('emails.orders.placed', [
+                'order' => $order,
+                'name' => $notifiable->name ?? '',
+                'siteName' => Setting::get('site_name', config('app.name')),
+                'items' => $items,
+                'totals' => $totals,
+                'deadline' => $order->payment_deadline ? wib($order->payment_deadline, 'd M Y, H:i', true) : null,
+                'recipient' => $clean($order->shipping_name) . ($order->shipping_phone ? ' (' . $clean($order->shipping_phone) . ')' : ''),
+                'address' => $clean($order->full_shipping_address),
+                'url' => route('customer.orders.show', $order->order_number),
+                'total' => $rp($order->total),
+            ]);
     }
 }

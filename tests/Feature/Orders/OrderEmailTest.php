@@ -52,7 +52,7 @@ class OrderEmailTest extends TestCase
         return $this->actingAs($user)
             ->withSession(['cart' => [$p->id => ['id' => $p->id, 'name' => $p->name, 'slug' => $p->slug, 'sku' => $p->sku, 'price' => $p->price, 'quantity' => 2, 'weight' => 1000, 'image' => null, 'stock' => $p->stock]], 'checkout_key' => 'k1'])
             ->post(route('customer.checkout.store'), [
-                'idempotency_key' => 'k1', 'name' => 'Budi', 'phone' => '0812', 'address' => 'Jl. Kopi 1',
+                'terms' => '1', 'idempotency_key' => 'k1', 'name' => 'Budi', 'phone' => '0812', 'address' => 'Jl. Kopi 1',
                 'province_id' => $prov->id, 'city_id' => $city->id, 'postal_code' => '40111',
             ]);
     }
@@ -162,6 +162,12 @@ class OrderEmailTest extends TestCase
         $this->assertStringContainsString('Mohon selesaikan pembayaran sebelum', $html);
         $this->assertStringContainsString('&lt;b&gt;Grinder&lt;/b&gt;', $html); // nama produk di-escape
         $this->assertStringContainsString(route('customer.orders.show', 'ORD-20261112-0001'), $html);
+        // Email berbranding: rincian, alamat kirim, footer toko dengan tautan kebijakan, bahasa baku ("Anda").
+        $this->assertStringContainsString('Rincian pesanan', $html);
+        $this->assertStringContainsString('Dikirim ke', $html);
+        $this->assertStringContainsString('Jl. Kopi 1', $html);
+        $this->assertStringContainsString(route('legal.privacy'), $html);
+        $this->assertStringNotContainsString('kamu', $html);
 
         $new = (new NewOrderAlert($order, 'baru'))->toMail(new AnonymousNotifiable());
         $this->assertStringContainsString('[Pesanan baru]', $new->subject);

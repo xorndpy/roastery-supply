@@ -258,10 +258,20 @@
                         @endif
                     </div>
 
+                    <div class="mb-4">
+                        <label for="terms" class="flex cursor-pointer items-start gap-2.5 text-sm text-stone-700">
+                            <input id="terms" type="checkbox" name="terms" value="1" required @checked(old('terms'))
+                                   class="mt-0.5 h-5 w-5 shrink-0 rounded border-stone-400 text-copper-500 focus:ring-copper-500">
+                            <span>Saya menyetujui <a href="{{ route('legal.terms') }}" target="_blank" rel="noopener" class="font-medium text-copper-700 underline">Syarat &amp; Ketentuan</a> dan <a href="{{ route('legal.returns') }}" target="_blank" rel="noopener" class="font-medium text-copper-700 underline">Kebijakan Retur &amp; Garansi</a>.</span>
+                        </label>
+                        @error('terms') <p class="text-red-600 text-xs mt-1.5" role="alert">{{ $message }}</p> @enderror
+                    </div>
+
                     <button type="submit"
                             class="w-full bg-copper-500 hover:bg-copper-600 text-white py-3 rounded-lg font-medium transition">
                         Buat Pesanan
                     </button>
+                    <x-trust-badges variant="checkout" />
                 </div>
             </div>
         </div>

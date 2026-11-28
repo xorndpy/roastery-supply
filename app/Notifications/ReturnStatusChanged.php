@@ -24,12 +24,12 @@ class ReturnStatusChanged extends Notification
 
         [$subject, $lines] = match ($this->event) {
             'approved' => ['Pengajuan retur disetujui', [
-                'Pengajuan retur kamu disetujui.',
-                'Refund sebesar Rp ' . number_format($r->refund_amount, 0, ',', '.') . ' akan ditransfer ke rekening yang kamu cantumkan.',
+                'Pengajuan retur Anda disetujui.',
+                'Refund sebesar Rp ' . number_format($r->refund_amount, 0, ',', '.') . ' akan ditransfer ke rekening yang Anda cantumkan.',
             ]],
-            'rejected' => ['Pengajuan retur ditolak', array_filter(['Pengajuan retur kamu belum dapat kami setujui.', $r->note ? 'Alasan: ' . $r->note : null])],
-            'refunded' => ['Refund sudah ditransfer', ['Refund sebesar Rp ' . number_format($r->refund_amount, 0, ',', '.') . ' sudah kami transfer ke rekening kamu.']],
-            default    => ['Update retur', ['Status retur kamu berubah.']],
+            'rejected' => ['Pengajuan retur ditolak', array_filter(['Pengajuan retur Anda belum dapat kami setujui.', $r->note ? 'Alasan: ' . $r->note : null])],
+            'refunded' => ['Refund sudah ditransfer', ['Refund sebesar Rp ' . number_format($r->refund_amount, 0, ',', '.') . ' sudah kami transfer ke rekening Anda.']],
+            default    => ['Update retur', ['Status retur Anda berubah.']],
         };
 
         $mail = (new MailMessage)->subject("[{$order->order_number}] {$subject}")->greeting('Halo ' . ($notifiable->name ?? '') . ',');

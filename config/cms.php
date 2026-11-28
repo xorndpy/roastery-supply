@@ -100,6 +100,8 @@ return [
         'SEO' => [
             'meta_title'       => ['label' => 'Meta Title', 'type' => 'text', 'max' => 70],
             'meta_description' => ['label' => 'Meta Description', 'type' => 'textarea', 'max' => 170, 'rows' => 2],
+            'og_image'         => ['label' => 'Gambar pratinjau tautan', 'type' => 'image', 'ratio' => '1200/630',
+                'help' => 'Tampil saat tautan situs dibagikan lewat WhatsApp, Facebook, dll. Disarankan 1200 x 630 px. Kosongkan untuk memakai logo.'],
         ],
     ],
 ];

@@ -22,5 +22,8 @@
         
         <span>Lanjutkan dengan Google</span>
     </a>
+    <p class="mt-3 text-center text-xs leading-relaxed text-stone-600">
+        Dengan melanjutkan, Anda menyetujui <a href="{{ route('legal.terms') }}" class="underline hover:text-copper-700">Syarat &amp; Ketentuan</a> dan <a href="{{ route('legal.privacy') }}" class="underline hover:text-copper-700">Kebijakan Privasi</a>.
+    </p>
 </div>
 @endif

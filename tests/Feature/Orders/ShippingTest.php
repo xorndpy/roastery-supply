@@ -69,7 +69,7 @@ class ShippingTest extends TestCase
     private function payload(City $city, array $over = []): array
     {
         return array_merge([
-            'idempotency_key' => 'k1', 'name' => 'Budi', 'phone' => '0812', 'address' => 'Jl. Kopi 1',
+            'terms' => '1', 'idempotency_key' => 'k1', 'name' => 'Budi', 'phone' => '0812', 'address' => 'Jl. Kopi 1',
             'province_id' => $city->province_id, 'city_id' => $city->id, 'postal_code' => '40111',
         ], $over);
     }
@@ -278,7 +278,7 @@ class ShippingTest extends TestCase
 
         // sudah ada tarif -> layanan wajib dipilih
         $this->rate($this->method(), $prov);
-        $this->checkout($user, $p, $this->payload($city, ['idempotency_key' => 'k2']), 1, ['checkout_key' => 'k2'])->assertSessionHasErrors('shipping_method_id');
+        $this->checkout($user, $p, $this->payload($city, ['terms' => '1', 'idempotency_key' => 'k2']), 1, ['checkout_key' => 'k2'])->assertSessionHasErrors('shipping_method_id');
         $this->assertSame(1, Order::count());
     }
 
@@ -330,7 +330,7 @@ class ShippingTest extends TestCase
         $this->assertSame('6000000.00', (string) Order::first()->total);
 
         // dengan voucher 20%: 6 jt - 1,2 jt = 4,8 jt < 5 jt -> ongkir dikenakan
-        $this->checkout($user, $p, $this->payload($city, ['shipping_method_id' => $m->id, 'idempotency_key' => 'k2']), 1, ['checkout_key' => 'k2', 'checkout_voucher' => 'DISKON20']);
+        $this->checkout($user, $p, $this->payload($city, ['shipping_method_id' => $m->id, 'terms' => '1', 'idempotency_key' => 'k2']), 1, ['checkout_key' => 'k2', 'checkout_voucher' => 'DISKON20']);
         $o = Order::latest('id')->first();
         $this->assertSame('1200000.00', (string) $o->discount);
         $this->assertSame('25000.00', (string) $o->shipping_cost);

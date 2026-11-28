@@ -79,7 +79,7 @@ class FlashSaleTest extends TestCase
         $price = $tamperPrice ?? $p->currentPrice();   // seperti add-to-cart: harga yang berlaku saat ini
 
         return $this->actingAs($u)->withSession(['cart' => [$p->id => ['id' => $p->id, 'name' => $p->name, 'slug' => $p->slug, 'sku' => $p->sku, 'price' => $price, 'quantity' => $qty, 'weight' => 1000, 'image' => null, 'stock' => $p->stock]], 'checkout_key' => $key])
-            ->post(route('customer.checkout.store'), ['idempotency_key' => $key, 'name' => 'Budi', 'phone' => '081234567890', 'address' => 'Jl. Kopi 1', 'province_id' => $prov->id, 'city_id' => $city->id, 'postal_code' => '40111']);
+            ->post(route('customer.checkout.store'), ['terms' => '1', 'idempotency_key' => $key, 'name' => 'Budi', 'phone' => '081234567890', 'address' => 'Jl. Kopi 1', 'province_id' => $prov->id, 'city_id' => $city->id, 'postal_code' => '40111']);
     }
 
     // ================= jadwal & kuota =================

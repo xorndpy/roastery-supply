@@ -25,6 +25,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // Di belakang proxy/CDN (Cloudflare, LiteSpeed, dll): percaya X-Forwarded-* agar IP klien & skema HTTPS terbaca benar.
         $middleware->trustProxies(at: '*');
 
+        // Header keamanan + noindex untuk area privat.
+        $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
+
         $middleware->alias([
             'role' => RoleMiddleware::class,
             '2fa' => RequireTwoFactor::class,

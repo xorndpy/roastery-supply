@@ -160,7 +160,9 @@ class CheckoutController extends Controller
             'postal_code' => 'required|digits:5',
             'shipping_method_id' => [Rule::requiredIf(fn () => $this->shipping->configured()), 'nullable', 'string', 'max:60'],
             'note' => 'nullable|string',
+            'terms' => 'accepted',
         ], [
+            'terms.accepted' => 'Centang persetujuan Syarat & Ketentuan sebelum membuat pesanan.',
             'city_id.exists' => 'Kota tidak sesuai dengan provinsi yang dipilih.',
             'postal_code.digits' => 'Kode pos harus 5 digit angka.',
             'shipping_method_id.required' => 'Pilih layanan pengiriman.',

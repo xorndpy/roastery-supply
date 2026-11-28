@@ -5,30 +5,70 @@
     $ga = $ga && preg_match('/^G-[A-Z0-9]{6,12}$/', $ga) ? $ga : null;
     $px = $px && preg_match('/^[0-9]{8,20}$/', $px) ? $px : null;
     // Cloudflare Web Analytics: token dari .env (CF_BEACON_TOKEN), divalidasi sebelum dicetak ke <script>.
+    // Beacon ini tanpa cookie, sehingga tidak memerlukan persetujuan.
     $cf = config('services.cloudflare.beacon_token');
     $cf = $cf && preg_match('/^[A-Za-z0-9]{16,64}$/', $cf) ? $cf : null;
 @endphp
 @if($cf)
     <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "{{ $cf }}"}'></script>
 @endif
-@if($ga)
-    <script async src="https://www.googletagmanager.com/gtag/js?id={{ $ga }}"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){ dataLayer.push(arguments); }
-        gtag('js', new Date());
-        gtag('config', @js($ga));
-    </script>
-@endif
-@if($px)
-    <script>
-        !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
-        fbq('init', @js($px));
-        fbq('track', 'PageView');
-    </script>
-@endif
 <script>
+    // GA4 dan Meta Pixel memasang cookie pelacak, jadi baru dimuat setelah pengunjung menyetujui
+    // lewat banner (komponen cookie-consent). Pilihan disimpan di localStorage ("granted" / "denied").
+    (function () {
+        var KEY = 'koff_consent_v1', GA = @js($ga), PX = @js($px);
+        var consent = {
+            get: function () { try { return localStorage.getItem(KEY); } catch (e) { return null; } },
+            set: function (v) { try { localStorage.setItem(KEY, v); } catch (e) {} }
+        };
+        window.koffConsent = consent;
+        window.koffHasTrackers = !!(GA || PX);
+
+        window.koffLoadTrackers = function () {
+            if (window.__koffTrackers) return;
+            window.__koffTrackers = true;
+            if (GA) {
+                var s = document.createElement('script');
+                s.async = true;
+                s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(GA);
+                document.head.appendChild(s);
+                window.dataLayer = window.dataLayer || [];
+                window.gtag = function () { window.dataLayer.push(arguments); };
+                window.gtag('js', new Date());
+                window.gtag('config', GA);
+            }
+            if (PX) {
+                (function (f, b, e, v, n, t, s) {
+                    if (f.fbq) return;
+                    n = f.fbq = function () { n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments); };
+                    if (!f._fbq) f._fbq = n;
+                    n.push = n; n.loaded = true; n.version = '2.0'; n.queue = [];
+                    t = b.createElement(e); t.async = true; t.src = v;
+                    s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s);
+                })(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+                window.fbq('init', PX);
+                window.fbq('track', 'PageView');
+            }
+        };
+
+        // Hapus cookie pelacak saat pengunjung menolak atau mencabut persetujuan.
+        window.koffClearTrackers = function () {
+            var parts = location.hostname.split('.'), domains = [location.hostname];
+            for (var i = 1; i < parts.length - 1; i++) domains.push('.' + parts.slice(i).join('.'));
+            document.cookie.split(';').forEach(function (c) {
+                var name = c.split('=')[0].trim();
+                if (!/^(_ga|_gid|_gat|_gcl|_fbp|_fbc)/.test(name)) return;
+                var gone = name + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+                document.cookie = gone;
+                domains.forEach(function (d) { document.cookie = gone + '; domain=' + d; });
+            });
+        };
+
+        if (consent.get() === 'granted') window.koffLoadTrackers();
+    })();
+
     // Helper event: window.track('view_item' | 'add_to_cart' | 'generate_lead', { name, value, id })
+    // Aman dipanggil kapan saja: tidak melakukan apa pun bila pelacak belum dimuat.
     window.track = function (event, p) {
         p = p || {};
         try {

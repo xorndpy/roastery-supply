@@ -115,4 +115,16 @@ return [
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Tema email markdown
+    |--------------------------------------------------------------------------
+    | Tema KOFFLINE: resources/views/vendor/mail/html/themes/koffline.css
+    */
+
+    'markdown' => [
+        'theme' => env('MAIL_MARKDOWN_THEME', 'koffline'),
+        'paths' => [resource_path('views/vendor/mail')],
+    ],
+
 ];

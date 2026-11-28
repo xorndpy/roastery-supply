@@ -61,6 +61,18 @@
                     </p>
                 </x-auth-input>
 
+                <div>
+                    <label for="terms" class="inline-flex min-h-[44px] cursor-pointer items-start gap-2.5 text-sm text-stone-700">
+                        <input id="terms" type="checkbox" name="terms" value="1" required @checked(old('terms'))
+                               aria-describedby="terms-error"
+                               class="mt-0.5 h-5 w-5 shrink-0 rounded border-stone-400 text-copper-500 focus:ring-copper-500">
+                        <span>Saya menyetujui <a href="{{ route('legal.terms') }}" target="_blank" rel="noopener" class="font-medium text-copper-700 underline">Syarat &amp; Ketentuan</a> dan <a href="{{ route('legal.privacy') }}" target="_blank" rel="noopener" class="font-medium text-copper-700 underline">Kebijakan Privasi</a>.</span>
+                    </label>
+                    @error('terms')
+                        <p id="terms-error" class="auth-error" role="alert">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <x-turnstile />
 
                 <button type="submit" class="auth-btn group" :disabled="loading" :aria-busy="loading.toString()">

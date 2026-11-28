@@ -361,7 +361,7 @@ class FinanceTest extends TestCase
         $this->actingAs($user)
             ->withSession(['cart' => [$withCost->id => $line($withCost, 2), $noCost->id => $line($noCost, 1)], 'checkout_key' => 'k1'])
             ->post(route('customer.checkout.store'), [
-                'idempotency_key' => 'k1', 'name' => 'Budi', 'phone' => '0812', 'address' => 'Jl. Kopi 1',
+                'terms' => '1', 'idempotency_key' => 'k1', 'name' => 'Budi', 'phone' => '0812', 'address' => 'Jl. Kopi 1',
                 'province_id' => $prov->id, 'city_id' => $city->id, 'postal_code' => '40111',
             ])->assertSessionHasNoErrors();
 

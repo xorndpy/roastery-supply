@@ -1,2 +1,17 @@
+# Halaman privat tidak perlu masuk hasil pencarian.
 User-agent: *
-Disallow:
+Disallow: /admin
+Disallow: /customer/
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /verify-email
+Disallow: /confirm-password
+Disallow: /two-factor
+Disallow: /auth/
+Disallow: /webhooks/
+Disallow: /bandingkan
+
+# GANTI domain di bawah ini bila alamat situs berubah.
+Sitemap: https://www.koffline.my.id/sitemap.xml

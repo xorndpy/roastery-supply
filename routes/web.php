@@ -22,6 +22,8 @@ use Illuminate\Support\Facades\Route;
 // Public / Web
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Web\HomeController;
+use App\Http\Controllers\Web\LegalController;
+use App\Http\Controllers\Web\SitemapController;
 use App\Http\Controllers\Web\KatalogController;
 use App\Http\Controllers\Web\CartController;
 use App\Http\Controllers\Web\CheckoutController;
@@ -88,9 +90,13 @@ Route::post('/produk/{slug}/penawaran', [\App\Http\Controllers\Web\QuoteControll
 Route::post('/produk/{slug}/ulasan', [\App\Http\Controllers\Web\ReviewController::class, 'store'])->middleware(['auth', 'throttle:10,1'])->name('products.review');
 Route::get('/tentang', [HomeController::class, 'about'])->name('about');
 Route::get('/faq', [HomeController::class, 'faq'])->name('faq');
+Route::get('/kebijakan-privasi', [LegalController::class, 'privacy'])->name('legal.privacy');
+Route::get('/syarat-ketentuan', [LegalController::class, 'terms'])->name('legal.terms');
+Route::get('/kebijakan-retur-garansi', [LegalController::class, 'returns'])->name('legal.returns');
 Route::get('/kontak', [ContactController::class, 'index'])->name('contact.index');
 Route::post('/kontak', [ContactController::class, 'store'])->middleware('throttle:5,10')->name('contact.send');
 Route::get('/cabang', [HomeController::class, 'branches'])->name('branches.index');
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 
 
 // =========================================================================

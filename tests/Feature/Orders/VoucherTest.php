@@ -61,7 +61,7 @@ class VoucherTest extends TestCase
 
     private function payload(string $key = 'k1'): array
     {
-        return ['idempotency_key' => $key, 'name' => 'Budi', 'phone' => '0812', 'address' => 'Jl. Kopi 1', 'province_id' => $this->region()[0]->id, 'city_id' => $this->region()[1]->id, 'postal_code' => '40111'];
+        return ['terms' => '1', 'idempotency_key' => $key, 'name' => 'Budi', 'phone' => '0812', 'address' => 'Jl. Kopi 1', 'province_id' => $this->region()[0]->id, 'city_id' => $this->region()[1]->id, 'postal_code' => '40111'];
     }
 
     private function checkout(User $user, Product $p, ?string $code, int $qty = 1, string $key = 'k1')

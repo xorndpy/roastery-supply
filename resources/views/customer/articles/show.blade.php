@@ -1,6 +1,9 @@
 @extends('layouts.insight')
 
 @section('title', $article->title)
+@section('description', \Illuminate\Support\Str::limit(strip_tags((string) ($article->excerpt ?: $article->body)), 155, ''))
+@section('og_type', 'article')
+@section('og_image', $article->cover_image ? media_url($article->cover_image) : '')
 
 @section('content')
 <article class="container-x py-10 sm:py-14">
